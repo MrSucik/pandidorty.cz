@@ -1,12 +1,15 @@
-// app.config.ts
-import { defineConfig } from "@tanstack/start/config";
+import { defineConfig } from '@tanstack/react-start/config'
+import tsConfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
-	server: {
-		preset: "node-server",
-	},
-});
-
-// Or you can use the --preset flag with the build command
-// to specify the deployment target when building the application:
-// npm run build --preset node-server
+  tsr: {
+    appDirectory: 'src',
+  },
+  vite: {
+    plugins: [
+      tsConfigPaths({
+        projects: ['./tsconfig.json'],
+      }),
+    ],
+  },
+})
