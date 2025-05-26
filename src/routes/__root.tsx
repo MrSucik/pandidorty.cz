@@ -7,6 +7,7 @@ import {
   useLocation,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import type { ReactNode, MouseEvent } from 'react'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
@@ -14,6 +15,16 @@ import { NotFound } from '~/components/NotFound'
 import { Footer } from '~/components/Footer'
 import appCss from '~/styles/app.css?url'
 import { seo } from '~/utils/seo'
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+})
 
 export const Route = createRootRoute({
   head: () => ({
@@ -70,11 +81,13 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <RootDocument>
-      <Navigation />
-      <Outlet />
-      <Footer />
-    </RootDocument>
+    <QueryClientProvider client={queryClient}>
+      <RootDocument>
+        <Navigation />
+        <Outlet />
+        <Footer />
+      </RootDocument>
+    </QueryClientProvider>
   )
 }
 
