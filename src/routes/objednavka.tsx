@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { addDays, format } from "date-fns";
 import { z } from "zod";
 
@@ -121,7 +121,7 @@ const submitOrder = async (formData: FormData): Promise<OrderResponse> => {
 		body: formData,
 	});
 
-	const result = await response.json() as OrderResponse;
+	const result = (await response.json()) as OrderResponse;
 
 	if (!response.ok) {
 		throw new Error(result.error || "Došlo k chybě při odesílání formuláře.");
@@ -140,7 +140,7 @@ const createZodValidator = (schema: z.ZodSchema<string>) => {
 
 const createConditionalValidator = (
 	condition: () => boolean,
-	validator: (value: string) => string | undefined
+	validator: (value: string) => string | undefined,
 ) => {
 	return ({ value }: { value: string }) => {
 		if (condition()) {
@@ -196,7 +196,7 @@ function OrderForm() {
 
 			// Create FormData for file upload
 			const formData = new FormData();
-			
+
 			// Add all form fields with proper type checking
 			for (const [key, val] of Object.entries(value)) {
 				if (key === "photos" && val instanceof FileList) {
@@ -518,7 +518,7 @@ function OrderForm() {
 																	return "Počet porcí je povinný při objednávce dortu";
 																}
 																return undefined;
-															}
+															},
 														),
 													}}
 												>
@@ -565,7 +565,7 @@ function OrderForm() {
 																	return "Příchuť je povinná při objednávce dortu";
 																}
 																return undefined;
-															}
+															},
 														),
 													}}
 												>
@@ -629,7 +629,7 @@ function OrderForm() {
 																return "Výběr dezertů je povinný při objednávce dezertů";
 															}
 															return undefined;
-														}
+														},
 													),
 												}}
 											>

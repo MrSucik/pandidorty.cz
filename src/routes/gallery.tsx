@@ -7,12 +7,12 @@ export const Route = createFileRoute("/gallery")({
 function Gallery() {
 	// Get all images from 1-199 that exist in the gallery directory
 	const images = Array.from({ length: 199 }, (_, i) => i + 1)
-		.map(num => {
+		.map((num) => {
 			// Skip images #18, #24, and #183 explicitly to maintain the numbering sequence
 			if (num === 18 || num === 24 || num === 183) {
 				return null;
 			}
-			
+
 			const path = `/gallery/${num}.webp`;
 			return path;
 		})
@@ -46,4 +46,4 @@ function Gallery() {
 			</div>
 		</div>
 	);
-} 
+}

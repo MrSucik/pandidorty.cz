@@ -59,12 +59,18 @@ export function Footer({ currentPath }: FooterProps = {}) {
 						<h3 className="font-bold text-lg mb-3 md:mb-4">Menu</h3>
 						<div className="space-y-2 text-black">
 							<p className="text-base">
-								<a href="/" className="hover:text-custom-blue transition-colors">
+								<a
+									href="/"
+									className="hover:text-custom-blue transition-colors"
+								>
 									Domů
 								</a>
 							</p>
 							<p className="text-base">
-								<a href="/cakes" className="hover:text-custom-blue transition-colors">
+								<a
+									href="/cakes"
+									className="hover:text-custom-blue transition-colors"
+								>
 									Nabídka
 								</a>
 							</p>
@@ -77,7 +83,10 @@ export function Footer({ currentPath }: FooterProps = {}) {
 								</a>
 							</p>
 							<p className="text-base">
-								<a href="/gallery" className="hover:text-custom-blue transition-colors">
+								<a
+									href="/gallery"
+									className="hover:text-custom-blue transition-colors"
+								>
 									Galerie
 								</a>
 							</p>
@@ -142,10 +151,11 @@ export function Footer({ currentPath }: FooterProps = {}) {
 
 				<div className="border-t border-black mt-8 md:mt-12 pt-6 md:pt-8 text-center text-black text-sm md:text-base">
 					<p>
-						&copy; {new Date().getFullYear()} Mai Linh Nguyenová. Všechna práva vyhrazena.
+						&copy; {new Date().getFullYear()} Mai Linh Nguyenová. Všechna práva
+						vyhrazena.
 					</p>
 				</div>
 			</div>
 		</footer>
 	);
-} 
+}

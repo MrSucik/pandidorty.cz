@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/")({
 	component: Home,

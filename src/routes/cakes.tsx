@@ -176,7 +176,8 @@ function Cakes() {
 							</div>
 
 							<p className="text-base md:text-lg italic">
-								Cena dortu z bezlepkové mouky je s přirážkou 15 %.<br />
+								Cena dortu z bezlepkové mouky je s přirážkou 15 %.
+								<br />
 								Cena dortu z bezlaktózových surovin je s přirážkou 20 %.
 							</p>
 						</div>
@@ -212,7 +213,9 @@ function Cakes() {
 
 							{/* MINI VĚTRNÍČKY */}
 							<div className="text-center">
-								<h3 className="text-xl md:text-2xl font-bold mb-4">MINI VĚTRNÍČKY</h3>
+								<h3 className="text-xl md:text-2xl font-bold mb-4">
+									MINI VĚTRNÍČKY
+								</h3>
 								<div className="space-y-2 md:space-y-1">
 									<p>karamel</p>
 									<p>pistácie</p>
@@ -225,7 +228,9 @@ function Cakes() {
 
 							{/* TARTALETKY */}
 							<div className="text-center">
-								<h3 className="text-xl md:text-2xl font-bold mb-4">TARTALETKY</h3>
+								<h3 className="text-xl md:text-2xl font-bold mb-4">
+									TARTALETKY
+								</h3>
 								<div className="space-y-2 md:space-y-1">
 									<p>čokoláda</p>
 									<p>čokoláda & karamel</p>
@@ -261,7 +266,9 @@ function Cakes() {
 
 							{/* PANNA COTTA */}
 							<div className="text-center">
-								<h3 className="text-xl md:text-2xl font-bold mb-4">PANNA COTTA</h3>
+								<h3 className="text-xl md:text-2xl font-bold mb-4">
+									PANNA COTTA
+								</h3>
 								<div className="space-y-2 md:space-y-1">
 									<p>vanilka - lesní ovoce</p>
 									<p>kokos - malina</p>
@@ -322,7 +329,9 @@ function Cakes() {
 
 							{/* MINI DORTÍKY */}
 							<div className="text-center">
-								<h3 className="text-xl md:text-2xl font-bold mb-4">MINI DORTÍKY</h3>
+								<h3 className="text-xl md:text-2xl font-bold mb-4">
+									MINI DORTÍKY
+								</h3>
 								<div className="space-y-2 md:space-y-1">
 									<p>příchutě viz dorty</p>
 								</div>
@@ -352,7 +361,9 @@ function Cakes() {
 
 							{/* DORTOVÉ NANUKY */}
 							<div className="text-center">
-								<h3 className="text-xl md:text-2xl font-bold mb-4">DORTOVÉ NANUKY</h3>
+								<h3 className="text-xl md:text-2xl font-bold mb-4">
+									DORTOVÉ NANUKY
+								</h3>
 								<div className="space-y-2 md:space-y-1">
 									<p>vanilka</p>
 									<p>čokoláda</p>
@@ -368,7 +379,9 @@ function Cakes() {
 
 							{/* KREMROLKY */}
 							<div className="text-center">
-								<h3 className="text-xl md:text-2xl font-bold mb-4">KREMROLKY</h3>
+								<h3 className="text-xl md:text-2xl font-bold mb-4">
+									KREMROLKY
+								</h3>
 								<div className="space-y-2 md:space-y-1">
 									<p>vanilka</p>
 									<p>pistácie</p>
@@ -403,7 +416,9 @@ function Cakes() {
 
 							{/* PROFITEROLES */}
 							<div className="text-center">
-								<h3 className="text-xl md:text-2xl font-bold mb-4">PROFITEROLES</h3>
+								<h3 className="text-xl md:text-2xl font-bold mb-4">
+									PROFITEROLES
+								</h3>
 								<div className="space-y-2 md:space-y-1">
 									<p>žloutkový krém</p>
 									<p>vanilka</p>
@@ -440,7 +455,9 @@ function Cakes() {
 
 							{/* MINI PAVLOVA */}
 							<div className="text-center">
-								<h3 className="text-xl md:text-2xl font-bold mb-4">MINI PAVLOVA</h3>
+								<h3 className="text-xl md:text-2xl font-bold mb-4">
+									MINI PAVLOVA
+								</h3>
 								<div className="space-y-2 md:space-y-1">
 									<p>mango & marakuja</p>
 									<p>malina</p>
@@ -453,7 +470,9 @@ function Cakes() {
 
 							{/* MÍŠA KELÍMEK */}
 							<div className="text-center">
-								<h3 className="text-xl md:text-2xl font-bold mb-4">MÍŠA KELÍMEK</h3>
+								<h3 className="text-xl md:text-2xl font-bold mb-4">
+									MÍŠA KELÍMEK
+								</h3>
 								<div className="space-y-2 md:space-y-1">
 									<p>čokoládový korpus, tvarohový krém, čokoládová křupinka</p>
 								</div>
@@ -465,7 +484,9 @@ function Cakes() {
 
 							{/* ČOKO MOUSSE */}
 							<div className="text-center">
-								<h3 className="text-xl md:text-2xl font-bold mb-4">ČOKO MOUSSE</h3>
+								<h3 className="text-xl md:text-2xl font-bold mb-4">
+									ČOKO MOUSSE
+								</h3>
 								<div className="space-y-2 md:space-y-1">
 									<p>tmavá čokoláda</p>
 									<p>bílá čokoláda</p>
@@ -500,7 +521,8 @@ function Cakes() {
 								</h3>
 								<div className="space-y-2 md:space-y-1">
 									<p>
-										čokoládový korpus, smetanový krém, strouhaná čokoláda a banán
+										čokoládový korpus, smetanový krém, strouhaná čokoláda a
+										banán
 									</p>
 								</div>
 								<div className="mt-4 md:mt-3">
@@ -555,4 +577,4 @@ function Cakes() {
 			</div>
 		</div>
 	);
-} 
+}
