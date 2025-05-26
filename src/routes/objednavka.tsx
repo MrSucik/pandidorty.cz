@@ -1,12 +1,28 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { addDays, format } from "date-fns";
+import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
+import { cs } from "date-fns/locale";
 import { z } from "zod";
 
 export const Route = createFileRoute("/objednavka")({
 	component: OrderForm,
 });
+
+// Helper function for date validation
+const isValidDeliveryDate = (dateString: string): boolean => {
+	try {
+		const today = startOfDay(new Date());
+		const minDate = addDays(today, 7);
+		const selectedDate = parseISO(dateString);
+		return (
+			isAfter(selectedDate, minDate) ||
+			selectedDate.getTime() === minDate.getTime()
+		);
+	} catch {
+		return false;
+	}
+};
 
 // Check if we're in a browser environment
 const isBrowser = typeof window !== "undefined";
@@ -34,12 +50,10 @@ const orderFormSchema = z
 		date: z
 			.string()
 			.min(1, "Toto pole je povinné")
-			.refine((date) => {
-				const today = new Date();
-				const minDate = addDays(today, 7);
-				const selectedDate = new Date(date);
-				return selectedDate >= minDate;
-			}, "Datum dodání musí být alespoň 7 dní od dnes"),
+			.refine(
+				isValidDeliveryDate,
+				"Datum dodání musí být alespoň 7 dní od dnes",
+			),
 		orderCake: z.boolean(),
 		orderDessert: z.boolean(),
 		size: z.string(),
@@ -104,12 +118,7 @@ const phoneSchema = z
 const dateSchema = z
 	.string()
 	.min(1, "Toto pole je povinné")
-	.refine((date) => {
-		const today = new Date();
-		const minDate = addDays(today, 7);
-		const selectedDate = new Date(date);
-		return selectedDate >= minDate;
-	}, "Datum dodání musí být alespoň 7 dní od dnes");
+	.refine(isValidDeliveryDate, "Datum dodání musí být alespoň 7 dní od dnes");
 
 // Form data type inferred from Zod schema - following TanStack Form TypeScript recommendations
 type OrderFormData = z.infer<typeof orderFormSchema>;
@@ -160,7 +169,7 @@ const createConditionalValidator = (
 
 function OrderForm() {
 	// Initialize the default date
-	const today = new Date();
+	const today = startOfDay(new Date());
 	const minDate = addDays(today, 7);
 	const defaultDate = format(minDate, "yyyy-MM-dd");
 
@@ -189,7 +198,9 @@ function OrderForm() {
 			const validationResult = orderFormSchema.safeParse(value);
 			if (!validationResult.success) {
 				// Show validation errors to user
-				const errorMessages = validationResult.error.errors.map(err => err.message);
+				const errorMessages = validationResult.error.errors.map(
+					(err) => err.message,
+				);
 				console.log("Validation errors:", errorMessages);
 				// The individual field validators will show the specific errors
 				return;

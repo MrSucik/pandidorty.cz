@@ -1,7 +1,22 @@
 import { json } from "@tanstack/react-start";
 import { createAPIFileRoute } from "@tanstack/react-start/api";
-import { addDays } from "date-fns";
+import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
+import { cs } from "date-fns/locale";
 import { z } from "zod";
+
+// Helper function for date validation
+const isValidDeliveryDate = (dateString: string): boolean => {
+	try {
+		const selectedDate = parseISO(dateString);
+		const minDate = addDays(startOfDay(new Date()), 7);
+		return (
+			isAfter(selectedDate, minDate) ||
+			selectedDate.getTime() === minDate.getTime()
+		);
+	} catch {
+		return false;
+	}
+};
 
 // Zod schema for order validation
 const orderSchema = z
@@ -18,11 +33,10 @@ const orderSchema = z
 		date: z
 			.string()
 			.min(1, "Datum dodání je povinné")
-			.refine((date) => {
-				const selectedDate = new Date(date);
-				const minDate = addDays(new Date(), 7);
-				return selectedDate >= minDate;
-			}, "Datum dodání musí být alespoň 7 dní od dnes"),
+			.refine(
+				isValidDeliveryDate,
+				"Datum dodání musí být alespoň 7 dní od dnes",
+			),
 		orderCake: z.boolean(),
 		orderDessert: z.boolean(),
 		size: z.string(),
@@ -114,6 +128,11 @@ export const APIRoute = createAPIFileRoute("/api/submit-order")({
 				email: orderData.email,
 				phone: orderData.phone,
 				deliveryDate: orderData.date,
+				deliveryDateFormatted: format(
+					parseISO(orderData.date),
+					"dd.MM.yyyy (EEEE)",
+					{ locale: cs },
+				),
 			});
 
 			console.log("🛒 Order Details:", {
