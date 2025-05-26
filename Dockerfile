@@ -46,4 +46,4 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD [ "pnpm", "run", "start" ]
+CMD [ "pnpm", "run", "start", "--host", "0.0.0.0", "--port", "3000" ]

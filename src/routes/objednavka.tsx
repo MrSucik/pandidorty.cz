@@ -184,21 +184,14 @@ function OrderForm() {
 			message: "",
 			photos: null,
 		} as OrderFormData,
-		validators: {
-			onChange: ({ value }) => {
-				const result = orderFormSchema.safeParse(value);
-				if (!result.success) {
-					// Return the first error message
-					return result.error.errors[0]?.message || "Validation error";
-				}
-				return undefined;
-			},
-		},
 		onSubmit: async ({ value }) => {
 			// Validate with Zod before submission
 			const validationResult = orderFormSchema.safeParse(value);
 			if (!validationResult.success) {
-				// Let form validation handle the errors
+				// Show validation errors to user
+				const errorMessages = validationResult.error.errors.map(err => err.message);
+				console.log("Validation errors:", errorMessages);
+				// The individual field validators will show the specific errors
 				return;
 			}
 
@@ -801,9 +794,7 @@ function OrderForm() {
 						<div className="text-center">
 							<button
 								type="submit"
-								disabled={
-									submitOrderMutation.isPending || !form.state.canSubmit
-								}
+								disabled={submitOrderMutation.isPending}
 								className="bg-blue-800 text-white px-8 py-3 rounded-lg hover:bg-blue-900 transition-colors relative disabled:opacity-50"
 							>
 								{submitOrderMutation.isPending ? (
