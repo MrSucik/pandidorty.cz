@@ -13,6 +13,7 @@ import type { MouseEvent, ReactNode } from "react";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
 import { Footer } from "~/components/Footer";
 import { NotFound } from "~/components/NotFound";
+// @ts-expect-error
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
 
