@@ -8,6 +8,14 @@ export const Route = createFileRoute("/objednavka")({
 	component: OrderForm,
 });
 
+// Check if we're in a browser environment
+const isBrowser = typeof window !== "undefined";
+
+// Create a safe FileList schema that works in both client and server environments
+const fileListSchema = isBrowser
+	? z.instanceof(FileList).nullable()
+	: z.any().nullable(); // On server, just accept any value
+
 // Zod validation schemas
 const orderFormSchema = z
 	.object({
@@ -38,7 +46,7 @@ const orderFormSchema = z
 		flavor: z.string(),
 		dessertChoice: z.string(),
 		message: z.string(),
-		photos: z.instanceof(FileList).nullable(),
+		photos: fileListSchema,
 	})
 	.refine(
 		(data) => {
@@ -199,7 +207,7 @@ function OrderForm() {
 
 			// Add all form fields with proper type checking
 			for (const [key, val] of Object.entries(value)) {
-				if (key === "photos" && val instanceof FileList) {
+				if (key === "photos" && isBrowser && val instanceof FileList) {
 					// Handle multiple files
 					for (const file of Array.from(val)) {
 						formData.append("photos", file);
