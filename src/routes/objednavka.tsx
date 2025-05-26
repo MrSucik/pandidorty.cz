@@ -511,7 +511,7 @@ function OrderForm() {
 										<div
 											className={`bg-pink-50/50 rounded-lg p-4 mb-6 transition-opacity duration-300 ease-in-out ${
 												cakeField.state.value
-													? "opacity-100"
+													? "block opacity-100"
 													: "hidden opacity-0"
 											}`}
 										>
@@ -624,7 +624,7 @@ function OrderForm() {
 										<div
 											className={`bg-blue-50/50 rounded-lg p-4 mb-6 transition-opacity duration-300 ease-in-out ${
 												dessertField.state.value
-													? "opacity-100"
+													? "block opacity-100"
 													: "hidden opacity-0"
 											}`}
 										>
@@ -683,123 +683,97 @@ function OrderForm() {
 								</form.Field>
 							</div>
 
-							{/* Additional information section */}
-							<div className="bg-white/80 rounded-lg p-5 border border-gray-100 shadow-sm">
-								<h2 className="text-xl font-semibold mb-4 text-blue-900 border-b pb-2">
-									Doplňující informace
-								</h2>
-
-								{/* Cake-specific section - only visible when cake is selected */}
-								<form.Field name="orderCake">
-									{(cakeField) => (
-										<>
-											{cakeField.state.value && (
-												<div className="transition-opacity duration-300 ease-in-out">
-													{/* Message field */}
-													<form.Field name="message">
-														{(field) => (
-															<div className="mb-6">
-																<label
-																	className="block text-sm font-medium mb-2"
-																	htmlFor={field.name}
-																>
-																	Vaše představa dortu
-																</label>
-																<textarea
-																	id={field.name}
-																	name={field.name}
-																	rows={4}
-																	value={field.state.value}
-																	onBlur={field.handleBlur}
-																	onChange={(e) =>
-																		field.handleChange(e.target.value)
-																	}
-																	className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-																/>
-															</div>
-														)}
-													</form.Field>
-
-													{/* Photos field */}
-													<form.Field name="photos">
-														{(field) => (
-															<div>
-																<label
-																	className="block text-sm font-medium mb-2"
-																	htmlFor={field.name}
-																>
-																	Fotografie pro inspiraci (můžete nahrát více
-																	fotografií)
-																</label>
-																<div className="relative">
-																	<input
-																		type="file"
-																		id={field.name}
-																		name={field.name}
-																		accept="image/*"
-																		multiple
-																		onChange={(e) =>
-																			field.handleChange(e.target.files)
-																		}
-																		className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
-																	/>
-																	<div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
-																		<svg
-																			xmlns="http://www.w3.org/2000/svg"
-																			className="h-5 w-5 inline-block mr-1"
-																			fill="none"
-																			viewBox="0 0 24 24"
-																			stroke="currentColor"
-																			aria-hidden="true"
-																		>
-																			<path
-																				strokeLinecap="round"
-																				strokeLinejoin="round"
-																				strokeWidth="2"
-																				d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-																			/>
-																		</svg>
-																		<span className="text-sm">
-																			Vyberte více souborů
-																		</span>
-																	</div>
-																</div>
-																<p className="text-sm text-gray-500 mt-1">
-																	Můžete nahrát více fotografií pro lepší
-																	představu o vašem vysněném dortu (držte Ctrl
-																	nebo Cmd pro výběr více souborů)
-																</p>
-																<p className="text-sm text-gray-500 mt-1">
-																	Podporované formáty: JPG, PNG, GIF, WEBP.
-																	Maximální velikost: 1 MB na soubor.
-																</p>
-															</div>
-														)}
-													</form.Field>
+							{/* Additional information section - visible only when cake is selected */}
+							{form.state.values.orderCake && (
+								<div className="transition-opacity duration-300 ease-in-out">
+									{/* Cake-specific fields */}
+									<div className="mb-6">
+										{/* Message field */}
+										<form.Field name="message">
+											{(field) => (
+												<div className="mb-6">
+													<label
+														className="block text-sm font-medium mb-2"
+														htmlFor={field.name}
+													>
+														Vaše představa dortu
+													</label>
+													<textarea
+														id={field.name}
+														name={field.name}
+														rows={4}
+														value={field.state.value}
+														onBlur={field.handleBlur}
+														onChange={(e) => field.handleChange(e.target.value)}
+														className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+													/>
 												</div>
 											)}
+										</form.Field>
 
-											{/* Info text for dessert-only orders */}
-											{!cakeField.state.value && (
-												<form.Field name="orderDessert">
-													{(dessertField) => (
-														<>
-															{dessertField.state.value && (
-																<div className="transition-opacity duration-300 ease-in-out">
-																	<p className="text-center text-gray-500 italic py-4">
-																		Pro objednávku dezertů nejsou potřeba další
-																		informace.
-																	</p>
-																</div>
-															)}
-														</>
-													)}
-												</form.Field>
+										{/* Photos field */}
+										<form.Field name="photos">
+											{(field) => (
+												<div>
+													<label
+														className="block text-sm font-medium mb-2"
+														htmlFor={field.name}
+													>
+														Fotografie pro inspiraci (můžete nahrát více fotografií)
+													</label>
+													<div className="relative">
+														<input
+															type="file"
+															id={field.name}
+															name={field.name}
+															accept="image/*"
+															multiple
+															onChange={(e) => field.handleChange(e.target.files)}
+															className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+														/>
+														<div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+															<svg
+																xmlns="http://www.w3.org/2000/svg"
+																className="h-5 w-5 inline-block mr-1"
+																fill="none"
+																viewBox="0 0 24 24"
+																stroke="currentColor"
+																aria-hidden="true"
+															>
+																<path
+																		strokeLinecap="round"
+																		strokeLinejoin="round"
+																		strokeWidth="2"
+																		d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+																/>
+															</svg>
+															<span className="text-sm">
+																Vyberte více souborů
+															</span>
+														</div>
+													</div>
+													<p className="text-sm text-gray-500 mt-1">
+														Můžete nahrát více fotografií pro lepší představu
+														o vašem vysněném dortu (držte Ctrl nebo Cmd pro
+														výběr více souborů)
+													</p>
+													<p className="text-sm text-gray-500 mt-1">
+														Podporované formáty: JPG, PNG, GIF, WEBP.
+														Maximální velikost: 1 MB na soubor.
+													</p>
+												</div>
 											)}
-										</>
-									)}
-								</form.Field>
-							</div>
+										</form.Field>
+									</div>
+								</div>
+							)}
+
+							{/* Info text for dessert-only orders (shown only when cake not selected) */}
+							{!form.state.values.orderCake && form.state.values.orderDessert && (
+								<p className="text-center text-gray-500 italic py-4 transition-opacity duration-300 ease-in-out">
+									Pro objednávku dezertů nejsou potřeba další informace.
+								</p>
+							)}
 						</div>
 
 						<div className="text-center">

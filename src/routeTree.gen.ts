@@ -11,12 +11,19 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as OrderImport } from './routes/order'
 import { Route as ObjednavkaImport } from './routes/objednavka'
 import { Route as GalleryImport } from './routes/gallery'
 import { Route as CakesImport } from './routes/cakes'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const OrderRoute = OrderImport.update({
+  id: '/order',
+  path: '/order',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const ObjednavkaRoute = ObjednavkaImport.update({
   id: '/objednavka',
@@ -74,6 +81,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ObjednavkaImport
       parentRoute: typeof rootRoute
     }
+    '/order': {
+      id: '/order'
+      path: '/order'
+      fullPath: '/order'
+      preLoaderRoute: typeof OrderImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -84,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/cakes': typeof CakesRoute
   '/gallery': typeof GalleryRoute
   '/objednavka': typeof ObjednavkaRoute
+  '/order': typeof OrderRoute
 }
 
 export interface FileRoutesByTo {
@@ -91,6 +106,7 @@ export interface FileRoutesByTo {
   '/cakes': typeof CakesRoute
   '/gallery': typeof GalleryRoute
   '/objednavka': typeof ObjednavkaRoute
+  '/order': typeof OrderRoute
 }
 
 export interface FileRoutesById {
@@ -99,14 +115,15 @@ export interface FileRoutesById {
   '/cakes': typeof CakesRoute
   '/gallery': typeof GalleryRoute
   '/objednavka': typeof ObjednavkaRoute
+  '/order': typeof OrderRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cakes' | '/gallery' | '/objednavka'
+  fullPaths: '/' | '/cakes' | '/gallery' | '/objednavka' | '/order'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cakes' | '/gallery' | '/objednavka'
-  id: '__root__' | '/' | '/cakes' | '/gallery' | '/objednavka'
+  to: '/' | '/cakes' | '/gallery' | '/objednavka' | '/order'
+  id: '__root__' | '/' | '/cakes' | '/gallery' | '/objednavka' | '/order'
   fileRoutesById: FileRoutesById
 }
 
@@ -115,6 +132,7 @@ export interface RootRouteChildren {
   CakesRoute: typeof CakesRoute
   GalleryRoute: typeof GalleryRoute
   ObjednavkaRoute: typeof ObjednavkaRoute
+  OrderRoute: typeof OrderRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -122,6 +140,7 @@ const rootRouteChildren: RootRouteChildren = {
   CakesRoute: CakesRoute,
   GalleryRoute: GalleryRoute,
   ObjednavkaRoute: ObjednavkaRoute,
+  OrderRoute: OrderRoute,
 }
 
 export const routeTree = rootRoute
@@ -137,7 +156,8 @@ export const routeTree = rootRoute
         "/",
         "/cakes",
         "/gallery",
-        "/objednavka"
+        "/objednavka",
+        "/order"
       ]
     },
     "/": {
@@ -151,6 +171,9 @@ export const routeTree = rootRoute
     },
     "/objednavka": {
       "filePath": "objednavka.tsx"
+    },
+    "/order": {
+      "filePath": "order.tsx"
     }
   }
 }
