@@ -7,7 +7,19 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": []
+		"ignore": [
+			"node_modules/**",
+			".output/**",
+			".vinxi/**",
+			"dist/**",
+			"build/**",
+			"*.min.js",
+			"*.d.ts",
+			"pnpm-lock.yaml",
+			"src/routeTree.gen.ts",
+			"**/*.gen.ts",
+			"**/*.generated.ts"
+		]
 	},
 	"formatter": {
 		"enabled": true,
