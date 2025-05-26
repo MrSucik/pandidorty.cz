@@ -12,7 +12,10 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as RedirectImport } from './routes/redirect'
+import { Route as ObjednavkaImport } from './routes/objednavka'
+import { Route as GalleryImport } from './routes/gallery'
 import { Route as DeferredImport } from './routes/deferred'
+import { Route as CakesImport } from './routes/cakes'
 import { Route as PathlessLayoutImport } from './routes/_pathlessLayout'
 import { Route as UsersRouteImport } from './routes/users.route'
 import { Route as PostsRouteImport } from './routes/posts.route'
@@ -34,9 +37,27 @@ const RedirectRoute = RedirectImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ObjednavkaRoute = ObjednavkaImport.update({
+  id: '/objednavka',
+  path: '/objednavka',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GalleryRoute = GalleryImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const DeferredRoute = DeferredImport.update({
   id: '/deferred',
   path: '/deferred',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CakesRoute = CakesImport.update({
+  id: '/cakes',
+  path: '/cakes',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -146,11 +167,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PathlessLayoutImport
       parentRoute: typeof rootRoute
     }
+    '/cakes': {
+      id: '/cakes'
+      path: '/cakes'
+      fullPath: '/cakes'
+      preLoaderRoute: typeof CakesImport
+      parentRoute: typeof rootRoute
+    }
     '/deferred': {
       id: '/deferred'
       path: '/deferred'
       fullPath: '/deferred'
       preLoaderRoute: typeof DeferredImport
+      parentRoute: typeof rootRoute
+    }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryImport
+      parentRoute: typeof rootRoute
+    }
+    '/objednavka': {
+      id: '/objednavka'
+      path: '/objednavka'
+      fullPath: '/objednavka'
+      preLoaderRoute: typeof ObjednavkaImport
       parentRoute: typeof rootRoute
     }
     '/redirect': {
@@ -284,7 +326,10 @@ export interface FileRoutesByFullPath {
   '/posts': typeof PostsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '': typeof PathlessLayoutNestedLayoutRouteWithChildren
+  '/cakes': typeof CakesRoute
   '/deferred': typeof DeferredRoute
+  '/gallery': typeof GalleryRoute
+  '/objednavka': typeof ObjednavkaRoute
   '/redirect': typeof RedirectRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
@@ -298,7 +343,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '': typeof PathlessLayoutNestedLayoutRouteWithChildren
+  '/cakes': typeof CakesRoute
   '/deferred': typeof DeferredRoute
+  '/gallery': typeof GalleryRoute
+  '/objednavka': typeof ObjednavkaRoute
   '/redirect': typeof RedirectRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
@@ -315,7 +363,10 @@ export interface FileRoutesById {
   '/posts': typeof PostsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/_pathlessLayout': typeof PathlessLayoutRouteWithChildren
+  '/cakes': typeof CakesRoute
   '/deferred': typeof DeferredRoute
+  '/gallery': typeof GalleryRoute
+  '/objednavka': typeof ObjednavkaRoute
   '/redirect': typeof RedirectRoute
   '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
@@ -334,7 +385,10 @@ export interface FileRouteTypes {
     | '/posts'
     | '/users'
     | ''
+    | '/cakes'
     | '/deferred'
+    | '/gallery'
+    | '/objednavka'
     | '/redirect'
     | '/posts/$postId'
     | '/users/$userId'
@@ -347,7 +401,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | ''
+    | '/cakes'
     | '/deferred'
+    | '/gallery'
+    | '/objednavka'
     | '/redirect'
     | '/posts/$postId'
     | '/users/$userId'
@@ -362,7 +419,10 @@ export interface FileRouteTypes {
     | '/posts'
     | '/users'
     | '/_pathlessLayout'
+    | '/cakes'
     | '/deferred'
+    | '/gallery'
+    | '/objednavka'
     | '/redirect'
     | '/_pathlessLayout/_nested-layout'
     | '/posts/$postId'
@@ -380,7 +440,10 @@ export interface RootRouteChildren {
   PostsRouteRoute: typeof PostsRouteRouteWithChildren
   UsersRouteRoute: typeof UsersRouteRouteWithChildren
   PathlessLayoutRoute: typeof PathlessLayoutRouteWithChildren
+  CakesRoute: typeof CakesRoute
   DeferredRoute: typeof DeferredRoute
+  GalleryRoute: typeof GalleryRoute
+  ObjednavkaRoute: typeof ObjednavkaRoute
   RedirectRoute: typeof RedirectRoute
   PostsPostIdDeepRoute: typeof PostsPostIdDeepRoute
 }
@@ -390,7 +453,10 @@ const rootRouteChildren: RootRouteChildren = {
   PostsRouteRoute: PostsRouteRouteWithChildren,
   UsersRouteRoute: UsersRouteRouteWithChildren,
   PathlessLayoutRoute: PathlessLayoutRouteWithChildren,
+  CakesRoute: CakesRoute,
   DeferredRoute: DeferredRoute,
+  GalleryRoute: GalleryRoute,
+  ObjednavkaRoute: ObjednavkaRoute,
   RedirectRoute: RedirectRoute,
   PostsPostIdDeepRoute: PostsPostIdDeepRoute,
 }
@@ -409,7 +475,10 @@ export const routeTree = rootRoute
         "/posts",
         "/users",
         "/_pathlessLayout",
+        "/cakes",
         "/deferred",
+        "/gallery",
+        "/objednavka",
         "/redirect",
         "/posts_/$postId/deep"
       ]
@@ -437,8 +506,17 @@ export const routeTree = rootRoute
         "/_pathlessLayout/_nested-layout"
       ]
     },
+    "/cakes": {
+      "filePath": "cakes.tsx"
+    },
     "/deferred": {
       "filePath": "deferred.tsx"
+    },
+    "/gallery": {
+      "filePath": "gallery.tsx"
+    },
+    "/objednavka": {
+      "filePath": "objednavka.tsx"
     },
     "/redirect": {
       "filePath": "redirect.tsx"

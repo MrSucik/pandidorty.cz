@@ -21,30 +21,31 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
       <ErrorComponent error={error} />
       <div className="flex gap-2 items-center flex-wrap">
         <button
+          type="button"
           onClick={() => {
             router.invalidate()
           }}
-          className={`px-2 py-1 bg-gray-600 dark:bg-gray-700 rounded text-white uppercase font-extrabold`}
+          className="px-4 py-2 bg-blue-800 hover:bg-blue-900 rounded text-white font-medium transition-colors"
         >
-          Try Again
+          Zkusit znovu
         </button>
         {isRoot ? (
           <Link
             to="/"
-            className={`px-2 py-1 bg-gray-600 dark:bg-gray-700 rounded text-white uppercase font-extrabold`}
+            className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-white font-medium transition-colors"
           >
-            Home
+            Domů
           </Link>
         ) : (
           <Link
             to="/"
-            className={`px-2 py-1 bg-gray-600 dark:bg-gray-700 rounded text-white uppercase font-extrabold`}
+            className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-white font-medium transition-colors"
             onClick={(e) => {
               e.preventDefault()
               window.history.back()
             }}
           >
-            Go Back
+            Zpět
           </Link>
         )}
       </div>

@@ -4,11 +4,14 @@ import {
   Outlet,
   Scripts,
   createRootRoute,
+  useLocation,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import * as React from 'react'
+import { useEffect, useState } from 'react'
+import type { ReactNode, MouseEvent } from 'react'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
+import { Footer } from '~/components/Footer'
 import appCss from '~/styles/app.css?url'
 import { seo } from '~/utils/seo'
 
@@ -19,13 +22,16 @@ export const Route = createRootRoute({
         charSet: 'utf-8',
       },
       {
+        name: 'description',
+        content: 'Pandí dorty - Vaše cukrárna v Ostravě-Porubě',
+      },
+      {
         name: 'viewport',
         content: 'width=device-width, initial-scale=1',
       },
       ...seo({
-        title:
-          'TanStack Start | Type-Safe, Client-First, Full-Stack React Framework',
-        description: `TanStack Start is a type-safe, client-first, full-stack React framework. `,
+        title: 'Pandí dorty | Zakázková výroba dortů a sladkých radostí',
+        description: 'Zakázková výroba dortů a dalších sladkých radostí v Ostravě. Kvalitní suroviny, poctivá práce a jedinečné dorty na míru.',
       }),
     ],
     links: [
@@ -48,7 +54,7 @@ export const Route = createRootRoute({
         href: '/favicon-16x16.png',
       },
       { rel: 'manifest', href: '/site.webmanifest', color: '#fffff' },
-      { rel: 'icon', href: '/favicon.ico' },
+      { rel: 'icon', type: 'image/png', href: '/favicon.ico' },
     ],
   }),
   errorComponent: (props) => {
@@ -65,71 +71,213 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
+      <Navigation />
       <Outlet />
+      <Footer />
     </RootDocument>
   )
 }
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function Navigation() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
+
+  // Handle scroll effect for header background
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Check initial scroll position
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close menu when route changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+    useEffect(() => {
+    setIsMenuOpen(false);
+    document.body.style.overflow = "";
+  }, [location.pathname]);
+
+  const toggleMenu = () => {
+    const newIsOpen = !isMenuOpen;
+    setIsMenuOpen(newIsOpen);
+    document.body.style.overflow = newIsOpen ? "hidden" : "";
+  };
+
+  const handleContactClick = (e: MouseEvent) => {
+    e.preventDefault();
+    
+    // Close mobile menu if open
+    if (isMenuOpen) {
+      toggleMenu();
+    }
+
+    // Scroll to bottom of page
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  };
+
   return (
-    <html>
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 py-3 px-4 md:py-4 md:px-6 transition-colors duration-200 ${
+          isScrolled ? "bg-blue-50/97 backdrop-blur-sm" : ""
+        }`}
+      >
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <Link to="/" className="z-10">
+            <img src="/logo-panda.png" alt="Pandí dorty" className="h-16" />
+          </Link>
+
+          <button
+            type="button"
+            className="md:hidden z-50 p-2 text-black hover:text-custom-blue transition-colors"
+            aria-label="Menu"
+            aria-expanded={isMenuOpen}
+            onClick={toggleMenu}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h16"
+                className={isMenuOpen ? "hidden" : ""}
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+                className={isMenuOpen ? "" : "hidden"}
+              />
+            </svg>
+          </button>
+
+          <nav className="hidden md:flex items-center">
+            <ul className="flex flex-row gap-6 text-base items-center">
+              <li>
+                <Link
+                  to="/"
+                  className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+                >
+                  Domů
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="/cakes"
+                  className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+                >
+                  Nabídka
+                </a>
+              </li>
+              <li>
+                <Link
+                  to="/objednavka"
+                  className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+                >
+                  Objednávka
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/gallery"
+                  className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+                >
+                  Galerie
+                </Link>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+                  onClick={handleContactClick}
+                >
+                  Kontakt
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+
+      {/* Mobile Menu */}
+      <div
+        className={`fixed inset-0 bg-white/95 backdrop-blur-sm transition-transform duration-300 z-40 md:hidden ${
+          isMenuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <nav className="h-full flex items-center justify-center">
+          <ul className="flex flex-col gap-8 text-xl text-center">
+            <li>
+              <Link
+                to="/"
+                className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+              >
+                Domů
+              </Link>
+            </li>
+            <li>
+              <a
+                href="/cakes"
+                className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+              >
+                Nabídka
+              </a>
+            </li>
+            <li>
+              <Link
+                to="/objednavka"
+                className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+              >
+                Objednávka
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/gallery"
+                className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+              >
+                Galerie
+              </Link>
+            </li>
+            <li>
+              <button
+                type="button"
+                className="hover:text-custom-blue transition-colors py-3 px-6 block w-full font-medium"
+                onClick={handleContactClick}
+              >
+                Kontakt
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </>
+  );
+}
+
+function RootDocument({ children }: { children: ReactNode }) {
+  return (
+    <html lang="cs">
       <head>
         <HeadContent />
       </head>
       <body>
-        <div className="p-2 flex gap-2 text-lg">
-          <Link
-            to="/"
-            activeProps={{
-              className: 'font-bold',
-            }}
-            activeOptions={{ exact: true }}
-          >
-            Home
-          </Link>{' '}
-          <Link
-            to="/posts"
-            activeProps={{
-              className: 'font-bold',
-            }}
-          >
-            Posts
-          </Link>{' '}
-          <Link
-            to="/users"
-            activeProps={{
-              className: 'font-bold',
-            }}
-          >
-            Users
-          </Link>{' '}
-          <Link
-            to="/route-a"
-            activeProps={{
-              className: 'font-bold',
-            }}
-          >
-            Pathless Layout
-          </Link>{' '}
-          <Link
-            to="/deferred"
-            activeProps={{
-              className: 'font-bold',
-            }}
-          >
-            Deferred
-          </Link>{' '}
-          <Link
-            // @ts-expect-error
-            to="/this-route-does-not-exist"
-            activeProps={{
-              className: 'font-bold',
-            }}
-          >
-            This Route Does Not Exist
-          </Link>
-        </div>
-        <hr />
         {children}
         <TanStackRouterDevtools position="bottom-right" />
         <Scripts />
