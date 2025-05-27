@@ -1,4 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
 import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
 import { cs } from "date-fns/locale";
 import { z } from "zod";
@@ -78,125 +77,138 @@ const orderSchema = z
 		},
 	);
 
-export const submitOrderFn = createServerFn({
-	method: "POST",
-})
-	.validator((formData: FormData) => {
-		// Extract form fields
-		const orderData = {
-			name: formData.get("name") as string,
-			email: formData.get("email") as string,
-			phone: formData.get("phone") as string,
-			date: formData.get("date") as string,
-			orderCake: formData.get("orderCake") === "true",
-			orderDessert: formData.get("orderDessert") === "true",
-			size: (formData.get("size") as string) || "",
-			flavor: (formData.get("flavor") as string) || "",
-			dessertChoice: (formData.get("dessertChoice") as string) || "",
-			message: (formData.get("message") as string) || "",
-		};
+export interface SubmitOrderResult {
+	success: boolean;
+	message: string;
+	orderId: string;
+	orderDetails: {
+		id: number;
+		orderNumber: string;
+		customerName: string;
+		deliveryDate: Date;
+		status: "created" | "paid" | "delivered";
+		photoCount: number;
+	};
+}
 
-		// Handle file uploads
-		const photos = formData.getAll("photos") as File[];
+// Main function to be called from the API route
+export async function submitOrder(
+	formData: FormData,
+): Promise<SubmitOrderResult> {
+	// Extract form fields
+	const orderData = {
+		name: formData.get("name") as string,
+		email: formData.get("email") as string,
+		phone: formData.get("phone") as string,
+		date: formData.get("date") as string,
+		orderCake: formData.get("orderCake") === "true",
+		orderDessert: formData.get("orderDessert") === "true",
+		size: (formData.get("size") as string) || "",
+		flavor: (formData.get("flavor") as string) || "",
+		dessertChoice: (formData.get("dessertChoice") as string) || "",
+		message: (formData.get("message") as string) || "",
+	};
 
-		// Validate with Zod
-		const validationResult = orderSchema.safeParse(orderData);
+	// Handle file uploads
+	const photos = formData.getAll("photos") as File[];
 
-		if (!validationResult.success) {
-			const errorMessages = validationResult.error.errors.map(
-				(err) => err.message,
-			);
-			throw new Error(errorMessages.join(", "));
-		}
+	// Validate with Zod
+	const validationResult = orderSchema.safeParse(orderData);
 
-		return { orderData, photos };
-	})
-	.handler(async ({ data: { orderData, photos } }) => {
-		try {
-			console.log("📝 Processing order submission...");
+	if (!validationResult.success) {
+		const errorMessages = validationResult.error.errors.map(
+			(err) => err.message,
+		);
+		throw new Error(errorMessages.join(", "));
+	}
 
-			// Handle file uploads
-			const photoInfo = photos
-				.filter((file) => file.size > 0) // Filter out empty files
-				.map((file) => ({
-					name: file.name,
-					size: file.size,
-					type: file.type,
-				}));
+	try {
+		console.log("📝 Processing order submission...");
 
-			// ✅ Order validation passed - now save to database
-			console.log("✅ Order validation passed! Saving to database...");
-			console.log("👤 Customer Info:", {
-				name: orderData.name,
-				email: orderData.email,
-				phone: orderData.phone,
-				deliveryDate: orderData.date,
-				deliveryDateFormatted: format(
-					parseISO(orderData.date),
-					"dd.MM.yyyy (EEEE)",
-					{ locale: cs },
-				),
-			});
+		// Handle file uploads (just for logging purposes)
+		const photoInfo = photos
+			.filter((file) => file.size > 0) // Filter out empty files
+			.map((file) => ({
+				name: file.name,
+				size: file.size,
+				type: file.type,
+			}));
 
-			console.log("🛒 Order Details:", {
-				orderCake: orderData.orderCake,
-				orderDessert: orderData.orderDessert,
-				...(orderData.orderCake && {
-					cakeSize: orderData.size,
-					cakeFlavor: orderData.flavor,
-					cakeMessage: orderData.message || "No special message",
-				}),
-				...(orderData.orderDessert && {
-					dessertChoice: orderData.dessertChoice,
-				}),
-			});
-
-			if (photoInfo.length > 0) {
-				console.log("📸 Uploaded Photos:", photoInfo);
-			}
-
-			// 💾 Save order to database
-			const dbResult = await createOrderFromForm(
-				orderData as OrderFormData,
-				photos,
-			);
-
-			if (!dbResult.success) {
-				console.error("❌ Failed to save order to database:", dbResult.error);
-				throw new Error(
-					"Došlo k chybě při ukládání objednávky. Zkuste to prosím později.",
-				);
-			}
-
-			// At this point TypeScript knows dbResult.success is true
-			const savedOrder = dbResult.order;
-			console.log("💾 Order saved to database with ID:", savedOrder.id);
-			console.log("📧 TODO: Send confirmation email to customer");
-			console.log("🔔 TODO: Send admin notification");
-
-			if (savedOrder.photos && savedOrder.photos.length > 0) {
-				console.log("📸 Photos saved:", savedOrder.photos.length);
-			}
-
-			// Return success response with real order data
-			return {
-				success: true,
-				message:
-					"Děkujeme! Vaše objednávka byla úspěšně odeslána. Brzy se Vám ozveme.",
-				orderId: savedOrder.orderNumber,
-				orderDetails: {
-					id: savedOrder.id,
-					orderNumber: savedOrder.orderNumber,
-					customerName: savedOrder.customerName,
-					deliveryDate: savedOrder.deliveryDate,
-					status: savedOrder.status,
-					photoCount: savedOrder.photos?.length || 0,
+		// ✅ Order validation passed - now save to database
+		console.log("✅ Order validation passed! Saving to database...");
+		console.log("👤 Customer Info:", {
+			name: orderData.name,
+			email: orderData.email,
+			phone: orderData.phone,
+			deliveryDate: orderData.date,
+			deliveryDateFormatted: format(
+				parseISO(orderData.date),
+				"dd.MM.yyyy (EEEE)",
+				{
+					locale: cs,
 				},
-			};
-		} catch (error) {
-			console.error("💥 Error processing order:", error);
+			),
+		});
+
+		console.log("🛒 Order Details:", {
+			orderCake: orderData.orderCake,
+			orderDessert: orderData.orderDessert,
+			...(orderData.orderCake && {
+				cakeSize: orderData.size,
+				cakeFlavor: orderData.flavor,
+				cakeMessage: orderData.message || "No special message",
+			}),
+			...(orderData.orderDessert && {
+				dessertChoice: orderData.dessertChoice,
+			}),
+		});
+
+		if (photoInfo.length > 0) {
+			console.log("📸 Uploaded Photos:", photoInfo);
+		}
+
+		// 💾 Save order to database
+		const dbResult = await createOrderFromForm(
+			orderData as OrderFormData,
+			photos,
+		);
+
+		if (!dbResult.success) {
+			console.error("❌ Failed to save order to database:", dbResult.error);
 			throw new Error(
-				"Došlo k chybě při zpracování objednávky. Zkuste to prosím později.",
+				"Došlo k chybě při ukládání objednávky. Zkuste to prosím později.",
 			);
 		}
-	});
+
+		// At this point TypeScript knows dbResult.success is true
+		const savedOrder = dbResult.order;
+		console.log("💾 Order saved to database with ID:", savedOrder.id);
+		console.log("📧 TODO: Send confirmation email to customer");
+		console.log("🔔 TODO: Send admin notification");
+
+		if (savedOrder.photos && savedOrder.photos.length > 0) {
+			console.log("📸 Photos saved:", savedOrder.photos.length);
+		}
+
+		// Return success response with real order data
+		return {
+			success: true,
+			message:
+				"Děkujeme! Vaše objednávka byla úspěšně odeslána. Brzy se Vám ozveme.",
+			orderId: savedOrder.orderNumber,
+			orderDetails: {
+				id: savedOrder.id,
+				orderNumber: savedOrder.orderNumber,
+				customerName: savedOrder.customerName,
+				deliveryDate: savedOrder.deliveryDate,
+				status: savedOrder.status as "created" | "paid" | "delivered",
+				photoCount: savedOrder.photos?.length || 0,
+			},
+		};
+	} catch (error) {
+		console.error("💥 Error processing order:", error);
+		throw new Error(
+			"Došlo k chybě při zpracování objednávky. Zkuste to prosím později.",
+		);
+	}
+}

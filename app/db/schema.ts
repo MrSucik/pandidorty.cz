@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
 	boolean,
 	decimal,
+	index,
 	integer,
 	pgEnum,
 	pgTable,
@@ -13,11 +14,9 @@ import {
 
 // Enums
 export const orderStatusEnum = pgEnum("order_status", [
-	"pending",
-	"processing",
-	"shipped",
+	"created",
+	"paid",
 	"delivered",
-	"cancelled",
 ]);
 
 // Users table (for admin users)
@@ -32,38 +31,50 @@ export const users = pgTable("users", {
 });
 
 // Orders table
-export const orders = pgTable("orders", {
-	id: serial("id").primaryKey(),
-	orderNumber: varchar("order_number", { length: 100 }).notNull().unique(),
-	customerName: varchar("customer_name", { length: 255 }).notNull(),
-	customerEmail: varchar("customer_email", { length: 255 }).notNull(),
-	customerPhone: varchar("customer_phone", { length: 50 }),
-	deliveryDate: timestamp("delivery_date").notNull(),
+export const orders = pgTable(
+	"orders",
+	{
+		id: serial("id").primaryKey(),
+		orderNumber: varchar("order_number", { length: 100 }).notNull().unique(),
+		customerName: varchar("customer_name", { length: 255 }).notNull(),
+		customerEmail: varchar("customer_email", { length: 255 }).notNull(),
+		customerPhone: varchar("customer_phone", { length: 50 }),
+		deliveryDate: timestamp("delivery_date").notNull(),
 
-	// Order type flags
-	orderCake: boolean("order_cake").notNull().default(false),
-	orderDessert: boolean("order_dessert").notNull().default(false),
+		// Order type flags
+		orderCake: boolean("order_cake").notNull().default(false),
+		orderDessert: boolean("order_dessert").notNull().default(false),
 
-	// Cake details
-	cakeSize: varchar("cake_size", { length: 100 }),
-	cakeFlavor: varchar("cake_flavor", { length: 100 }),
-	cakeMessage: text("cake_message"),
+		// Cake details
+		cakeSize: varchar("cake_size", { length: 100 }),
+		cakeFlavor: varchar("cake_flavor", { length: 100 }),
+		cakeMessage: text("cake_message"),
 
-	// Dessert details
-	dessertChoice: varchar("dessert_choice", { length: 255 }),
+		// Dessert details
+		dessertChoice: varchar("dessert_choice", { length: 255 }),
 
-	// Legacy fields (keeping for compatibility)
-	shippingAddress: text("shipping_address"),
-	billingAddress: text("billing_address"),
-	totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
+		// Legacy fields (keeping for compatibility)
+		shippingAddress: text("shipping_address"),
+		billingAddress: text("billing_address"),
+		totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
 
-	status: orderStatusEnum("status").notNull().default("pending"),
-	notes: text("notes"),
-	createdById: integer("created_by_id").references(() => users.id),
-	updatedById: integer("updated_by_id").references(() => users.id),
-	createdAt: timestamp("created_at").notNull().defaultNow(),
-	updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+		status: orderStatusEnum("status").notNull().default("created"),
+		notes: text("notes"),
+		createdById: integer("created_by_id").references(() => users.id),
+		updatedById: integer("updated_by_id").references(() => users.id),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+		updatedAt: timestamp("updated_at").notNull().defaultNow(),
+	},
+	(table) => ({
+		orderNumberTrgmIdx: index("orders_order_number_trgm").on(table.orderNumber),
+		customerNameTrgmIdx: index("orders_customer_name_trgm").on(
+			table.customerName,
+		),
+		customerEmailTrgmIdx: index("orders_customer_email_trgm").on(
+			table.customerEmail,
+		),
+	}),
+);
 
 // Order photos table
 export const orderPhotos = pgTable("order_photos", {

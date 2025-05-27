@@ -193,16 +193,16 @@ function AdminDashboard() {
 					<div className="bg-white shadow rounded-lg p-6">
 						<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 							<div className="text-center">
-								<div className="text-2xl font-bold text-pink-600">
-									{stats.pending}
+								<div className="text-2xl font-bold text-yellow-600">
+									{stats.created}
 								</div>
-								<div className="text-sm text-gray-500">Nové objednávky</div>
+								<div className="text-sm text-gray-500">Vytvořené</div>
 							</div>
 							<div className="text-center">
 								<div className="text-2xl font-bold text-blue-600">
-									{stats.processing}
+									{stats.paid}
 								</div>
-								<div className="text-sm text-gray-500">Zpracovávané</div>
+								<div className="text-sm text-gray-500">Zaplacené</div>
 							</div>
 							<div className="text-center">
 								<div className="text-2xl font-bold text-green-600">

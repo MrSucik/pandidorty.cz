@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
 import { cs } from "date-fns/locale";
+import { useEffect } from "react";
 import {
 	type SubmitHandler,
 	useForm as useReactHookForm,
@@ -129,6 +130,13 @@ export default function OrderForm() {
 		mutationFn: submitOrder,
 	});
 
+	// Scroll to top when the order is successfully submitted
+	useEffect(() => {
+		if (typeof window !== "undefined" && submitOrderMutation.isSuccess) {
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		}
+	}, [submitOrderMutation.isSuccess]);
+
 	const {
 		register,
 		handleSubmit,
@@ -137,7 +145,8 @@ export default function OrderForm() {
 		formState: { errors, isSubmitting },
 	} = useReactHookForm<OrderFormData>({
 		resolver: zodResolver(orderFormSchema),
-		mode: "onChange",
+		mode: "onSubmit",
+		reValidateMode: "onChange",
 		defaultValues: {
 			name: "",
 			email: "",

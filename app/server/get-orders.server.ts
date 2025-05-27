@@ -1,5 +1,16 @@
 // Dynamic imports to ensure server-only execution
-import { createServerFn } from "@tanstack/react-start";
+
+import {
+	type SQL,
+	and,
+	asc,
+	count,
+	desc as descFn,
+	eq,
+	ilike,
+	or,
+} from "drizzle-orm";
+import { db, orderPhotos, orders } from "../db";
 
 export interface OrderWithPhotos {
 	id: number;
@@ -14,7 +25,7 @@ export interface OrderWithPhotos {
 	cakeFlavor: string | null;
 	cakeMessage: string | null;
 	dessertChoice: string | null;
-	status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+	status: "created" | "paid" | "delivered";
 	createdAt: string;
 	photos?: Photo[];
 }
@@ -29,13 +40,12 @@ export interface Photo {
 
 export async function getAllOrders(): Promise<OrderWithPhotos[]> {
 	try {
-		const { db, orders, orderPhotos } = await import("../db");
-		const { eq, desc } = await import("drizzle-orm");
+		// static imports used
 
 		const ordersData = await db
 			.select()
 			.from(orders)
-			.orderBy(desc(orders.createdAt));
+			.orderBy(descFn(orders.createdAt));
 
 		// Get photos for all orders in parallel
 		const ordersWithPhotos = await Promise.all(
@@ -74,9 +84,6 @@ export async function getOrderByNumber(
 	orderNumber: string,
 ): Promise<OrderWithPhotos | null> {
 	try {
-		const { db, orders, orderPhotos } = await import("../db");
-		const { eq } = await import("drizzle-orm");
-
 		const orderData = await db
 			.select()
 			.from(orders)
@@ -116,19 +123,116 @@ export async function getOrderByNumber(
 	}
 }
 
-// TanStack Start server functions
-export const getOrdersFn = createServerFn({
-	method: "GET",
-}).handler(async () => {
-	const orders = await getAllOrders();
-	return { orders };
-});
+export type SortField =
+	| "createdAt"
+	| "deliveryDate"
+	| "orderNumber"
+	| "customerName"
+	| "status";
 
-export const getOrderByNumberFn = createServerFn({
-	method: "GET",
-})
-	.validator((orderNumber: string) => orderNumber)
-	.handler(async ({ data: orderNumber }) => {
-		const order = await getOrderByNumber(orderNumber);
-		return order;
-	});
+export interface OrdersQueryOptions {
+	status?: "created" | "paid" | "delivered" | "all";
+	sort?: SortField;
+	dir?: "asc" | "desc";
+	search?: string;
+	limit: number;
+	offset: number;
+}
+
+export async function getOrdersPaged({
+	status = "all",
+	sort = "createdAt",
+	dir = "desc",
+	search = "",
+	limit,
+	offset,
+}: OrdersQueryOptions): Promise<{ orders: OrderWithPhotos[]; total: number }> {
+	try {
+		const conditions: SQL[] = [];
+		if (status !== "all") {
+			conditions.push(eq(orders.status, status));
+		}
+
+		if (search.trim()) {
+			const pattern = `%${search.trim()}%`;
+			const searchCondition = or(
+				ilike(orders.orderNumber, pattern) as SQL,
+				ilike(orders.customerName, pattern) as SQL,
+				ilike(orders.customerEmail, pattern) as SQL,
+			);
+			conditions.push(searchCondition as SQL);
+		}
+
+		const whereCondition = conditions.length ? and(...conditions) : undefined;
+
+		// Total count before pagination
+		const totalResultQuery = db.select({ c: count() }).from(orders);
+		const totalResult = whereCondition
+			? await totalResultQuery.where(whereCondition)
+			: await totalResultQuery;
+
+		const total = totalResult[0]?.c ?? 0;
+
+		// Sorting
+		const sortColumn = (() => {
+			switch (sort) {
+				case "deliveryDate":
+					return orders.deliveryDate;
+				case "orderNumber":
+					return orders.orderNumber;
+				case "customerName":
+					return orders.customerName;
+				case "status":
+					return orders.status;
+				default:
+					return orders.createdAt;
+			}
+		})();
+
+		const orderByExpr = dir === "asc" ? asc(sortColumn) : descFn(sortColumn);
+
+		// Query orders with pagination
+		const ordersQuery = whereCondition
+			? db
+					.select()
+					.from(orders)
+					.where(whereCondition as SQL)
+			: db.select().from(orders);
+
+		const ordersData = await ordersQuery
+			.orderBy(orderByExpr)
+			.limit(limit)
+			.offset(offset);
+
+		// Fetch photos for these orders
+		const ordersWithPhotos = await Promise.all(
+			ordersData.map(async (order) => {
+				const photos = await db
+					.select({
+						id: orderPhotos.id,
+						originalName: orderPhotos.originalName,
+						mimeType: orderPhotos.mimeType,
+						fileSize: orderPhotos.fileSize,
+						uploadedAt: orderPhotos.uploadedAt,
+					})
+					.from(orderPhotos)
+					.where(eq(orderPhotos.orderId, order.id));
+
+				return {
+					...order,
+					deliveryDate: order.deliveryDate.toISOString(),
+					createdAt: order.createdAt.toISOString(),
+					photos: photos.map((photo) => ({
+						...photo,
+						uploadedAt: photo.uploadedAt.toISOString(),
+					})),
+				} as OrderWithPhotos;
+			}),
+		);
+
+		return { orders: ordersWithPhotos, total };
+	} catch (error) {
+		console.error("Error fetching paged orders:", error);
+		return { orders: [], total: 0 };
+	}
+}

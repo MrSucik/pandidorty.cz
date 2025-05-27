@@ -65,11 +65,6 @@ function Navigation() {
 	const [isScrolled, setIsScrolled] = useState(false);
 	const location = useLocation();
 
-	// Do not render navigation on admin routes
-	if (location.pathname.startsWith("/admin")) {
-		return null;
-	}
-
 	// Handle scroll effect for header background
 	useEffect(() => {
 		const handleScroll = () => {
@@ -84,7 +79,7 @@ function Navigation() {
 
 	// Close menu when route changes
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-		useEffect(() => {
+	useEffect(() => {
 		setIsMenuOpen(false);
 		document.body.style.overflow = "";
 	}, [location.pathname]);
@@ -263,11 +258,14 @@ function Navigation() {
 // ---------------------------------------------
 
 export default function App() {
+	const location = useLocation();
+	const showFooterAndNavigation = !location.pathname.startsWith("/admin");
+
 	return (
 		<QueryClientProvider client={queryClient}>
-			<Navigation />
+			{showFooterAndNavigation && <Navigation />}
 			<Outlet />
-			<Footer />
+			{showFooterAndNavigation && <Footer />}
 		</QueryClientProvider>
 	);
 }

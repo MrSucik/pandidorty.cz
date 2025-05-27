@@ -15,15 +15,15 @@
 		"@react-router/serve": "^7.5.3",
 		"@tanstack/react-query": "^5.77.1",
 		"date-fns": "^4.1.0",
+		"dotenv": "^16.5.0",
+		"drizzle-orm": "^0.43.1",
 		"isbot": "^5.1.27",
+		"pg": "^8.16.0",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",
 		"react-hook-form": "^7.56.4",
 		"react-router": "^7.5.3",
-		"zod": "^3.24.1",
-		"drizzle-orm": "^0.43.1",
-		"pg": "^8.16.0",
-		"dotenv": "^16.5.0"
+		"zod": "^3.24.1"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
@@ -32,6 +32,7 @@
 		"@types/node": "^20",
 		"@types/react": "^19.1.2",
 		"@types/react-dom": "^19.1.2",
+		"drizzle-kit": "^0.31.1",
 		"tailwindcss": "^4.1.4",
 		"typescript": "^5.8.3",
 		"vite": "^6.3.3",
