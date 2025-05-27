@@ -1,15 +1,171 @@
 @import "tailwindcss";
 
-@theme {
-	--font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-		"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+/* Custom Fonts */
+@font-face {
+	font-family: "LiebeErika-Regular";
+	src: url("/fonts/06d53b10031cc01c7f208d283d054e0d.eot");
+	src: url("/fonts/06d53b10031cc01c7f208d283d054e0d.eot?#iefix")
+		format("embedded-opentype"),
+		url("/fonts/06d53b10031cc01c7f208d283d054e0d.woff") format("woff"),
+		url("/fonts/06d53b10031cc01c7f208d283d054e0d.woff2") format("woff2"),
+		url("/fonts/06d53b10031cc01c7f208d283d054e0d.ttf") format("truetype"),
+		url("/fonts/06d53b10031cc01c7f208d283d054e0d.svg#LiebeErika W03 Regular")
+		format("svg");
+	unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+		U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+	font-weight: normal;
+	font-style: normal;
+	font-display: block;
 }
 
-html,
-body {
-	@apply bg-white dark:bg-gray-950;
+@font-face {
+	font-family: "LiebeErika-Medium";
+	src: url("/fonts/9897e38317b3a3c0a35153fcc9298387.eot");
+	src: url("/fonts/9897e38317b3a3c0a35153fcc9298387.eot?#iefix")
+		format("embedded-opentype"),
+		url("/fonts/9897e38317b3a3c0a35153fcc9298387.woff") format("woff"),
+		url("/fonts/9897e38317b3a3c0a35153fcc9298387.woff2") format("woff2"),
+		url("/fonts/9897e38317b3a3c0a35153fcc9298387.ttf") format("truetype"),
+		url("/fonts/9897e38317b3a3c0a35153fcc9298387.svg#LiebeErika W03 Medium")
+		format("svg");
+	font-weight: normal;
+	font-style: normal;
+	font-display: block;
+}
 
-	@media (prefers-color-scheme: dark) {
-		color-scheme: dark;
+@font-face {
+	font-family: "LiebeErika-Bold";
+	src: url("/fonts/630c0ad44781de163af5d966a9fb5ff8.eot");
+	src: url("/fonts/630c0ad44781de163af5d966a9fb5ff8.eot?#iefix")
+		format("embedded-opentype"),
+		url("/fonts/630c0ad44781de163af5d966a9fb5ff8.woff") format("woff"),
+		url("/fonts/630c0ad44781de163af5d966a9fb5ff8.woff2") format("woff2"),
+		url("/fonts/630c0ad44781de163af5d966a9fb5ff8.ttf") format("truetype"),
+		url("/fonts/630c0ad44781de163af5d966a9fb5ff8.svg#LiebeErika W03 Bold")
+		format("svg");
+	font-weight: normal;
+	font-style: normal;
+	font-display: block;
+}
+
+@font-face {
+	font-family: "LiebeErika-Black";
+	src: url("/fonts/c74e0a6abeb07c2ecc029c85ddf522e2.eot");
+	src: url("/fonts/c74e0a6abeb07c2ecc029c85ddf522e2.eot?#iefix")
+		format("embedded-opentype"),
+		url("/fonts/c74e0a6abeb07c2ecc029c85ddf522e2.woff") format("woff"),
+		url("/fonts/c74e0a6abeb07c2ecc029c85ddf522e2.woff2") format("woff2"),
+		url("/fonts/c74e0a6abeb07c2ecc029c85ddf522e2.ttf") format("truetype"),
+		url("/fonts/c74e0a6abeb07c2ecc029c85ddf522e2.svg#LiebeErika W03 Black")
+		format("svg");
+	font-weight: normal;
+	font-style: normal;
+	font-display: block;
+}
+
+@layer base {
+	html {
+		scroll-behavior: smooth;
+		scroll-padding-top: 80px; /* Add padding for fixed header */
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	html,
+	body {
+		@apply text-gray-900 bg-white;
+		font-family: "Fraunces", sans-serif;
+	}
+
+	.using-mouse * {
+		outline: none !important;
+	}
+}
+
+@layer components {
+	.bg-flowers {
+		background-image: url("/bg-flowers.png");
+		background-size: 80% auto;
+		background-position: top center;
+		background-repeat: repeat-y;
+	}
+
+	@media (min-width: 1200px) {
+		.bg-flowers {
+			background-size: 100% auto;
+		}
+	}
+
+	/* Custom hover color for footer links */
+	.hover\:text-custom-blue:hover {
+		color: rgb(125 147 171); /* Grayish blue */
+	}
+
+	/* Masonry Grid Layout for Gallery */
+	.masonry-grid {
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: repeat(1, 1fr);
+		/* Note: CSS Grid masonry is experimental, fallback to regular grid */
+	}
+
+	.masonry-item {
+		break-inside: avoid;
+		margin-bottom: 1rem;
+	}
+
+	/* Responsive columns */
+	@media (min-width: 640px) {
+		.masonry-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.masonry-grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+	/* Alternative masonry using CSS columns for better browser support */
+	@supports not (grid-template-rows: masonry) {
+		.masonry-grid {
+			display: block;
+			columns: 1;
+			column-gap: 1rem;
+		}
+
+		@media (min-width: 640px) {
+			.masonry-grid {
+				columns: 2;
+			}
+		}
+
+		@media (min-width: 1024px) {
+			.masonry-grid {
+				columns: 3;
+			}
+		}
+	}
+
+	/* Form checkbox styling */
+	.form-checkbox {
+		@apply rounded border-2;
+	}
+
+	/* Custom font utility */
+	.liebe-erika {
+		font-family: "LiebeErika-Black", sans-serif;
+	}
+}
+
+@layer utilities {
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+
+		#slider {
+			transition: none !important;
+		}
 	}
 }

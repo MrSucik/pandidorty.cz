@@ -6,6 +6,10 @@ import {
 	ScrollRestoration,
 	isRouteErrorResponse,
 } from "react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Link, useLocation } from "react-router";
+import { useEffect, useState, type MouseEvent } from "react";
+import { Footer } from "./components/Footer";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -22,6 +26,16 @@ export const links: Route.LinksFunction = () => [
 		href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
 	},
 ];
+
+// Create a client for React Query
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: 1000 * 60 * 5, // 5 minutes
+			retry: 1,
+		},
+	},
+});
 
 export function Layout({ children }: { children: React.ReactNode }) {
 	return (
@@ -41,8 +55,220 @@ export function Layout({ children }: { children: React.ReactNode }) {
 	);
 }
 
+// ---------------------------------------------
+// Navigation copied and adapted from the legacy
+// TanStack Router implementation
+// ---------------------------------------------
+
+function Navigation() {
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isScrolled, setIsScrolled] = useState(false);
+	const location = useLocation();
+
+	// Do not render navigation on admin routes
+	if (location.pathname.startsWith("/admin")) {
+		return null;
+	}
+
+	// Handle scroll effect for header background
+	useEffect(() => {
+		const handleScroll = () => {
+			setIsScrolled(window.scrollY > 50);
+		};
+
+		window.addEventListener("scroll", handleScroll);
+		handleScroll(); // Check initial scroll position
+
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
+
+	// Close menu when route changes
+	useEffect(() => {
+		setIsMenuOpen(false);
+		document.body.style.overflow = "";
+	}, [location.pathname]);
+
+	const toggleMenu = () => {
+		const newIsOpen = !isMenuOpen;
+		setIsMenuOpen(newIsOpen);
+		document.body.style.overflow = newIsOpen ? "hidden" : "";
+	};
+
+	const handleContactClick = (e: MouseEvent) => {
+		e.preventDefault();
+
+		// Close mobile menu if open
+		if (isMenuOpen) {
+			toggleMenu();
+		}
+
+		// Scroll to bottom of page
+		window.scrollTo({
+			top: document.documentElement.scrollHeight,
+			behavior: "smooth",
+		});
+	};
+
+	return (
+		<>
+			<header
+				className={`fixed top-0 left-0 right-0 z-50 py-3 px-4 md:py-4 md:px-6 transition-colors duration-200 ${
+					isScrolled ? "bg-blue-50/97 backdrop-blur-sm" : ""
+				}`}
+			>
+				<div className="max-w-7xl mx-auto flex justify-between items-center">
+					<Link to="/" className="z-10">
+						<img src="/logo-panda.png" alt="Pandí dorty" className="h-16" />
+					</Link>
+
+					<button
+						type="button"
+						className="md:hidden z-50 p-2 text-black hover:text-custom-blue transition-colors"
+						aria-label="Menu"
+						aria-expanded={isMenuOpen}
+						onClick={toggleMenu}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="h-6 w-6"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							aria-hidden="true"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
+								d="M4 6h16M4 12h16M4 18h16"
+								className={isMenuOpen ? "hidden" : ""}
+							/>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
+								d="M6 18L18 6M6 6l12 12"
+								className={isMenuOpen ? "" : "hidden"}
+							/>
+						</svg>
+					</button>
+
+					<nav className="hidden md:flex items-center">
+						<ul className="flex flex-row gap-6 text-base items-center">
+							<li>
+								<Link
+									to="/"
+									className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+								>
+									Domů
+								</Link>
+							</li>
+							<li>
+								<a
+									href="/cakes"
+									className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+								>
+									Nabídka
+								</a>
+							</li>
+							<li>
+								<Link
+									to="/objednavka"
+									className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+								>
+									Objednávka
+								</Link>
+							</li>
+							<li>
+								<Link
+									to="/gallery"
+									className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+								>
+									Galerie
+								</Link>
+							</li>
+							<li>
+								<button
+									type="button"
+									className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+									onClick={handleContactClick}
+								>
+									Kontakt
+								</button>
+							</li>
+						</ul>
+					</nav>
+				</div>
+			</header>
+
+			{/* Mobile Menu */}
+			<div
+				className={`fixed inset-0 bg-white/95 backdrop-blur-sm transition-transform duration-300 z-40 md:hidden ${
+					isMenuOpen ? "translate-x-0" : "-translate-x-full"
+				}`}
+			>
+				<nav className="h-full flex items-center justify-center">
+					<ul className="flex flex-col gap-8 text-xl text-center">
+						<li>
+							<Link
+								to="/"
+								className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+							>
+								Domů
+							</Link>
+						</li>
+						<li>
+							<a
+								href="/cakes"
+								className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+							>
+								Nabídka
+							</a>
+						</li>
+						<li>
+							<Link
+								to="/objednavka"
+								className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+							>
+								Objednávka
+							</Link>
+						</li>
+						<li>
+							<Link
+								to="/gallery"
+								className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
+							>
+								Galerie
+							</Link>
+						</li>
+						<li>
+							<button
+								type="button"
+								className="hover:text-custom-blue transition-colors py-3 px-6 block w-full font-medium"
+								onClick={handleContactClick}
+							>
+								Kontakt
+							</button>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</>
+	);
+}
+
+// ---------------------------------------------
+// Root application wrapper
+// ---------------------------------------------
+
 export default function App() {
-	return <Outlet />;
+	return (
+		<QueryClientProvider client={queryClient}>
+			<Navigation />
+			<Outlet />
+			<Footer />
+		</QueryClientProvider>
+	);
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
