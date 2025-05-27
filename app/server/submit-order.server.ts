@@ -1,22 +1,22 @@
-import { createServerFn } from '@tanstack/react-start'
-import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns"
-import { cs } from "date-fns/locale"
-import { z } from "zod"
-import { createOrderFromForm, type OrderFormData } from "../db/orders"
+import { createServerFn } from "@tanstack/react-start";
+import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
+import { cs } from "date-fns/locale";
+import { z } from "zod";
+import { type OrderFormData, createOrderFromForm } from "../db/orders";
 
 // Helper function for date validation
 const isValidDeliveryDate = (dateString: string): boolean => {
 	try {
-		const selectedDate = parseISO(dateString)
-		const minDate = addDays(startOfDay(new Date()), 7)
+		const selectedDate = parseISO(dateString);
+		const minDate = addDays(startOfDay(new Date()), 7);
 		return (
 			isAfter(selectedDate, minDate) ||
 			selectedDate.getTime() === minDate.getTime()
-		)
+		);
 	} catch {
-		return false
+		return false;
 	}
-}
+};
 
 // Zod schema for order validation
 const orderSchema = z
@@ -47,7 +47,7 @@ const orderSchema = z
 	.refine(
 		(data) => {
 			// At least one option must be selected
-			return data.orderCake || data.orderDessert
+			return data.orderCake || data.orderDessert;
 		},
 		{
 			message: "Vyberte alespoň jednu možnost: Dort nebo Dezert",
@@ -57,9 +57,9 @@ const orderSchema = z
 		(data) => {
 			// If cake is selected, size and flavor are required
 			if (data.orderCake) {
-				return data.size.trim() !== "" && data.flavor.trim() !== ""
+				return data.size.trim() !== "" && data.flavor.trim() !== "";
 			}
-			return true
+			return true;
 		},
 		{
 			message: "Při objednávce dortu jsou povinné údaje o velikosti a příchuti",
@@ -69,17 +69,17 @@ const orderSchema = z
 		(data) => {
 			// If dessert is selected, dessertChoice is required
 			if (data.orderDessert) {
-				return data.dessertChoice.trim() !== ""
+				return data.dessertChoice.trim() !== "";
 			}
-			return true
+			return true;
 		},
 		{
 			message: "Při objednávce dezertů je povinný výběr dezertů",
 		},
-	)
+	);
 
 export const submitOrderFn = createServerFn({
-	method: 'POST',
+	method: "POST",
 })
 	.validator((formData: FormData) => {
 		// Extract form fields
@@ -94,26 +94,26 @@ export const submitOrderFn = createServerFn({
 			flavor: (formData.get("flavor") as string) || "",
 			dessertChoice: (formData.get("dessertChoice") as string) || "",
 			message: (formData.get("message") as string) || "",
-		}
+		};
 
 		// Handle file uploads
-		const photos = formData.getAll("photos") as File[]
+		const photos = formData.getAll("photos") as File[];
 
 		// Validate with Zod
-		const validationResult = orderSchema.safeParse(orderData)
+		const validationResult = orderSchema.safeParse(orderData);
 
 		if (!validationResult.success) {
 			const errorMessages = validationResult.error.errors.map(
 				(err) => err.message,
-			)
-			throw new Error(errorMessages.join(", "))
+			);
+			throw new Error(errorMessages.join(", "));
 		}
 
-		return { orderData, photos }
+		return { orderData, photos };
 	})
 	.handler(async ({ data: { orderData, photos } }) => {
 		try {
-			console.log("📝 Processing order submission...")
+			console.log("📝 Processing order submission...");
 
 			// Handle file uploads
 			const photoInfo = photos
@@ -122,10 +122,10 @@ export const submitOrderFn = createServerFn({
 					name: file.name,
 					size: file.size,
 					type: file.type,
-				}))
+				}));
 
 			// ✅ Order validation passed - now save to database
-			console.log("✅ Order validation passed! Saving to database...")
+			console.log("✅ Order validation passed! Saving to database...");
 			console.log("👤 Customer Info:", {
 				name: orderData.name,
 				email: orderData.email,
@@ -136,7 +136,7 @@ export const submitOrderFn = createServerFn({
 					"dd.MM.yyyy (EEEE)",
 					{ locale: cs },
 				),
-			})
+			});
 
 			console.log("🛒 Order Details:", {
 				orderCake: orderData.orderCake,
@@ -149,28 +149,33 @@ export const submitOrderFn = createServerFn({
 				...(orderData.orderDessert && {
 					dessertChoice: orderData.dessertChoice,
 				}),
-			})
+			});
 
 			if (photoInfo.length > 0) {
-				console.log("📸 Uploaded Photos:", photoInfo)
+				console.log("📸 Uploaded Photos:", photoInfo);
 			}
 
 			// 💾 Save order to database
-			const dbResult = await createOrderFromForm(orderData as OrderFormData, photos)
-			
+			const dbResult = await createOrderFromForm(
+				orderData as OrderFormData,
+				photos,
+			);
+
 			if (!dbResult.success) {
-				console.error("❌ Failed to save order to database:", dbResult.error)
-				throw new Error("Došlo k chybě při ukládání objednávky. Zkuste to prosím později.")
+				console.error("❌ Failed to save order to database:", dbResult.error);
+				throw new Error(
+					"Došlo k chybě při ukládání objednávky. Zkuste to prosím později.",
+				);
 			}
 
 			// At this point TypeScript knows dbResult.success is true
-			const savedOrder = dbResult.order
-			console.log("💾 Order saved to database with ID:", savedOrder.id)
-			console.log("📧 TODO: Send confirmation email to customer")
-			console.log("🔔 TODO: Send admin notification")
-			
+			const savedOrder = dbResult.order;
+			console.log("💾 Order saved to database with ID:", savedOrder.id);
+			console.log("📧 TODO: Send confirmation email to customer");
+			console.log("🔔 TODO: Send admin notification");
+
 			if (savedOrder.photos && savedOrder.photos.length > 0) {
-				console.log("📸 Photos saved:", savedOrder.photos.length)
+				console.log("📸 Photos saved:", savedOrder.photos.length);
 			}
 
 			// Return success response with real order data
@@ -187,9 +192,11 @@ export const submitOrderFn = createServerFn({
 					status: savedOrder.status,
 					photoCount: savedOrder.photos?.length || 0,
 				},
-			}
+			};
 		} catch (error) {
-			console.error("💥 Error processing order:", error)
-			throw new Error("Došlo k chybě při zpracování objednávky. Zkuste to prosím později.")
+			console.error("💥 Error processing order:", error);
+			throw new Error(
+				"Došlo k chybě při zpracování objednávky. Zkuste to prosím později.",
+			);
 		}
-	}) 
+	});

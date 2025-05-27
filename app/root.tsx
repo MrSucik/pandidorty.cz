@@ -1,3 +1,5 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { type MouseEvent, useEffect, useState } from "react";
 import {
 	Links,
 	Meta,
@@ -6,9 +8,7 @@ import {
 	ScrollRestoration,
 	isRouteErrorResponse,
 } from "react-router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Link, useLocation } from "react-router";
-import { useEffect, useState, type MouseEvent } from "react";
 import { Footer } from "./components/Footer";
 
 import type { Route } from "./+types/root";
@@ -83,7 +83,8 @@ function Navigation() {
 	}, []);
 
 	// Close menu when route changes
-	useEffect(() => {
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+		useEffect(() => {
 		setIsMenuOpen(false);
 		document.body.style.overflow = "";
 	}, [location.pathname]);

@@ -1,5 +1,5 @@
-import { Link } from "react-router";
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 
 export function NotFound({ children }: { children?: ReactNode }) {
 	return (

@@ -1,5 +1,5 @@
-import { Link } from "react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router";
 
 export default function Home() {
 	const [currentSlide, setCurrentSlide] = useState(0);
