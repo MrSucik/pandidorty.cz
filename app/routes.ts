@@ -9,4 +9,9 @@ export default [
 	route("admin/orders", "routes/admin/orders.tsx"),
 	route("photo/:photoId", "routes/photo.$photoId.ts"),
 	route("api/submit-order", "routes/api.submit-order.ts"),
+	route("api/orders/:orderId/paid", "routes/api.orders.$orderId.paid.ts"),
+	route(
+		"api/orders/:orderId/delivered",
+		"routes/api.orders.$orderId.delivered.ts",
+	),
 ] satisfies RouteConfig;

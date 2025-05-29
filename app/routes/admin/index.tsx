@@ -1,4 +1,5 @@
-import { Link, useLoaderData } from "react-router";
+import { useEffect } from "react";
+import { Link, useLoaderData, useRevalidator } from "react-router";
 import type { LoaderFunctionArgs } from "react-router";
 
 import type { OrderStats } from "../../server/get-order-stats.server";
