@@ -1,17 +1,25 @@
 import { useEffect } from "react";
-import { Link, useLoaderData, useRevalidator } from "react-router";
+import { Link, useLoaderData, useRevalidator, Form } from "react-router";
 import type { LoaderFunctionArgs } from "react-router";
 
 import type { OrderStats } from "../../server/get-order-stats.server";
 import { getOrderStats } from "../../server/get-order-stats.server";
+import { requireUserSession } from "../../utils/session.server";
 
-export async function loader(_: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
+	const session = await requireUserSession(request);
+	
 	// Load statistics for dashboard via server-side utility
-	return await getOrderStats();
+	const stats = await getOrderStats();
+	
+	return {
+		stats,
+		user: session.user,
+	};
 }
 
 function AdminDashboard() {
-	const stats = useLoaderData() as OrderStats;
+	const { stats, user } = useLoaderData<typeof loader>();
 
 	return (
 		<div className="min-h-screen bg-gray-50 pt-8">
@@ -20,28 +28,39 @@ function AdminDashboard() {
 					<div>
 						<h1 className="text-3xl font-bold text-gray-900">Administrace</h1>
 						<p className="mt-2 text-gray-600">Správa objednávek a systému</p>
+						<p className="mt-1 text-sm text-gray-500">Přihlášen jako: {user.name}</p>
 					</div>
-					<Link
-						to="/"
-						className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-pink-600 bg-pink-100 hover:bg-pink-200"
-					>
-						<svg
-							className="mr-2 -ml-1 w-4 h-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							role="img"
-							aria-hidden="true"
+					<div className="flex gap-4">
+						<Form action="/admin/logout" method="post">
+							<button
+								type="submit"
+								className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+							>
+								Odhlásit
+							</button>
+						</Form>
+						<Link
+							to="/"
+							className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-pink-600 bg-pink-100 hover:bg-pink-200"
 						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M10 19l-7-7m0 0l7-7m-7 7h18"
-							/>
-						</svg>
-						Zpět
-					</Link>
+							<svg
+								className="mr-2 -ml-1 w-4 h-4"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								role="img"
+								aria-hidden="true"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M10 19l-7-7m0 0l7-7m-7 7h18"
+								/>
+							</svg>
+							Zpět
+						</Link>
+					</div>
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

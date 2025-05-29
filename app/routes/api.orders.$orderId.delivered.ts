@@ -1,8 +1,18 @@
 import { eq } from "drizzle-orm";
 import type { ActionFunctionArgs } from "react-router";
 import { db, orders } from "../db";
+import { getUserSession } from "../utils/session.server";
 
 export async function action({ request, params }: ActionFunctionArgs) {
+	// Check authentication
+	const session = await getUserSession(request);
+	if (!session || !session.user.isActive) {
+		return new Response(JSON.stringify({ error: "Unauthorized" }), {
+			status: 401,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
 	if (request.method !== "PATCH") {
 		return new Response("Method not allowed", { status: 405 });
 	}
@@ -35,6 +45,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			.set({
 				deliveredAt: isDelivered ? new Date() : null,
 				updatedAt: new Date(),
+				updatedById: session.user.id, // Track who made the update
 			})
 			.where(eq(orders.id, Number(orderId)))
 			.returning();

@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
 import { cs } from "date-fns/locale";
-import { useRevalidator } from "react-router";
+import { useRevalidator, useNavigate } from "react-router";
 
 interface Props {
 	orderId: number;
@@ -10,6 +10,7 @@ interface Props {
 
 export default function DeliveredStatusButton({ orderId, deliveredAt }: Props) {
 	const revalidator = useRevalidator();
+	const navigate = useNavigate();
 
 	const mutation = useMutation({
 		mutationFn: async (isDelivered: boolean) => {
@@ -20,6 +21,12 @@ export default function DeliveredStatusButton({ orderId, deliveredAt }: Props) {
 				},
 				body: JSON.stringify({ isDelivered }),
 			});
+
+			if (response.status === 401) {
+				// Redirect to login on unauthorized
+				navigate("/admin/login");
+				throw new Error("Session expired. Please login again.");
+			}
 
 			if (!response.ok) {
 				const error = await response.json();

@@ -4,8 +4,12 @@ import type { LoaderFunctionArgs } from "react-router";
 import OrderCard from "../../components/admin/OrderCard";
 import Pagination from "../../components/admin/Pagination";
 import { getOrdersPaged } from "../../server/get-orders.server";
+import { requireUserSession } from "../../utils/session.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+	// Require authentication
+	await requireUserSession(request);
+
 	const url = new URL(request.url);
 
 	// Pagination params

@@ -18,9 +18,31 @@ export const users = pgTable("users", {
 	name: varchar("name", { length: 255 }).notNull(),
 	password: varchar("password", { length: 255 }).notNull(),
 	isActive: boolean("is_active").notNull().default(true),
+	lastLogin: timestamp("last_login"),
+	failedLoginAttempts: integer("failed_login_attempts").notNull().default(0),
+	lockedUntil: timestamp("locked_until"),
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 	updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+// Sessions table for authentication
+export const sessions = pgTable(
+	"sessions",
+	{
+		id: serial("id").primaryKey(),
+		userId: integer("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		token: varchar("token", { length: 255 }).notNull().unique(),
+		expiresAt: timestamp("expires_at").notNull(),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+	},
+	(table) => ({
+		tokenIdx: index("idx_sessions_token").on(table.token),
+		userIdIdx: index("idx_sessions_user_id").on(table.userId),
+		expiresAtIdx: index("idx_sessions_expires_at").on(table.expiresAt),
+	}),
+);
 
 // Orders table
 export const orders = pgTable(
@@ -86,6 +108,14 @@ export const orderPhotos = pgTable("order_photos", {
 export const usersRelations = relations(users, ({ many }) => ({
 	createdOrders: many(orders, { relationName: "createdBy" }),
 	updatedOrders: many(orders, { relationName: "updatedBy" }),
+	sessions: many(sessions),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+	user: one(users, {
+		fields: [sessions.userId],
+		references: [users.id],
+	}),
 }));
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
@@ -112,6 +142,8 @@ export const orderPhotosRelations = relations(orderPhotos, ({ one }) => ({
 // Type exports for TypeScript inference
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type Session = typeof sessions.$inferSelect;
+export type NewSession = typeof sessions.$inferInsert;
 export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
 export type OrderPhoto = typeof orderPhotos.$inferSelect;
