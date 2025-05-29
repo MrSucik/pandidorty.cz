@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useLoaderData, useRevalidator, Form } from "react-router";
+import { Form, Link, useLoaderData, useRevalidator } from "react-router";
 import type { LoaderFunctionArgs } from "react-router";
 
 import type { OrderStats } from "../../server/get-order-stats.server";
@@ -8,10 +8,10 @@ import { requireUserSession } from "../../utils/session.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const session = await requireUserSession(request);
-	
+
 	// Load statistics for dashboard via server-side utility
 	const stats = await getOrderStats();
-	
+
 	return {
 		stats,
 		user: session.user,
@@ -28,7 +28,9 @@ function AdminDashboard() {
 					<div>
 						<h1 className="text-3xl font-bold text-gray-900">Administrace</h1>
 						<p className="mt-2 text-gray-600">Správa objednávek a systému</p>
-						<p className="mt-1 text-sm text-gray-500">Přihlášen jako: {user.name}</p>
+						<p className="mt-1 text-sm text-gray-500">
+							Přihlášen jako: {user.name}
+						</p>
 					</div>
 					<div className="flex gap-4">
 						<Form action="/admin/logout" method="post">
@@ -110,49 +112,51 @@ function AdminDashboard() {
 						</div>
 					</Link>
 
-					{/* Users Management (placeholder) */}
-					<div className="bg-white overflow-hidden shadow rounded-lg opacity-50">
-						<div className="p-5">
-							<div className="flex items-center">
-								<div className="flex-shrink-0">
-									<div className="w-8 h-8 bg-gray-400 rounded-md flex items-center justify-center">
-										<svg
-											className="w-5 h-5 text-white"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											role="img"
-											aria-label="Ikona uživatelů"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-											/>
-										</svg>
+					{/* Users Management */}
+					<Link to="/admin/users">
+						<div className="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow cursor-pointer">
+							<div className="p-5">
+								<div className="flex items-center">
+									<div className="flex-shrink-0">
+										<div className="w-8 h-8 bg-pink-600 rounded-md flex items-center justify-center">
+											<svg
+												className="w-5 h-5 text-white"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+												role="img"
+												aria-label="Ikona uživatelů"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+												/>
+											</svg>
+										</div>
+									</div>
+									<div className="ml-5 w-0 flex-1">
+										<dl>
+											<dt className="text-sm font-medium text-gray-500 truncate">
+												Uživatelé
+											</dt>
+											<dd className="text-lg font-medium text-gray-900">
+												Správa uživatelů
+											</dd>
+										</dl>
 									</div>
 								</div>
-								<div className="ml-5 w-0 flex-1">
-									<dl>
-										<dt className="text-sm font-medium text-gray-500 truncate">
-											Uživatelé
-										</dt>
-										<dd className="text-lg font-medium text-gray-900">
-											Správa uživatelů
-										</dd>
-									</dl>
+							</div>
+							<div className="bg-gray-50 px-5 py-3">
+								<div className="text-sm">
+									<span className="font-medium text-pink-600 hover:text-pink-500">
+										Zobrazit všechny uživatele →
+									</span>
 								</div>
 							</div>
 						</div>
-						<div className="bg-gray-50 px-5 py-3">
-							<div className="text-sm">
-								<span className="font-medium text-gray-400">
-									Připravuje se...
-								</span>
-							</div>
-						</div>
-					</div>
+					</Link>
 
 					{/* Settings (placeholder) */}
 					<div className="bg-white overflow-hidden shadow rounded-lg opacity-50">

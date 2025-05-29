@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
 import { cs } from "date-fns/locale";
-import { useRevalidator, useNavigate } from "react-router";
+import { useNavigate, useRevalidator } from "react-router";
 
 interface Props {
 	orderId: number;

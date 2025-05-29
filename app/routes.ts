@@ -9,6 +9,7 @@ export default [
 	route("admin/login", "routes/admin/login.tsx"),
 	route("admin/logout", "routes/admin/logout.tsx"),
 	route("admin/orders", "routes/admin/orders.tsx"),
+	route("admin/users", "routes/admin/users.tsx"),
 	route("photo/:photoId", "routes/photo.$photoId.ts"),
 	route("api/submit-order", "routes/api.submit-order.ts"),
 	route("api/orders/:orderId/paid", "routes/api.orders.$orderId.paid.ts"),
