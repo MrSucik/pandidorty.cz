@@ -1,27 +1,34 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1748237417885,
-      "tag": "0000_right_nekra",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1748239778157,
-      "tag": "0001_striped_otto_octavius",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1748337904560,
-      "tag": "0002_charming_rocket_raccoon",
-      "breakpoints": true
-    }
-  ]
+	"version": "7",
+	"dialect": "postgresql",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "7",
+			"when": 1748237417885,
+			"tag": "0000_right_nekra",
+			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "7",
+			"when": 1748239778157,
+			"tag": "0001_striped_otto_octavius",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1748337904560,
+			"tag": "0002_charming_rocket_raccoon",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1748338970920,
+			"tag": "0003_broad_susan_delgado",
+			"breakpoints": true
+		}
+	]
 }

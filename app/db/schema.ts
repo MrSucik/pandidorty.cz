@@ -4,20 +4,12 @@ import {
 	decimal,
 	index,
 	integer,
-	pgEnum,
 	pgTable,
 	serial,
 	text,
 	timestamp,
 	varchar,
 } from "drizzle-orm/pg-core";
-
-// Enums
-export const orderStatusEnum = pgEnum("order_status", [
-	"created",
-	"paid",
-	"delivered",
-]);
 
 // Users table (for admin users)
 export const users = pgTable("users", {
@@ -58,7 +50,8 @@ export const orders = pgTable(
 		billingAddress: text("billing_address"),
 		totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
 
-		status: orderStatusEnum("status").notNull().default("created"),
+		paidAt: timestamp("paid_at"),
+		deliveredAt: timestamp("delivered_at"),
 		notes: text("notes"),
 		createdById: integer("created_by_id").references(() => users.id),
 		updatedById: integer("updated_by_id").references(() => users.id),

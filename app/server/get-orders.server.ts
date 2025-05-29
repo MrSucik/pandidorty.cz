@@ -25,7 +25,8 @@ export interface OrderWithPhotos {
 	cakeFlavor: string | null;
 	cakeMessage: string | null;
 	dessertChoice: string | null;
-	status: "created" | "paid" | "delivered";
+	paidAt: string | null;
+	deliveredAt: string | null;
 	createdAt: string;
 	photos?: Photo[];
 }
@@ -65,6 +66,10 @@ export async function getAllOrders(): Promise<OrderWithPhotos[]> {
 					...order,
 					deliveryDate: order.deliveryDate.toISOString(),
 					createdAt: order.createdAt.toISOString(),
+					paidAt: order.paidAt ? order.paidAt.toISOString() : null,
+					deliveredAt: order.deliveredAt
+						? order.deliveredAt.toISOString()
+						: null,
 					photos: photos.map((photo) => ({
 						...photo,
 						uploadedAt: photo.uploadedAt.toISOString(),
@@ -112,6 +117,8 @@ export async function getOrderByNumber(
 			...order,
 			deliveryDate: order.deliveryDate.toISOString(),
 			createdAt: order.createdAt.toISOString(),
+			paidAt: order.paidAt ? order.paidAt.toISOString() : null,
+			deliveredAt: order.deliveredAt ? order.deliveredAt.toISOString() : null,
 			photos: photos.map((photo) => ({
 				...photo,
 				uploadedAt: photo.uploadedAt.toISOString(),
@@ -127,11 +134,9 @@ export type SortField =
 	| "createdAt"
 	| "deliveryDate"
 	| "orderNumber"
-	| "customerName"
-	| "status";
+	| "customerName";
 
 export interface OrdersQueryOptions {
-	status?: "created" | "paid" | "delivered" | "all";
 	sort?: SortField;
 	dir?: "asc" | "desc";
 	search?: string;
@@ -140,7 +145,6 @@ export interface OrdersQueryOptions {
 }
 
 export async function getOrdersPaged({
-	status = "all",
 	sort = "createdAt",
 	dir = "desc",
 	search = "",
@@ -149,9 +153,6 @@ export async function getOrdersPaged({
 }: OrdersQueryOptions): Promise<{ orders: OrderWithPhotos[]; total: number }> {
 	try {
 		const conditions: SQL[] = [];
-		if (status !== "all") {
-			conditions.push(eq(orders.status, status));
-		}
 
 		if (search.trim()) {
 			const pattern = `%${search.trim()}%`;
@@ -182,8 +183,6 @@ export async function getOrdersPaged({
 					return orders.orderNumber;
 				case "customerName":
 					return orders.customerName;
-				case "status":
-					return orders.status;
 				default:
 					return orders.createdAt;
 			}
@@ -222,6 +221,10 @@ export async function getOrdersPaged({
 					...order,
 					deliveryDate: order.deliveryDate.toISOString(),
 					createdAt: order.createdAt.toISOString(),
+					paidAt: order.paidAt ? order.paidAt.toISOString() : null,
+					deliveredAt: order.deliveredAt
+						? order.deliveredAt.toISOString()
+						: null,
 					photos: photos.map((photo) => ({
 						...photo,
 						uploadedAt: photo.uploadedAt.toISOString(),

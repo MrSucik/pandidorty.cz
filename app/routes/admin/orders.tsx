@@ -4,7 +4,6 @@ import type { LoaderFunctionArgs } from "react-router";
 import OrderCard from "../../components/admin/OrderCard";
 import Pagination from "../../components/admin/Pagination";
 import { getOrdersPaged } from "../../server/get-orders.server";
-import { allowedStatuses } from "../../utils/orderStatus";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
@@ -20,7 +19,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		"deliveryDate",
 		"orderNumber",
 		"customerName",
-		"status",
 	] as const;
 	type SortField = (typeof allowedSortFields)[number];
 
@@ -36,22 +34,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			? (dirParam as "asc" | "desc")
 			: "desc";
 
-	// Filtering params – status
-	type StatusFilter = (typeof allowedStatuses)[number] | "all";
-
-	let status: StatusFilter = "all";
-	const statusParam = url.searchParams.get("status");
-	if (
-		statusParam &&
-		(allowedStatuses as readonly string[]).includes(statusParam)
-	) {
-		status = statusParam as StatusFilter;
-	}
+	// Filtering params – status (REMOVED)
 
 	const searchParam = url.searchParams.get("q") ?? "";
 
 	const { orders, total } = await getOrdersPaged({
-		status,
 		sort,
 		dir,
 		limit: pageSize,
@@ -72,7 +59,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		currentPage,
 		sort,
 		dir,
-		status,
 		search,
 	};
 }
@@ -85,7 +71,6 @@ function AdminOrders() {
 		currentPage,
 		sort,
 		dir,
-		status,
 		search: searchParam,
 	} = useLoaderData<typeof loader>();
 
@@ -96,7 +81,7 @@ function AdminOrders() {
 
 	// debounce: update URL 300ms after stop typing
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-		useEffect(() => {
+	useEffect(() => {
 		const id = setTimeout(() => {
 			if (searchInput !== searchParam) {
 				updateQueryParams({ q: searchInput, page: "1" });
@@ -152,67 +137,134 @@ function AdminOrders() {
 				</div>
 
 				{/* Sorting & Filtering controls */}
-				<div className="mb-6 flex items-center flex-wrap gap-4">
-					<label htmlFor="sort" className="text-sm font-medium text-gray-700">
-						Řadit podle:
-					</label>
-					<select
-						id="sort"
-						className="border-gray-300 text-sm rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
-						value={`${sort}|${dir}`}
-						onChange={(e) => {
-							const [newSort, newDir] = e.target.value.split("|");
-							updateQueryParams({ sort: newSort, dir: newDir, page: "1" });
-						}}
-					>
-						<option value="createdAt|desc">Datum vytvoření – nejnovější</option>
-						<option value="createdAt|asc">Datum vytvoření – nejstarší</option>
-						<option value="deliveryDate|asc">Datum doručení – nejbližší</option>
-						<option value="deliveryDate|desc">
-							Datum doručení – nejpozdější
-						</option>
-						<option value="customerName|asc">Zákazník A → Z</option>
-						<option value="customerName|desc">Zákazník Z → A</option>
-						<option value="orderNumber|asc">Číslo objednávky ↑</option>
-						<option value="orderNumber|desc">Číslo objednávky ↓</option>
-						<option value="status|asc">Status A → Z</option>
-						<option value="status|desc">Status Z → A</option>
-					</select>
+				<div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+						{/* Sort Control */}
+						<div className="space-y-2">
+							<label
+								htmlFor="sort"
+								className="block text-sm font-medium text-gray-900"
+							>
+								<svg
+									className="inline w-4 h-4 mr-2 text-gray-500"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									role="img"
+									aria-label="Ikona řazení"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"
+									/>
+								</svg>
+								Řadit podle
+							</label>
+							<select
+								id="sort"
+								className="w-full border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 text-sm"
+								value={`${sort}|${dir}`}
+								onChange={(e) => {
+									const [newSort, newDir] = e.target.value.split("|");
+									updateQueryParams({ sort: newSort, dir: newDir, page: "1" });
+								}}
+							>
+								<option value="createdAt|desc">
+									Datum vytvoření – nejnovější
+								</option>
+								<option value="createdAt|asc">
+									Datum vytvoření – nejstarší
+								</option>
+								<option value="deliveryDate|asc">
+									Datum doručení – nejbližší
+								</option>
+								<option value="deliveryDate|desc">
+									Datum doručení – nejpozdější
+								</option>
+								<option value="customerName|asc">Zákazník A → Z</option>
+								<option value="customerName|desc">Zákazník Z → A</option>
+								<option value="orderNumber|asc">Číslo objednávky ↑</option>
+								<option value="orderNumber|desc">Číslo objednávky ↓</option>
+							</select>
+						</div>
 
-					<label htmlFor="status" className="text-sm font-medium text-gray-700">
-						Status:
-					</label>
-					<select
-						id="status"
-						className="border-gray-300 text-sm rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500"
-						value={status}
-						onChange={(e) => {
-							updateQueryParams({ status: e.target.value, page: "1" });
-						}}
-					>
-						<option value="all">Všechny</option>
-						{allowedStatuses.map((s) => (
-							<option key={s} value={s}>
-								{s === "created"
-									? "Vytvořeno"
-									: s === "paid"
-										? "Zaplaceno"
-										: "Doručeno"}
-							</option>
-						))}
-					</select>
-
-					<label htmlFor="search" className="text-sm font-medium text-gray-700">
-						Hledat:
-					</label>
-					<input
-						id="search"
-						type="text"
-						placeholder="Jméno, email, číslo objednávky..."
-						className="border-gray-300 text-sm rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 px-2 py-1"
-						value={searchInput}
-						onChange={(e) => setSearchInput(e.target.value)}
-					/>
+						{/* Search */}
+						<div className="space-y-2">
+							<label
+								htmlFor="search"
+								className="block text-sm font-medium text-gray-900"
+							>
+								<svg
+									className="inline w-4 h-4 mr-2 text-gray-500"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									role="img"
+									aria-label="Ikona vyhledávání"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+									/>
+								</svg>
+								Hledat
+							</label>
+							<div className="relative">
+								<input
+									id="search"
+									type="text"
+									placeholder="Jméno, email, číslo objednávky..."
+									className="w-full border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 text-sm pl-10 pr-4 py-2"
+									value={searchInput}
+									onChange={(e) => setSearchInput(e.target.value)}
+								/>
+								<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+									<svg
+										className="h-4 w-4 text-gray-400"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										role="img"
+										aria-label="Ikona vyhledávání"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+										/>
+									</svg>
+								</div>
+								{searchInput && (
+									<button
+										type="button"
+										className="absolute inset-y-0 right-0 pr-3 flex items-center"
+										onClick={() => setSearchInput("")}
+									>
+										<svg
+											className="h-4 w-4 text-gray-400 hover:text-gray-600"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											role="img"
+											aria-label="Vymazat vyhledávání"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M6 18L18 6M6 6l12 12"
+											/>
+										</svg>
+									</button>
+								)}
+							</div>
+						</div>
+					</div>
 				</div>
 
 				{totalOrders === 0 && (
@@ -234,7 +286,7 @@ function AdminOrders() {
 					currentPage={currentPage}
 					totalPages={totalPages}
 					paramBuilder={(page) =>
-						`?page=${page}&sort=${sort}&dir=${dir}&status=${status}&q=${encodeURIComponent(
+						`?page=${page}&sort=${sort}&dir=${dir}&q=${encodeURIComponent(
 							searchParam,
 						)}`
 					}

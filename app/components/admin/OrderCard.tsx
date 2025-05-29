@@ -1,7 +1,10 @@
-import { differenceInCalendarDays, format } from "date-fns";
+import {
+	format,
+	formatDistanceToNow,
+	differenceInCalendarDays,
+} from "date-fns";
 import { cs } from "date-fns/locale";
 import type { OrderWithPhotos } from "../../server/get-orders.server";
-import { getStatusColor, getStatusText } from "../../utils/orderStatus";
 
 interface Props {
 	order: OrderWithPhotos;
@@ -15,11 +18,45 @@ export default function OrderCard({ order }: Props) {
 				<p className="text-base font-semibold text-pink-600">
 					{order.orderNumber}
 				</p>
-				<span
-					className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}`}
-				>
-					{getStatusText(order.status)}
-				</span>
+				{/* Always show both delivered and paid status */}
+				<div className="text-xs space-y-1">
+					<div className="flex items-center gap-2">
+						<span className="font-medium text-gray-700">Doručeno:</span>
+						{order.deliveredAt ? (
+							<span className="px-2 py-1 rounded-full bg-green-100 text-green-800 font-semibold">
+								{format(new Date(order.deliveredAt), "dd.MM.yyyy")}
+								{" ("}
+								{formatDistanceToNow(new Date(order.deliveredAt), {
+									addSuffix: true,
+									locale: cs,
+								})}
+								{")"}
+							</span>
+						) : (
+							<span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600 font-semibold">
+								Ne
+							</span>
+						)}
+					</div>
+					<div className="flex items-center gap-2">
+						<span className="font-medium text-gray-700">Zaplaceno:</span>
+						{order.paidAt ? (
+							<span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 font-semibold">
+								{format(new Date(order.paidAt), "dd.MM.yyyy")}
+								{" ("}
+								{formatDistanceToNow(new Date(order.paidAt), {
+									addSuffix: true,
+									locale: cs,
+								})}
+								{")"}
+							</span>
+						) : (
+							<span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600 font-semibold">
+								Ne
+							</span>
+						)}
+					</div>
+				</div>
 			</div>
 
 			{/* Customer info */}
@@ -105,10 +142,28 @@ export default function OrderCard({ order }: Props) {
 					})()}
 				</p>
 				{order.photos && order.photos.length > 0 && (
-					<p>
-						<span className="font-medium">Fotografie:</span>{" "}
-						{order.photos.length}
-					</p>
+					<div className="pt-2">
+						<span className="font-medium text-gray-700 block mb-1">
+							Fotografie:
+						</span>
+						<div className="flex flex-wrap gap-2">
+							{order.photos.map((photo) => (
+								<a
+									key={photo.id}
+									href={`/photo/${photo.id}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="block w-24 h-24 border rounded overflow-hidden"
+								>
+									<img
+										src={`/photo/${photo.id}`}
+										alt={photo.originalName}
+										className="w-full h-full object-cover"
+									/>
+								</a>
+							))}
+						</div>
+					</div>
 				)}
 			</div>
 		</li>

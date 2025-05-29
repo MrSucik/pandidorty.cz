@@ -61,7 +61,6 @@ export async function createOrderFromForm(
 			billingAddress: null,
 			totalAmount: null,
 
-			status: "created",
 			notes: null,
 			createdById: null, // No admin user creating this order
 			updatedById: null,

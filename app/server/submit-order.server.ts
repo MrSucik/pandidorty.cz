@@ -86,7 +86,6 @@ export interface SubmitOrderResult {
 		orderNumber: string;
 		customerName: string;
 		deliveryDate: Date;
-		status: "created" | "paid" | "delivered";
 		photoCount: number;
 	};
 }
@@ -201,7 +200,6 @@ export async function submitOrder(
 				orderNumber: savedOrder.orderNumber,
 				customerName: savedOrder.customerName,
 				deliveryDate: savedOrder.deliveryDate,
-				status: savedOrder.status as "created" | "paid" | "delivered",
 				photoCount: savedOrder.photos?.length || 0,
 			},
 		};

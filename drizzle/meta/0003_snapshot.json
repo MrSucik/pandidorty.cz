@@ -1,6 +1,6 @@
 {
-	"id": "7977b13b-a422-4d5e-9837-ac6f4ddd235b",
-	"prevId": "cc04bd9b-ea50-478d-98a6-839b8cb37bb0",
+	"id": "33c7ca46-10c1-446f-93c7-4e74b9b0218c",
+	"prevId": "7977b13b-a422-4d5e-9837-ac6f4ddd235b",
 	"version": "7",
 	"dialect": "postgresql",
 	"tables": {
@@ -166,13 +166,17 @@
 					"primaryKey": false,
 					"notNull": false
 				},
-				"status": {
-					"name": "status",
-					"type": "order_status",
-					"typeSchema": "public",
+				"paid_at": {
+					"name": "paid_at",
+					"type": "timestamp",
 					"primaryKey": false,
-					"notNull": true,
-					"default": "'created'"
+					"notNull": false
+				},
+				"delivered_at": {
+					"name": "delivered_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
 				},
 				"notes": {
 					"name": "notes",
@@ -351,13 +355,7 @@
 			"isRLSEnabled": false
 		}
 	},
-	"enums": {
-		"public.order_status": {
-			"name": "order_status",
-			"schema": "public",
-			"values": ["created", "paid", "delivered"]
-		}
-	},
+	"enums": {},
 	"schemas": {},
 	"sequences": {},
 	"roles": {},
