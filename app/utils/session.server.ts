@@ -70,6 +70,19 @@ export async function requireUserSession(request: Request) {
 	return session;
 }
 
+export async function requireApiSession(request: Request) {
+	const session = await getUserSession(request);
+
+	if (!session || !session.user.isActive) {
+		throw new Response(JSON.stringify({ error: "Unauthorized" }), {
+			status: 401,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
+	return session;
+}
+
 export async function logout(request: Request) {
 	const session = await sessionStorage.getSession(
 		request.headers.get("Cookie"),

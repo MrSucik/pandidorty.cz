@@ -10,6 +10,7 @@ export default [
 	route("admin/logout", "routes/admin/logout.tsx"),
 	route("admin/orders", "routes/admin/orders.tsx"),
 	route("admin/users", "routes/admin/users.tsx"),
+	route("admin/settings", "routes/admin/settings.tsx"),
 	route("photo/:photoId", "routes/photo.$photoId.ts"),
 	route("api/submit-order", "routes/api.submit-order.ts"),
 	route("api/orders/:orderId/paid", "routes/api.orders.$orderId.paid.ts"),
@@ -17,4 +18,6 @@ export default [
 		"api/orders/:orderId/delivered",
 		"routes/api.orders.$orderId.delivered.ts",
 	),
+	route("api/blocked-dates/add", "routes/api.blocked-dates.add.ts"),
+	route("api/blocked-dates/remove", "routes/api.blocked-dates.remove.ts"),
 ] satisfies RouteConfig;

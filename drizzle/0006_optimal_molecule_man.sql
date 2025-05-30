@@ -1,0 +1,1 @@
+ALTER TABLE "blocked_dates" DROP COLUMN "reason";

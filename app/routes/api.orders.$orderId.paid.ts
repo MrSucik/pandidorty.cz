@@ -1,43 +1,64 @@
 import { eq } from "drizzle-orm";
 import type { ActionFunctionArgs } from "react-router";
+import { z } from "zod";
 import { db, orders } from "../db";
-import { getUserSession } from "../utils/session.server";
+import { requireApiSession } from "../utils/session.server";
+
+const paramsSchema = z.object({
+	orderId: z.string().transform((val) => {
+		const num = Number(val);
+		if (Number.isNaN(num)) {
+			throw new Error("Order ID must be a valid number");
+		}
+		return num;
+	}),
+});
+
+const bodySchema = z.object({
+	isPaid: z.boolean(),
+});
 
 export async function action({ request, params }: ActionFunctionArgs) {
-	// Check authentication
-	const session = await getUserSession(request);
-	if (!session || !session.user.isActive) {
-		return new Response(JSON.stringify({ error: "Unauthorized" }), {
-			status: 401,
-			headers: { "Content-Type": "application/json" },
-		});
-	}
-
 	if (request.method !== "PATCH") {
 		return new Response("Method not allowed", { status: 405 });
 	}
 
-	const orderId = params.orderId;
-	if (!orderId || Number.isNaN(Number(orderId))) {
-		return new Response(JSON.stringify({ error: "Invalid order ID" }), {
-			status: 400,
-			headers: { "Content-Type": "application/json" },
-		});
-	}
-
 	try {
-		const body = await request.json();
-		const { isPaid } = body;
+		const session = await requireApiSession(request);
 
-		if (typeof isPaid !== "boolean") {
+		// Validate params
+		const paramsValidation = paramsSchema.safeParse(params);
+		if (!paramsValidation.success) {
 			return new Response(
-				JSON.stringify({ error: "isPaid must be a boolean" }),
+				JSON.stringify({
+					error: "Invalid order ID",
+					details: paramsValidation.error.errors,
+				}),
 				{
 					status: 400,
 					headers: { "Content-Type": "application/json" },
 				},
 			);
 		}
+
+		// Validate body
+		const body = await request.json();
+		const bodyValidation = bodySchema.safeParse(body);
+		if (!bodyValidation.success) {
+			return new Response(
+				JSON.stringify({
+					error: "Invalid request data",
+					details: bodyValidation.error.errors,
+				}),
+				{
+					status: 400,
+					headers: { "Content-Type": "application/json" },
+				},
+			);
+		}
+
+		const { orderId } = paramsValidation.data;
+		const { isPaid } = bodyValidation.data;
 
 		// Update the order
 		const [updatedOrder] = await db
@@ -47,7 +68,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				updatedAt: new Date(),
 				updatedById: session.user.id, // Track who made the update
 			})
-			.where(eq(orders.id, Number(orderId)))
+			.where(eq(orders.id, orderId))
 			.returning();
 
 		if (!updatedOrder) {
@@ -68,6 +89,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			},
 		);
 	} catch (error) {
+		// If it's already a Response (from requireApiSession), re-throw it
+		if (error instanceof Response) {
+			throw error;
+		}
 		console.error("Error updating order paid status:", error);
 		return new Response(JSON.stringify({ error: "Internal server error" }), {
 			status: 500,

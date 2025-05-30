@@ -1,15 +1,37 @@
 import type { LoaderFunctionArgs } from "react-router";
+import { z } from "zod";
+import { requireApiSession } from "../utils/session.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
-	const { photoId } = params as { photoId?: string };
-	if (!photoId) {
-		throw new Response("Photo ID required", { status: 400 });
+const paramsSchema = z.object({
+	photoId: z.string().transform((val) => {
+		const num = Number.parseInt(val, 10);
+		if (Number.isNaN(num)) {
+			throw new Error("Photo ID must be a valid number");
+		}
+		return num;
+	}),
+});
+
+export async function loader({ params, request }: LoaderFunctionArgs) {
+	// Check authentication - photos contain customer order data
+	await requireApiSession(request);
+
+	// Validate params
+	const paramsValidation = paramsSchema.safeParse(params);
+	if (!paramsValidation.success) {
+		throw new Response(
+			JSON.stringify({
+				error: "Invalid photo ID",
+				details: paramsValidation.error.errors,
+			}),
+			{
+				status: 400,
+				headers: { "Content-Type": "application/json" },
+			},
+		);
 	}
 
-	const id = Number.parseInt(photoId, 10);
-	if (Number.isNaN(id)) {
-		throw new Response("Invalid photo ID", { status: 400 });
-	}
+	const { photoId } = paramsValidation.data;
 
 	// Lazy import to keep DB code server-only
 	const { db, orderPhotos } = await import("../db");
@@ -18,7 +40,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	const rows = await db
 		.select()
 		.from(orderPhotos)
-		.where(eq(orderPhotos.id, id))
+		.where(eq(orderPhotos.id, photoId))
 		.limit(1);
 
 	if (!rows[0]) {
@@ -37,7 +59,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 		headers: {
 			"Content-Type": photo.mimeType,
 			"Content-Length": photo.fileSize.toString(),
-			"Cache-Control": "public, max-age=31536000",
+			"Cache-Control": "private, max-age=3600",
 			"Content-Disposition": `inline; filename="${photo.originalName}"`,
 		},
 	});

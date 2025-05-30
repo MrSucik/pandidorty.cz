@@ -2,19 +2,41 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
 import { cs } from "date-fns/locale";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
 	type SubmitHandler,
 	useForm as useReactHookForm,
 } from "react-hook-form";
+import { useLoaderData } from "react-router";
+import type { LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
+import { getBlockedDates } from "../server/blocked-dates.server";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+	const blockedDates = await getBlockedDates();
+	// Convert to array of date strings for easier client-side usage
+	const blockedDateStrings = blockedDates.map((bd) => bd.date);
+
+	return {
+		blockedDates: blockedDateStrings,
+	};
+}
 
 // Helper function for date validation
-const isValidDeliveryDate = (dateString: string): boolean => {
+const isValidDeliveryDate = (
+	dateString: string,
+	blockedDates: string[],
+): boolean => {
 	try {
 		const today = startOfDay(new Date());
 		const minDate = addDays(today, 7);
 		const selectedDate = parseISO(dateString);
+
+		// Check if date is blocked
+		if (blockedDates.includes(dateString)) {
+			return false;
+		}
+
 		return (
 			isAfter(selectedDate, minDate) ||
 			selectedDate.getTime() === minDate.getTime()
@@ -32,36 +54,80 @@ const fileListSchema = isBrowser
 	? z.instanceof(FileList).nullable()
 	: z.any().nullable();
 
-// Define the base schema first
-const baseOrderFormSchema = z.object({
-	name: z
-		.string()
-		.min(1, "Toto pole je povinné")
-		.min(2, "Jméno musí mít alespoň 2 znaky"),
-	email: z
-		.string()
-		.min(1, "Toto pole je povinné")
-		.email("Zadejte platnou emailovou adresu"),
-	phone: z
-		.string()
-		.min(1, "Toto pole je povinné")
-		.min(9, "Telefon musí mít alespoň 9 číslic"),
-	date: z
-		.string()
-		.min(1, "Toto pole je povinné")
-		.refine(isValidDeliveryDate, "Datum dodání musí být alespoň 7 dní od dnes"),
-	orderCake: z.boolean(),
-	orderDessert: z.boolean(),
-	size: z.string(),
-	flavor: z.string(),
-	dessertChoice: z.string(),
-	message: z.string(),
-	photos: fileListSchema,
-});
+interface OrderResponse {
+	success: boolean;
+	message?: string;
+	error?: string;
+	orderId?: string;
+}
 
-// Zod validation schemas with refinements
-const orderFormSchema: z.ZodType<z.infer<typeof baseOrderFormSchema>> =
-	baseOrderFormSchema
+const submitOrder = async (formData: FormData): Promise<OrderResponse> => {
+	const response = await fetch("/api/submit-order", {
+		method: "POST",
+		body: formData,
+	});
+
+	const result = (await response.json()) as OrderResponse;
+
+	if (!response.ok) {
+		throw new Error(result.error || "Došlo k chybě při odesílání formuláře.");
+	}
+
+	return result;
+};
+
+export default function OrderForm() {
+	const { blockedDates } = useLoaderData<typeof loader>();
+	const [showBlockedDates, setShowBlockedDates] = useState(false);
+
+	// Initialize default date (yyyy-MM-dd)
+	const today = startOfDay(new Date());
+	const minDate = addDays(today, 7);
+	const defaultDate = format(minDate, "yyyy-MM-dd", { locale: cs });
+
+	// Get future blocked dates
+	const futureBlockedDates = blockedDates.filter((dateStr) => {
+		const date = parseISO(dateStr);
+		return isAfter(date, today) || date.getTime() === today.getTime();
+	});
+
+	// Define the base schema first
+	const baseOrderFormSchema = z.object({
+		name: z
+			.string()
+			.min(1, "Toto pole je povinné")
+			.min(2, "Jméno musí mít alespoň 2 znaky"),
+		email: z
+			.string()
+			.min(1, "Toto pole je povinné")
+			.email("Zadejte platnou emailovou adresu"),
+		phone: z
+			.string()
+			.min(1, "Toto pole je povinné")
+			.min(9, "Telefon musí mít alespoň 9 číslic"),
+		date: z
+			.string()
+			.min(1, "Toto pole je povinné")
+			.refine(
+				(date) => isValidDeliveryDate(date, blockedDates),
+				(date) => {
+					if (blockedDates.includes(date)) {
+						return { message: "Tento termín není dostupný" };
+					}
+					return { message: "Datum dodání musí být alespoň 7 dní od dnes" };
+				},
+			),
+		orderCake: z.boolean(),
+		orderDessert: z.boolean(),
+		size: z.string(),
+		flavor: z.string(),
+		dessertChoice: z.string(),
+		message: z.string(),
+		photos: fileListSchema,
+	});
+
+	// Zod validation schemas with refinements
+	const orderFormSchema = baseOrderFormSchema
 		.refine(
 			(data) => {
 				return data.orderCake || data.orderDessert;
@@ -97,34 +163,7 @@ const orderFormSchema: z.ZodType<z.infer<typeof baseOrderFormSchema>> =
 			},
 		);
 
-type OrderFormData = z.infer<typeof baseOrderFormSchema>;
-interface OrderResponse {
-	success: boolean;
-	message?: string;
-	error?: string;
-	orderId?: string;
-}
-
-const submitOrder = async (formData: FormData): Promise<OrderResponse> => {
-	const response = await fetch("/api/submit-order", {
-		method: "POST",
-		body: formData,
-	});
-
-	const result = (await response.json()) as OrderResponse;
-
-	if (!response.ok) {
-		throw new Error(result.error || "Došlo k chybě při odesílání formuláře.");
-	}
-
-	return result;
-};
-
-export default function OrderForm() {
-	// Initialize default date (yyyy-MM-dd)
-	const today = startOfDay(new Date());
-	const minDate = addDays(today, 7);
-	const defaultDate = format(minDate, "yyyy-MM-dd", { locale: cs });
+	type OrderFormData = z.infer<typeof orderFormSchema>;
 
 	const submitOrderMutation = useMutation({
 		mutationFn: submitOrder,
@@ -333,7 +372,16 @@ export default function OrderForm() {
 											type="date"
 											id="date"
 											min={defaultDate}
-											{...register("date")}
+											{...register("date", {
+												onChange: (e) => {
+													const selectedDate = e.target.value;
+													if (blockedDates.includes(selectedDate)) {
+														setShowBlockedDates(true);
+													} else {
+														setShowBlockedDates(false);
+													}
+												},
+											})}
 											className={`w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-pink-500 focus:border-transparent ${errors.date ? "border-red-300 bg-red-50" : "border-gray-300"}`}
 										/>
 										<p className="text-sm text-gray-500 mt-1">
@@ -344,6 +392,27 @@ export default function OrderForm() {
 												{errors.date.message}
 											</p>
 										)}
+										{(showBlockedDates ||
+											errors.date?.message?.includes("není dostupný")) &&
+											futureBlockedDates.length > 0 && (
+												<div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+													<p className="text-sm font-medium text-yellow-800 mb-2">
+														Následující termíny nejsou dostupné:
+													</p>
+													<div className="text-sm text-yellow-700 space-y-1">
+														{futureBlockedDates
+															.sort((a, b) => a.localeCompare(b))
+															.map((date) => (
+																<div key={date}>
+																	•{" "}
+																	{format(parseISO(date), "EEEE d. MMMM yyyy", {
+																		locale: cs,
+																	})}
+																</div>
+															))}
+													</div>
+												</div>
+											)}
 									</div>
 								</div>
 							</div>

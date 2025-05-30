@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
 	boolean,
+	date,
 	decimal,
 	index,
 	integer,
@@ -104,6 +105,22 @@ export const orderPhotos = pgTable("order_photos", {
 	uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
 });
 
+// Blocked dates table
+export const blockedDates = pgTable(
+	"blocked_dates",
+	{
+		id: serial("id").primaryKey(),
+		date: date("date").notNull().unique(),
+		createdById: integer("created_by_id")
+			.notNull()
+			.references(() => users.id),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+	},
+	(table) => ({
+		dateIdx: index("idx_blocked_dates_date").on(table.date),
+	}),
+);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
 	createdOrders: many(orders, { relationName: "createdBy" }),
@@ -139,6 +156,13 @@ export const orderPhotosRelations = relations(orderPhotos, ({ one }) => ({
 	}),
 }));
 
+export const blockedDatesRelations = relations(blockedDates, ({ one }) => ({
+	createdBy: one(users, {
+		fields: [blockedDates.createdById],
+		references: [users.id],
+	}),
+}));
+
 // Type exports for TypeScript inference
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -148,3 +172,5 @@ export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
 export type OrderPhoto = typeof orderPhotos.$inferSelect;
 export type NewOrderPhoto = typeof orderPhotos.$inferInsert;
+export type BlockedDate = typeof blockedDates.$inferSelect;
+export type NewBlockedDate = typeof blockedDates.$inferInsert;

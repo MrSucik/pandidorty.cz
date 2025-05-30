@@ -158,55 +158,57 @@ function AdminDashboard() {
 						</div>
 					</Link>
 
-					{/* Settings (placeholder) */}
-					<div className="bg-white overflow-hidden shadow rounded-lg opacity-50">
-						<div className="p-5">
-							<div className="flex items-center">
-								<div className="flex-shrink-0">
-									<div className="w-8 h-8 bg-gray-400 rounded-md flex items-center justify-center">
-										<svg
-											className="w-5 h-5 text-white"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											role="img"
-											aria-label="Ikona nastavení"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-											/>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-											/>
-										</svg>
+					{/* Settings */}
+					<Link to="/admin/settings">
+						<div className="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow cursor-pointer">
+							<div className="p-5">
+								<div className="flex items-center">
+									<div className="flex-shrink-0">
+										<div className="w-8 h-8 bg-pink-600 rounded-md flex items-center justify-center">
+											<svg
+												className="w-5 h-5 text-white"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+												role="img"
+												aria-label="Ikona nastavení"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+												/>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+												/>
+											</svg>
+										</div>
+									</div>
+									<div className="ml-5 w-0 flex-1">
+										<dl>
+											<dt className="text-sm font-medium text-gray-500 truncate">
+												Nastavení
+											</dt>
+											<dd className="text-lg font-medium text-gray-900">
+												Konfigurace systému
+											</dd>
+										</dl>
 									</div>
 								</div>
-								<div className="ml-5 w-0 flex-1">
-									<dl>
-										<dt className="text-sm font-medium text-gray-500 truncate">
-											Nastavení
-										</dt>
-										<dd className="text-lg font-medium text-gray-900">
-											Konfigurace systému
-										</dd>
-									</dl>
+							</div>
+							<div className="bg-gray-50 px-5 py-3">
+								<div className="text-sm">
+									<span className="font-medium text-pink-600 hover:text-pink-500">
+										Spravovat blokované termíny →
+									</span>
 								</div>
 							</div>
 						</div>
-						<div className="bg-gray-50 px-5 py-3">
-							<div className="text-sm">
-								<span className="font-medium text-gray-400">
-									Připravuje se...
-								</span>
-							</div>
-						</div>
-					</div>
+					</Link>
 				</div>
 
 				{/* Quick Stats */}

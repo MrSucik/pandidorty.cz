@@ -16,12 +16,43 @@ A modern, production-ready template for building full-stack React applications u
 
 ## Getting Started
 
+### Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```bash
+# Database
+DATABASE_URL=postgresql://username:password@localhost:5432/pandidorty
+
+# Admin Seeding (for npm run seed:admin)
+ADMIN_EMAIL=admin@pandidorty.cz
+ADMIN_PASSWORD=your_secure_password_here
+```
+
 ### Installation
 
 Install the dependencies:
 
 ```bash
 npm install
+```
+
+### Database Setup
+
+Make sure you have a PostgreSQL database running and configured in your `.env` file.
+
+### Admin User Creation
+
+Create an admin user for accessing the admin panel:
+
+```bash
+ADMIN_PASSWORD=your_secure_password npm run seed:admin
+```
+
+Or add `ADMIN_PASSWORD` to your `.env` file and run:
+
+```bash
+npm run seed:admin
 ```
 
 ### Development

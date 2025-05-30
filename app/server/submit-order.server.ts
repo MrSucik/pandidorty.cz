@@ -2,6 +2,7 @@ import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
 import { cs } from "date-fns/locale";
 import { z } from "zod";
 import { type OrderFormData, createOrderFromForm } from "../db/orders";
+import { isDateBlocked } from "./blocked-dates.server";
 
 // Helper function for date validation
 const isValidDeliveryDate = (dateString: string): boolean => {
@@ -119,6 +120,12 @@ export async function submitOrder(
 			(err) => err.message,
 		);
 		throw new Error(errorMessages.join(", "));
+	}
+
+	// Check if the selected date is blocked
+	const dateIsBlocked = await isDateBlocked(orderData.date);
+	if (dateIsBlocked) {
+		throw new Error("Vybraný termín není dostupný. Zvolte prosím jiný termín.");
 	}
 
 	try {
