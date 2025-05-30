@@ -107,9 +107,9 @@ function AdminOrders() {
 		<div className="min-h-screen bg-gray-50 pt-8">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				<div className="mb-8">
-					<div className="flex items-center justify-between flex-wrap gap-4">
-						<div>
-							<h1 className="text-3xl font-bold text-gray-900">
+					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+						<div className="flex-1">
+							<h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
 								Správa objednávek
 							</h1>
 							<p className="mt-2 text-gray-600">
@@ -118,7 +118,7 @@ function AdminOrders() {
 						</div>
 						<Link
 							to="/admin"
-							className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-pink-600 bg-pink-100 hover:bg-pink-200"
+							className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
 						>
 							<svg
 								className="mr-2 -ml-1 w-4 h-4"
@@ -141,8 +141,8 @@ function AdminOrders() {
 				</div>
 
 				{/* Sorting & Filtering controls */}
-				<div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 						{/* Sort Control */}
 						<div className="space-y-2">
 							<label
@@ -278,7 +278,7 @@ function AdminOrders() {
 				)}
 
 				{orders.length > 0 && (
-					<ul className="space-y-6">
+					<ul className="space-y-4 sm:space-y-6">
 						{orders.map((order) => (
 							<OrderCard key={order.id} order={order} />
 						))}

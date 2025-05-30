@@ -24,26 +24,28 @@ function AdminDashboard() {
 	return (
 		<div className="min-h-screen bg-gray-50 pt-8">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-				<div className="mb-8 flex items-center justify-between">
-					<div>
-						<h1 className="text-3xl font-bold text-gray-900">Administrace</h1>
+				<div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+					<div className="flex-1">
+						<h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+							Administrace
+						</h1>
 						<p className="mt-2 text-gray-600">Správa objednávek a systému</p>
 						<p className="mt-1 text-sm text-gray-500">
 							Přihlášen jako: {user.name}
 						</p>
 					</div>
-					<div className="flex gap-4">
+					<div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
 						<Form action="/admin/logout" method="post">
 							<button
 								type="submit"
-								className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+								className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
 							>
 								Odhlásit
 							</button>
 						</Form>
 						<Link
 							to="/"
-							className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-pink-600 bg-pink-100 hover:bg-pink-200"
+							className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-pink-600 bg-pink-100 hover:bg-pink-200"
 						>
 							<svg
 								className="mr-2 -ml-1 w-4 h-4"
@@ -65,11 +67,11 @@ function AdminDashboard() {
 					</div>
 				</div>
 
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
 					{/* Orders Management */}
 					<Link to="/admin/orders">
 						<div className="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow cursor-pointer">
-							<div className="p-5">
+							<div className="p-4 sm:p-5">
 								<div className="flex items-center">
 									<div className="flex-shrink-0">
 										<div className="w-8 h-8 bg-pink-600 rounded-md flex items-center justify-center">
@@ -95,14 +97,14 @@ function AdminDashboard() {
 											<dt className="text-sm font-medium text-gray-500 truncate">
 												Objednávky
 											</dt>
-											<dd className="text-lg font-medium text-gray-900">
+											<dd className="text-base sm:text-lg font-medium text-gray-900">
 												Správa objednávek
 											</dd>
 										</dl>
 									</div>
 								</div>
 							</div>
-							<div className="bg-gray-50 px-5 py-3">
+							<div className="bg-gray-50 px-4 sm:px-5 py-3">
 								<div className="text-sm">
 									<span className="font-medium text-pink-600 hover:text-pink-500">
 										Zobrazit všechny objednávky →
@@ -115,7 +117,7 @@ function AdminDashboard() {
 					{/* Users Management */}
 					<Link to="/admin/users">
 						<div className="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow cursor-pointer">
-							<div className="p-5">
+							<div className="p-4 sm:p-5">
 								<div className="flex items-center">
 									<div className="flex-shrink-0">
 										<div className="w-8 h-8 bg-pink-600 rounded-md flex items-center justify-center">
@@ -141,14 +143,14 @@ function AdminDashboard() {
 											<dt className="text-sm font-medium text-gray-500 truncate">
 												Uživatelé
 											</dt>
-											<dd className="text-lg font-medium text-gray-900">
+											<dd className="text-base sm:text-lg font-medium text-gray-900">
 												Správa uživatelů
 											</dd>
 										</dl>
 									</div>
 								</div>
 							</div>
-							<div className="bg-gray-50 px-5 py-3">
+							<div className="bg-gray-50 px-4 sm:px-5 py-3">
 								<div className="text-sm">
 									<span className="font-medium text-pink-600 hover:text-pink-500">
 										Zobrazit všechny uživatele →
@@ -161,7 +163,7 @@ function AdminDashboard() {
 					{/* Settings */}
 					<Link to="/admin/settings">
 						<div className="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow cursor-pointer">
-							<div className="p-5">
+							<div className="p-4 sm:p-5">
 								<div className="flex items-center">
 									<div className="flex-shrink-0">
 										<div className="w-8 h-8 bg-pink-600 rounded-md flex items-center justify-center">
@@ -193,14 +195,14 @@ function AdminDashboard() {
 											<dt className="text-sm font-medium text-gray-500 truncate">
 												Nastavení
 											</dt>
-											<dd className="text-lg font-medium text-gray-900">
+											<dd className="text-base sm:text-lg font-medium text-gray-900">
 												Konfigurace systému
 											</dd>
 										</dl>
 									</div>
 								</div>
 							</div>
-							<div className="bg-gray-50 px-5 py-3">
+							<div className="bg-gray-50 px-4 sm:px-5 py-3">
 								<div className="text-sm">
 									<span className="font-medium text-pink-600 hover:text-pink-500">
 										Spravovat blokované termíny →
@@ -212,26 +214,26 @@ function AdminDashboard() {
 				</div>
 
 				{/* Quick Stats */}
-				<div className="mt-8">
-					<h2 className="text-lg font-medium text-gray-900 mb-4">
+				<div className="mt-6 sm:mt-8">
+					<h2 className="text-base sm:text-lg font-medium text-gray-900 mb-4">
 						Rychlý přehled
 					</h2>
-					<div className="bg-white shadow rounded-lg p-6">
-						<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-							<div className="text-center">
-								<div className="text-2xl font-bold text-blue-600">
+					<div className="bg-white shadow rounded-lg p-4 sm:p-6">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+							<div className="text-center p-4 sm:p-0">
+								<div className="text-xl sm:text-2xl font-bold text-blue-600">
 									{stats.paid}
 								</div>
 								<div className="text-sm text-gray-500">Zaplacené</div>
 							</div>
-							<div className="text-center">
-								<div className="text-2xl font-bold text-green-600">
+							<div className="text-center p-4 sm:p-0">
+								<div className="text-xl sm:text-2xl font-bold text-green-600">
 									{stats.delivered}
 								</div>
 								<div className="text-sm text-gray-500">Doručené</div>
 							</div>
-							<div className="text-center">
-								<div className="text-2xl font-bold text-gray-600">
+							<div className="text-center p-4 sm:p-0">
+								<div className="text-xl sm:text-2xl font-bold text-gray-600">
 									{stats.total}
 								</div>
 								<div className="text-sm text-gray-500">Celkem</div>

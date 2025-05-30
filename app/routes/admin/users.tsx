@@ -59,9 +59,9 @@ function AdminUsers() {
 	return (
 		<div className="min-h-screen bg-gray-50 pt-8">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-				<div className="mb-8 flex items-center justify-between">
-					<div>
-						<h1 className="text-3xl font-bold text-gray-900">
+				<div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+					<div className="flex-1">
+						<h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
 							Správa uživatelů
 						</h1>
 						<p className="mt-2 text-gray-600">Administrátorské účty systému</p>
@@ -69,10 +69,10 @@ function AdminUsers() {
 							Celkem uživatelů: {users.length}
 						</p>
 					</div>
-					<div className="flex gap-4">
+					<div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
 						<Link
 							to="/admin"
-							className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+							className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
 						>
 							<svg
 								className="mr-2 -ml-1 w-4 h-4"
@@ -89,7 +89,7 @@ function AdminUsers() {
 									d="M10 19l-7-7m0 0l7-7m-7 7h18"
 								/>
 							</svg>
-							Zpět na administraci
+							Zpět na dashboard
 						</Link>
 					</div>
 				</div>
@@ -99,7 +99,7 @@ function AdminUsers() {
 						{users.map((user) => (
 							<li key={user.id}>
 								<div className="px-4 py-4 sm:px-6">
-									<div className="flex items-center justify-between">
+									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 										<div className="flex items-center">
 											<div className="flex-shrink-0">
 												<div className="h-10 w-10 rounded-full bg-pink-500 flex items-center justify-center">
@@ -108,9 +108,9 @@ function AdminUsers() {
 													</span>
 												</div>
 											</div>
-											<div className="ml-4">
-												<div className="flex items-center">
-													<p className="text-sm font-medium text-gray-900">
+											<div className="ml-4 flex-1 min-w-0">
+												<div className="flex flex-col sm:flex-row sm:items-center gap-2">
+													<p className="text-sm font-medium text-gray-900 break-words">
 														{user.name}
 														{user.id === currentUser.id && (
 															<span className="ml-2 text-xs text-pink-600 font-medium">
@@ -118,22 +118,46 @@ function AdminUsers() {
 															</span>
 														)}
 													</p>
-													<div className="ml-2">{getStatusBadge(user)}</div>
+													<div className="flex-shrink-0">
+														{getStatusBadge(user)}
+													</div>
 												</div>
-												<p className="text-sm text-gray-500">{user.email}</p>
+												<p className="text-sm text-gray-500 break-all">
+													{user.email}
+												</p>
 											</div>
 										</div>
-										<div className="flex flex-col items-end text-sm text-gray-500">
-											<p>Posledně přihlášen: {formatDate(user.lastLogin)}</p>
-											<p>Vytvořen: {formatDate(user.createdAt)}</p>
+										<div className="flex flex-col text-sm text-gray-500 space-y-1 sm:items-end">
+											<p className="break-words">
+												<span className="sm:hidden font-medium">
+													Posledně přihlášen:{" "}
+												</span>
+												{formatDate(user.lastLogin)}
+											</p>
+											<p className="break-words">
+												<span className="sm:hidden font-medium">
+													Vytvořen:{" "}
+												</span>
+												{formatDate(user.createdAt)}
+											</p>
 											{user.failedLoginAttempts > 0 && (
 												<p className="text-yellow-600">
-													Neúspěšné pokusy: {user.failedLoginAttempts}
+													<span className="sm:hidden font-medium">
+														Neúspěšné pokusy:{" "}
+													</span>
+													<span className="hidden sm:inline">
+														Neúspěšné pokusy:{" "}
+													</span>
+													{user.failedLoginAttempts}
 												</p>
 											)}
 											{isAccountLocked(user) && (
-												<p className="text-red-600">
-													Uzamčen do: {formatDate(user.lockedUntil)}
+												<p className="text-red-600 break-words">
+													<span className="sm:hidden font-medium">
+														Uzamčen do:{" "}
+													</span>
+													<span className="hidden sm:inline">Uzamčen do: </span>
+													{formatDate(user.lockedUntil)}
 												</p>
 											)}
 										</div>

@@ -111,16 +111,16 @@ function AdminSettings() {
 	return (
 		<div className="min-h-screen bg-gray-50 pt-8">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-				<div className="mb-8 flex items-center justify-between">
-					<div>
-						<h1 className="text-3xl font-bold text-gray-900">
+				<div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+					<div className="flex-1">
+						<h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
 							Nastavení systému
 						</h1>
 						<p className="mt-2 text-gray-600">Správa blokovaných termínů</p>
 					</div>
 					<Link
 						to="/admin"
-						className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+						className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
 					>
 						<svg
 							className="mr-2 -ml-1 w-4 h-4"
@@ -137,7 +137,7 @@ function AdminSettings() {
 								d="M10 19l-7-7m0 0l7-7m-7 7h18"
 							/>
 						</svg>
-						Zpět na administraci
+						Zpět na dashboard
 					</Link>
 				</div>
 
