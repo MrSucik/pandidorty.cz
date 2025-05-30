@@ -23,15 +23,20 @@ function AdminSettings() {
 	const revalidator = useRevalidator();
 	const navigate = useNavigate();
 	const [date, setDate] = useState("");
+	const [startDate, setStartDate] = useState("");
+	const [endDate, setEndDate] = useState("");
+	const [isDateRange, setIsDateRange] = useState(false);
 
 	const addMutation = useMutation({
-		mutationFn: async ({ date }: { date: string }) => {
+		mutationFn: async (
+			payload: { date: string } | { startDate: string; endDate: string },
+		) => {
 			const response = await fetch("/api/blocked-dates/add", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ date }),
+				body: JSON.stringify(payload),
 			});
 
 			if (response.status === 401) {
@@ -49,6 +54,8 @@ function AdminSettings() {
 		onSuccess: () => {
 			revalidator.revalidate();
 			setDate("");
+			setStartDate("");
+			setEndDate("");
 		},
 	});
 
@@ -99,8 +106,14 @@ function AdminSettings() {
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		if (date) {
-			addMutation.mutate({ date });
+		if (isDateRange) {
+			if (startDate && endDate) {
+				addMutation.mutate({ startDate, endDate });
+			}
+		} else {
+			if (date) {
+				addMutation.mutate({ date });
+			}
 		}
 	};
 
@@ -147,24 +160,93 @@ function AdminSettings() {
 						Přidat blokovaný termín
 					</h2>
 					<form onSubmit={handleSubmit} className="space-y-4">
-						<div>
-							<label
-								htmlFor="date"
-								className="block text-sm font-medium text-gray-700"
-							>
-								Datum
+						{/* Toggle between single date and date range */}
+						<div className="flex items-center space-x-4 mb-4">
+							<label className="inline-flex items-center">
+								<input
+									type="radio"
+									name="dateType"
+									value="single"
+									checked={!isDateRange}
+									onChange={() => setIsDateRange(false)}
+									className="form-radio h-4 w-4 text-pink-600"
+								/>
+								<span className="ml-2 text-sm text-gray-700">Jeden den</span>
 							</label>
-							<input
-								type="date"
-								id="date"
-								name="date"
-								value={date}
-								onChange={(e) => setDate(e.target.value)}
-								min={getTodayString()}
-								required
-								className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
-							/>
+							<label className="inline-flex items-center">
+								<input
+									type="radio"
+									name="dateType"
+									value="range"
+									checked={isDateRange}
+									onChange={() => setIsDateRange(true)}
+									className="form-radio h-4 w-4 text-pink-600"
+								/>
+								<span className="ml-2 text-sm text-gray-700">Rozsah dnů</span>
+							</label>
 						</div>
+
+						{!isDateRange ? (
+							<div>
+								<label
+									htmlFor="date"
+									className="block text-sm font-medium text-gray-700"
+								>
+									Datum
+								</label>
+								<input
+									type="date"
+									id="date"
+									name="date"
+									value={date}
+									onChange={(e) => setDate(e.target.value)}
+									min={getTodayString()}
+									required
+									className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+								/>
+							</div>
+						) : (
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<div>
+									<label
+										htmlFor="startDate"
+										className="block text-sm font-medium text-gray-700"
+									>
+										Od data
+									</label>
+									<input
+										type="date"
+										id="startDate"
+										name="startDate"
+										value={startDate}
+										onChange={(e) => setStartDate(e.target.value)}
+										min={getTodayString()}
+										max={endDate || undefined}
+										required
+										className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor="endDate"
+										className="block text-sm font-medium text-gray-700"
+									>
+										Do data
+									</label>
+									<input
+										type="date"
+										id="endDate"
+										name="endDate"
+										value={endDate}
+										onChange={(e) => setEndDate(e.target.value)}
+										min={startDate || getTodayString()}
+										required
+										className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+									/>
+								</div>
+							</div>
+						)}
+
 						<button
 							type="submit"
 							disabled={addMutation.isPending}
@@ -172,13 +254,22 @@ function AdminSettings() {
 						>
 							{addMutation.isPending
 								? "Přidávám..."
-								: "Přidat blokovaný termín"}
+								: isDateRange
+									? "Přidat rozsah termínů"
+									: "Přidat blokovaný termín"}
 						</button>
 						{addMutation.error && (
 							<p className="text-red-600 text-sm mt-2">
 								{addMutation.error.message}
 							</p>
 						)}
+						{addMutation.isSuccess &&
+							addMutation.data?.blockedDatesCount > 1 && (
+								<p className="text-green-600 text-sm mt-2">
+									Úspěšně přidáno {addMutation.data.blockedDatesCount}{" "}
+									blokovaných termínů.
+								</p>
+							)}
 					</form>
 				</div>
 

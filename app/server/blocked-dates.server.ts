@@ -34,10 +34,14 @@ export async function addBlockedDate(
 	date: string,
 	userId: number,
 ): Promise<void> {
-	await db.insert(blockedDates).values({
-		date,
-		createdById: userId,
-	});
+	// Check if date is already blocked
+	const isBlocked = await isDateBlocked(date);
+	if (!isBlocked) {
+		await db.insert(blockedDates).values({
+			date,
+			createdById: userId,
+		});
+	}
 }
 
 export async function removeBlockedDate(id: number): Promise<void> {

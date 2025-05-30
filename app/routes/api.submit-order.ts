@@ -10,7 +10,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		const formData = await request.formData();
 		const result = await submitOrder(formData);
 
-		return Response.json(result);
+		return result;
 	} catch (error) {
 		console.error("Error in submit-order API route:", error);
 		return Response.json(

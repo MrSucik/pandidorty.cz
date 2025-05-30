@@ -29,15 +29,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		// Validate params
 		const paramsValidation = paramsSchema.safeParse(params);
 		if (!paramsValidation.success) {
-			return new Response(
-				JSON.stringify({
+			return Response.json(
+				{
 					error: "Invalid order ID",
 					details: paramsValidation.error.errors,
-				}),
-				{
-					status: 400,
-					headers: { "Content-Type": "application/json" },
 				},
+				{ status: 400 },
 			);
 		}
 
@@ -45,15 +42,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		const body = await request.json();
 		const bodyValidation = bodySchema.safeParse(body);
 		if (!bodyValidation.success) {
-			return new Response(
-				JSON.stringify({
+			return Response.json(
+				{
 					error: "Invalid request data",
 					details: bodyValidation.error.errors,
-				}),
-				{
-					status: 400,
-					headers: { "Content-Type": "application/json" },
 				},
+				{ status: 400 },
 			);
 		}
 
@@ -72,31 +66,19 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			.returning();
 
 		if (!updatedOrder) {
-			return new Response(JSON.stringify({ error: "Order not found" }), {
-				status: 404,
-				headers: { "Content-Type": "application/json" },
-			});
+			return Response.json({ error: "Order not found" }, { status: 404 });
 		}
 
-		return new Response(
-			JSON.stringify({
-				success: true,
-				deliveredAt: updatedOrder.deliveredAt?.toISOString() || null,
-			}),
-			{
-				status: 200,
-				headers: { "Content-Type": "application/json" },
-			},
-		);
+		return {
+			success: true,
+			deliveredAt: updatedOrder.deliveredAt?.toISOString() || null,
+		};
 	} catch (error) {
 		// If it's already a Response (from requireApiSession), re-throw it
 		if (error instanceof Response) {
 			throw error;
 		}
 		console.error("Error updating order delivered status:", error);
-		return new Response(JSON.stringify({ error: "Internal server error" }), {
-			status: 500,
-			headers: { "Content-Type": "application/json" },
-		});
+		return Response.json({ error: "Internal server error" }, { status: 500 });
 	}
 }

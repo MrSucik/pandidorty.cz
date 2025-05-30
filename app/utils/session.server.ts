@@ -74,10 +74,7 @@ export async function requireApiSession(request: Request) {
 	const session = await getUserSession(request);
 
 	if (!session || !session.user.isActive) {
-		throw new Response(JSON.stringify({ error: "Unauthorized" }), {
-			status: 401,
-			headers: { "Content-Type": "application/json" },
-		});
+		throw Response.json({ error: "Unauthorized" }, { status: 401 });
 	}
 
 	return session;

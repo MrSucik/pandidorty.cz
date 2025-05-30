@@ -18,10 +18,7 @@ const removeBlockedDateSchema = z.object({
 
 export async function action({ request }: ActionFunctionArgs) {
 	if (request.method !== "DELETE") {
-		return new Response(JSON.stringify({ error: "Method not allowed" }), {
-			status: 405,
-			headers: { "Content-Type": "application/json" },
-		});
+		return Response.json({ error: "Method not allowed" }, { status: 405 });
 	}
 
 	try {
@@ -30,15 +27,12 @@ export async function action({ request }: ActionFunctionArgs) {
 
 		const validation = removeBlockedDateSchema.safeParse(body);
 		if (!validation.success) {
-			return new Response(
-				JSON.stringify({
+			return Response.json(
+				{
 					error: "Invalid request data",
 					details: validation.error.errors,
-				}),
-				{
-					status: 400,
-					headers: { "Content-Type": "application/json" },
 				},
+				{ status: 400 },
 			);
 		}
 
@@ -52,17 +46,11 @@ export async function action({ request }: ActionFunctionArgs) {
 			throw error;
 		}
 		if (error instanceof Error) {
-			return new Response(JSON.stringify({ error: error.message }), {
-				status: 400,
-				headers: { "Content-Type": "application/json" },
-			});
+			return Response.json({ error: error.message }, { status: 400 });
 		}
-		return new Response(
-			JSON.stringify({ error: "Failed to remove blocked date" }),
-			{
-				status: 500,
-				headers: { "Content-Type": "application/json" },
-			},
+		return Response.json(
+			{ error: "Failed to remove blocked date" },
+			{ status: 500 },
 		);
 	}
 }
