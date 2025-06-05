@@ -1,5 +1,6 @@
 import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
 import { cs } from "date-fns/locale";
+import { Resend } from "resend";
 import { z } from "zod";
 import { type OrderFormData, createOrderFromForm } from "../db/orders";
 import { isDateBlocked } from "./blocked-dates.server";
@@ -88,6 +89,17 @@ export interface SubmitOrderResult {
 		customerName: string;
 		deliveryDate: Date;
 		photoCount: number;
+	};
+}
+
+// Helper function to process file to buffer
+async function processFileToBuffer(
+	file: File,
+): Promise<{ filename: string; content: Buffer }> {
+	const arrayBuffer = await file.arrayBuffer();
+	return {
+		filename: file.name,
+		content: Buffer.from(arrayBuffer),
 	};
 }
 
@@ -189,8 +201,108 @@ export async function submitOrder(
 		// At this point TypeScript knows dbResult.success is true
 		const savedOrder = dbResult.order;
 		console.log("💾 Order saved to database with ID:", savedOrder.id);
-		console.log("📧 TODO: Send confirmation email to customer");
-		console.log("🔔 TODO: Send admin notification");
+
+		// 📧 Send notification emails
+		try {
+			const resend = new Resend(process.env.RESEND_API_KEY);
+
+			// Process attachments if photos exist
+			const emailAttachments = [];
+			const validPhotos = photos.filter((file) => file.size > 0);
+
+			for (const photo of validPhotos) {
+				try {
+					const attachment = await processFileToBuffer(photo);
+					emailAttachments.push(attachment);
+				} catch (error) {
+					console.error(`Error processing photo ${photo.name}:`, error);
+				}
+			}
+
+			// Format attachment info
+			const attachmentInfo =
+				validPhotos.length > 0
+					? `Přiložené fotografie: ${validPhotos.map((f) => f.name).join(", ")}`
+					: "Bez přiložených fotografií";
+
+			// Prepare order details
+			let orderDetails = "Objednané položky:\n";
+
+			if (orderData.orderCake) {
+				orderDetails += `
+- Dort
+  Velikost/Počet porcí: ${orderData.size}
+  Vybraná příchuť: ${orderData.flavor}
+  ${orderData.message ? `Nápis na dort: ${orderData.message}` : ""}`;
+			}
+
+			if (orderData.orderDessert) {
+				orderDetails += `
+- Dezerty
+  ${orderData.dessertChoice}`;
+			}
+
+			// Send admin notification email
+			await resend.emails.send({
+				from: "Pandí Dorty <pandidorty@blaze.codes>",
+				to: ["mr.sucik@gmail.com", "pandidorty@gmail.com"],
+				subject: `Nová objednávka #${savedOrder.orderNumber} - ${orderData.name}`,
+				text: `
+Nová objednávka byla přijata!
+
+Číslo objednávky: ${savedOrder.orderNumber}
+Datum přijetí: ${format(new Date(), "dd.MM.yyyy HH:mm", { locale: cs })}
+
+KONTAKTNÍ ÚDAJE:
+Jméno: ${orderData.name}
+Email: ${orderData.email}
+Telefon: ${orderData.phone}
+
+DATUM DODÁNÍ:
+${format(parseISO(orderData.date), "dd.MM.yyyy (EEEE)", { locale: cs })}
+
+${orderDetails}
+
+${orderData.message ? `\nPOZNÁMKA OD ZÁKAZNÍKA:\n${orderData.message}` : ""}
+
+${attachmentInfo}
+`,
+				attachments: emailAttachments,
+			});
+
+			console.log("📧 Admin notification email sent successfully");
+
+			// Send customer confirmation email
+			await resend.emails.send({
+				from: "Pandí Dorty <pandidorty@blaze.codes>",
+				to: orderData.email,
+				subject: `Potvrzení objednávky #${savedOrder.orderNumber} - Pandí Dorty`,
+				text: `
+Dobrý den ${orderData.name},
+
+děkujeme za Vaši objednávku! Tímto potvrzujeme, že jsme ji přijali a brzy se Vám ozveme s dalšími detaily.
+
+SHRNUTÍ OBJEDNÁVKY:
+Číslo objednávky: ${savedOrder.orderNumber}
+Datum dodání: ${format(parseISO(orderData.date), "dd.MM.yyyy (EEEE)", { locale: cs })}
+
+${orderDetails}
+
+${orderData.message ? `\nVaše poznámka: ${orderData.message}` : ""}
+
+Pokud budete mít jakékoliv dotazy, neváhejte nás kontaktovat na pandidorty@gmail.com nebo na telefonním čísle uvedeném na našich stránkách.
+
+S pozdravem,
+Tým Pandí Dorty
+`,
+			});
+
+			console.log("📧 Customer confirmation email sent successfully");
+		} catch (emailError) {
+			console.error("⚠️ Error sending emails:", emailError);
+			// Don't throw here - the order was saved successfully
+			// Just log the error and continue
+		}
 
 		if (savedOrder.photos && savedOrder.photos.length > 0) {
 			console.log("📸 Photos saved:", savedOrder.photos.length);
