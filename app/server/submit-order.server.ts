@@ -226,10 +226,10 @@ export async function submitOrder(
 				}
 			}
 
-			// Format attachment info
+			// Format attachment info based on successfully processed attachments
 			const attachmentInfo =
-				validPhotos.length > 0
-					? `Přiložené fotografie: ${validPhotos.map((f) => f.name).join(", ")}`
+				emailAttachments.length > 0
+					? `Přiložené fotografie: ${emailAttachments.map((a) => a.filename).join(", ")}`
 					: "Bez přiložených fotografií";
 
 			// Prepare order details
