@@ -5,6 +5,13 @@ import { z } from "zod";
 import { type OrderFormData, createOrderFromForm } from "../db/orders";
 import { isDateBlocked } from "./blocked-dates.server";
 
+// Verify RESEND_API_KEY is set at module load time
+if (!process.env.RESEND_API_KEY) {
+	throw new Error(
+		"RESEND_API_KEY environment variable is not set. Email functionality will not work.",
+	);
+}
+
 // Helper function for date validation
 const isValidDeliveryDate = (dateString: string): boolean => {
 	try {
@@ -233,7 +240,7 @@ export async function submitOrder(
 - Dort
   Velikost/Počet porcí: ${orderData.size}
   Vybraná příchuť: ${orderData.flavor}
-  ${orderData.message ? `Nápis na dort: ${orderData.message}` : ""}`;
+  ${orderData.message ? `Vaše představa dortu: ${orderData.message}` : ""}`;
 			}
 
 			if (orderData.orderDessert) {
@@ -263,8 +270,6 @@ ${format(parseISO(orderData.date), "dd.MM.yyyy (EEEE)", { locale: cs })}
 
 ${orderDetails}
 
-${orderData.message ? `\nPOZNÁMKA OD ZÁKAZNÍKA:\n${orderData.message}` : ""}
-
 ${attachmentInfo}
 `,
 				attachments: emailAttachments,
@@ -287,8 +292,6 @@ SHRNUTÍ OBJEDNÁVKY:
 Datum dodání: ${format(parseISO(orderData.date), "dd.MM.yyyy (EEEE)", { locale: cs })}
 
 ${orderDetails}
-
-${orderData.message ? `\nVaše poznámka: ${orderData.message}` : ""}
 
 Pokud budete mít jakékoliv dotazy, neváhejte nás kontaktovat na pandidorty@gmail.com nebo na telefonním čísle uvedeném na našich stránkách.
 
