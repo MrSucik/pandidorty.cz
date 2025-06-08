@@ -164,7 +164,7 @@ function Navigation() {
 									href="/cakes"
 									className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
 								>
-									Nabídka
+									Nabídka a ceník
 								</a>
 							</li>
 							<li>
@@ -218,7 +218,7 @@ function Navigation() {
 								href="/cakes"
 								className="hover:text-custom-blue transition-colors py-3 px-6 block font-medium"
 							>
-								Nabídka
+								Nabídka a ceník
 							</a>
 						</li>
 						<li>

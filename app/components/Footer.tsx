@@ -71,7 +71,7 @@ export function Footer({ currentPath }: FooterProps = {}) {
 									href="/cakes"
 									className="hover:text-custom-blue transition-colors"
 								>
-									Nabídka
+									Nabídka a ceník
 								</a>
 							</p>
 							<p className="text-base">
