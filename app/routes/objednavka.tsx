@@ -91,6 +91,49 @@ export default function OrderForm() {
 		return isAfter(date, today) || date.getTime() === today.getTime();
 	});
 
+	// Group consecutive dates into ranges
+	const groupDateRanges = (dates: string[]) => {
+		if (dates.length === 0) return [];
+		
+		const sortedDates = dates.sort((a, b) => a.localeCompare(b));
+		const ranges: string[] = [];
+		let rangeStart = sortedDates[0];
+		let rangeEnd = sortedDates[0];
+		
+		for (let i = 1; i < sortedDates.length; i++) {
+			const currentDate = parseISO(sortedDates[i]);
+			const previousDate = parseISO(rangeEnd);
+			const nextDay = addDays(previousDate, 1);
+			
+			if (currentDate.getTime() === nextDay.getTime()) {
+				// Consecutive date, extend the range
+				rangeEnd = sortedDates[i];
+			} else {
+				// Non-consecutive date, finish current range and start new one
+				if (rangeStart === rangeEnd) {
+					ranges.push(format(parseISO(rangeStart), "EEEE d. MMMM yyyy", { locale: cs }));
+				} else {
+					ranges.push(
+						`${format(parseISO(rangeStart), "EEEE d. MMMM", { locale: cs })} - ${format(parseISO(rangeEnd), "EEEE d. MMMM yyyy", { locale: cs })}`
+					);
+				}
+				rangeStart = sortedDates[i];
+				rangeEnd = sortedDates[i];
+			}
+		}
+		
+		// Add the last range
+		if (rangeStart === rangeEnd) {
+			ranges.push(format(parseISO(rangeStart), "EEEE d. MMMM yyyy", { locale: cs }));
+		} else {
+			ranges.push(
+				`${format(parseISO(rangeStart), "EEEE d. MMMM", { locale: cs })} - ${format(parseISO(rangeEnd), "EEEE d. MMMM yyyy", { locale: cs })}`
+			);
+		}
+		
+		return ranges;
+	};
+
 	// Define the base schema first
 	const baseOrderFormSchema = z.object({
 		name: z
@@ -400,16 +443,11 @@ export default function OrderForm() {
 														Následující termíny nejsou dostupné:
 													</p>
 													<div className="text-sm text-yellow-700 space-y-1">
-														{futureBlockedDates
-															.sort((a, b) => a.localeCompare(b))
-															.map((date) => (
-																<div key={date}>
-																	•{" "}
-																	{format(parseISO(date), "EEEE d. MMMM yyyy", {
-																		locale: cs,
-																	})}
-																</div>
-															))}
+														{groupDateRanges(futureBlockedDates).map((range, index) => (
+															<div key={index}>
+																• {range}
+															</div>
+														))}
 													</div>
 												</div>
 											)}
