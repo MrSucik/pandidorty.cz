@@ -251,7 +251,7 @@ export async function submitOrder(
 
 			// Send admin notification email
 			await resend.emails.send({
-				from: "Pandí Dorty <pandidorty@blaze.codes>",
+				from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
 				to: ["mr.sucik@gmail.com", "pandidorty@gmail.com"],
 				subject: `Nová objednávka #${savedOrder.orderNumber} - ${orderData.name}`,
 				text: `
@@ -279,7 +279,7 @@ ${attachmentInfo}
 
 			// Send customer confirmation email
 			await resend.emails.send({
-				from: "Pandí Dorty <pandidorty@blaze.codes>",
+				from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
 				to: orderData.email,
 				subject: `Potvrzení objednávky #${savedOrder.orderNumber} - Pandí Dorty`,
 				text: `
