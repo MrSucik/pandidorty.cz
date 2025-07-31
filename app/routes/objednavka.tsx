@@ -94,43 +94,47 @@ export default function OrderForm() {
 	// Group consecutive dates into ranges
 	const groupDateRanges = (dates: string[]) => {
 		if (dates.length === 0) return [];
-		
+
 		const sortedDates = dates.sort((a, b) => a.localeCompare(b));
 		const ranges: string[] = [];
 		let rangeStart = sortedDates[0];
 		let rangeEnd = sortedDates[0];
-		
+
 		for (let i = 1; i < sortedDates.length; i++) {
 			const currentDate = parseISO(sortedDates[i]);
 			const previousDate = parseISO(rangeEnd);
 			const nextDay = addDays(previousDate, 1);
-			
+
 			if (currentDate.getTime() === nextDay.getTime()) {
 				// Consecutive date, extend the range
 				rangeEnd = sortedDates[i];
 			} else {
 				// Non-consecutive date, finish current range and start new one
 				if (rangeStart === rangeEnd) {
-					ranges.push(format(parseISO(rangeStart), "EEEE d. MMMM yyyy", { locale: cs }));
+					ranges.push(
+						format(parseISO(rangeStart), "EEEE d. MMMM yyyy", { locale: cs }),
+					);
 				} else {
 					ranges.push(
-						`${format(parseISO(rangeStart), "EEEE d. MMMM", { locale: cs })} - ${format(parseISO(rangeEnd), "EEEE d. MMMM yyyy", { locale: cs })}`
+						`${format(parseISO(rangeStart), "EEEE d. MMMM", { locale: cs })} - ${format(parseISO(rangeEnd), "EEEE d. MMMM yyyy", { locale: cs })}`,
 					);
 				}
 				rangeStart = sortedDates[i];
 				rangeEnd = sortedDates[i];
 			}
 		}
-		
+
 		// Add the last range
 		if (rangeStart === rangeEnd) {
-			ranges.push(format(parseISO(rangeStart), "EEEE d. MMMM yyyy", { locale: cs }));
+			ranges.push(
+				format(parseISO(rangeStart), "EEEE d. MMMM yyyy", { locale: cs }),
+			);
 		} else {
 			ranges.push(
-				`${format(parseISO(rangeStart), "EEEE d. MMMM", { locale: cs })} - ${format(parseISO(rangeEnd), "EEEE d. MMMM yyyy", { locale: cs })}`
+				`${format(parseISO(rangeStart), "EEEE d. MMMM", { locale: cs })} - ${format(parseISO(rangeEnd), "EEEE d. MMMM yyyy", { locale: cs })}`,
 			);
 		}
-		
+
 		return ranges;
 	};
 
@@ -443,11 +447,11 @@ export default function OrderForm() {
 														Následující termíny nejsou dostupné:
 													</p>
 													<div className="text-sm text-yellow-700 space-y-1">
-														{groupDateRanges(futureBlockedDates).map((range, index) => (
-															<div key={index}>
-																• {range}
-															</div>
-														))}
+														{groupDateRanges(futureBlockedDates).map(
+															(range) => (
+																<div key={range}>• {range}</div>
+															),
+														)}
 													</div>
 												</div>
 											)}
