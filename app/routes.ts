@@ -20,4 +20,5 @@ export default [
 	),
 	route("api/blocked-dates/add", "routes/api.blocked-dates.add.ts"),
 	route("api/blocked-dates/remove", "routes/api.blocked-dates.remove.ts"),
+	route("api/test-email", "routes/api.test-email.ts"),
 ] satisfies RouteConfig;
