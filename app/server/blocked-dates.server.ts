@@ -1,3 +1,4 @@
+import { addMonths, isAfter, isBefore, parseISO } from "date-fns";
 import { desc, eq } from "drizzle-orm";
 import { blockedDates, db, users } from "../db";
 import type { BlockedDate } from "../db/schema";
@@ -49,6 +50,25 @@ export async function removeBlockedDate(id: number): Promise<void> {
 }
 
 export async function isDateBlocked(date: string): Promise<boolean> {
+	// Check if the date falls on Sunday (0), Monday (1), Tuesday (2), or Wednesday (3)
+	const parsedDate = parseISO(date);
+	const dayOfWeek = parsedDate.getDay();
+	const now = new Date();
+	const threeMonthsFromNow = addMonths(now, 3);
+
+	// Block Sundays, Mondays, Tuesdays, and Wednesdays (only within next 3 months)
+	if (
+		(dayOfWeek === 0 ||
+			dayOfWeek === 1 ||
+			dayOfWeek === 2 ||
+			dayOfWeek === 3) &&
+		isAfter(parsedDate, now) &&
+		isBefore(parsedDate, threeMonthsFromNow)
+	) {
+		return true;
+	}
+
+	// Check if date is manually blocked in database
 	const result = await db
 		.select({ id: blockedDates.id })
 		.from(blockedDates)
