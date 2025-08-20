@@ -144,6 +144,22 @@ export async function submitOrder(
 	// Check if the selected date is blocked
 	const dateIsBlocked = await isDateBlocked(orderData.date);
 	if (dateIsBlocked) {
+		const selectedDate = parseISO(orderData.date);
+		const dayOfWeek = selectedDate.getDay();
+
+		// Check if it's a weekday that's always blocked
+		if (
+			dayOfWeek === 0 ||
+			dayOfWeek === 1 ||
+			dayOfWeek === 2 ||
+			dayOfWeek === 3
+		) {
+			throw new Error(
+				"Objednávky přijímáme pouze na čtvrtek, pátek a sobotu. Neděle až středa jsou uzavřené.",
+			);
+		}
+
+		// Otherwise it's a manually blocked date
 		throw new Error("Vybraný termín není dostupný. Zvolte prosím jiný termín.");
 	}
 
