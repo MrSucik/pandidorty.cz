@@ -31,8 +31,19 @@ const isValidDeliveryDate = (
 		const today = startOfDay(new Date());
 		const minDate = addDays(today, 7);
 		const selectedDate = parseISO(dateString);
+		const dayOfWeek = selectedDate.getDay();
 
-		// Check if date is blocked
+		// Check if it's Sun-Wed (always blocked)
+		if (
+			dayOfWeek === 0 ||
+			dayOfWeek === 1 ||
+			dayOfWeek === 2 ||
+			dayOfWeek === 3
+		) {
+			return false;
+		}
+
+		// Check if date is manually blocked
 		if (blockedDates.includes(dateString)) {
 			return false;
 		}
@@ -158,6 +169,19 @@ export default function OrderForm() {
 			.refine(
 				(date) => isValidDeliveryDate(date, blockedDates),
 				(date) => {
+					const parsedDate = parseISO(date);
+					const dayOfWeek = parsedDate.getDay();
+
+					if (
+						dayOfWeek === 0 ||
+						dayOfWeek === 1 ||
+						dayOfWeek === 2 ||
+						dayOfWeek === 3
+					) {
+						return {
+							message: "Objednávky přijímáme pouze na čtvrtek, pátek a sobotu",
+						};
+					}
 					if (blockedDates.includes(date)) {
 						return { message: "Tento termín není dostupný" };
 					}
@@ -433,6 +457,9 @@ export default function OrderForm() {
 										/>
 										<p className="text-sm text-gray-500 mt-1">
 											Objednávky přijímáme minimálně 7 dní předem
+										</p>
+										<p className="text-sm text-orange-600 mt-1 font-medium">
+											⚠️ Objednávky přijímáme pouze na čtvrtek, pátek a sobotu
 										</p>
 										{errors.date && (
 											<p className="text-red-600 text-sm mt-1">
