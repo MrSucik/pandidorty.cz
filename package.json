@@ -9,8 +9,6 @@
 		"typecheck": "react-router typegen && tsc",
 		"format": "biome check --write --unsafe .",
 		"seed:admin": "tsx scripts/seed-admin.ts",
-		"deploy:test": "fly deploy -a pandidorty-cz-test",
-		"deploy:prod": "fly deploy -a pandidorty-cz",
 		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
 		"db:generate": "drizzle-kit generate",
