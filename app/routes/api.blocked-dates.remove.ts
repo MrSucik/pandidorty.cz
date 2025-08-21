@@ -8,7 +8,7 @@ const removeBlockedDateSchema = z.object({
 		.string()
 		.min(1, "ID is required")
 		.transform((val) => {
-			const num = Number.parseInt(val);
+			const num = Number.parseInt(val, 10);
 			if (Number.isNaN(num)) {
 				throw new Error("ID must be a valid number");
 			}
@@ -30,7 +30,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			return Response.json(
 				{
 					error: "Invalid request data",
-					details: validation.error.errors,
+					details: validation.error.issues,
 				},
 				{ status: 400 },
 			);

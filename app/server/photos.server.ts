@@ -30,7 +30,7 @@ export async function getPhoto(photoId: number): Promise<Response> {
 				"Content-Type": photoData.mimeType,
 				"Content-Length": photoData.fileSize.toString(),
 				"Cache-Control": "public, max-age=31536000", // Cache for 1 year
-				"Content-Disposition": `inline; filename=\"${photoData.originalName}\"`,
+				"Content-Disposition": `inline; filename="${photoData.originalName}"`,
 			},
 		});
 	} catch (error) {

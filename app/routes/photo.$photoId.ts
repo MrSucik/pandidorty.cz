@@ -22,7 +22,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		throw new Response(
 			JSON.stringify({
 				error: "Invalid photo ID",
-				details: paramsValidation.error.errors,
+				details: paramsValidation.error.issues,
 			}),
 			{
 				status: 400,

@@ -1,8 +1,6 @@
-import { useEffect } from "react";
-import { Form, Link, useLoaderData, useRevalidator } from "react-router";
 import type { LoaderFunctionArgs } from "react-router";
+import { Form, Link, useLoaderData } from "react-router";
 
-import type { OrderStats } from "../../server/get-order-stats.server";
 import { getOrderStats } from "../../server/get-order-stats.server";
 import { requireUserSession } from "../../utils/session.server";
 

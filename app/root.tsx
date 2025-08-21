@@ -1,17 +1,17 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type MouseEvent, useEffect, useState } from "react";
 import {
+	isRouteErrorResponse,
+	Link,
 	Links,
 	Meta,
 	Outlet,
 	Scripts,
 	ScrollRestoration,
-	isRouteErrorResponse,
+	useLocation,
 } from "react-router";
-import { Link, useLocation } from "react-router";
-import { Footer } from "./components/Footer";
-
 import type { Route } from "./+types/root";
+import { Footer } from "./components/Footer";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -78,7 +78,7 @@ function Navigation() {
 	}, []);
 
 	// Close menu when route changes
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Route changes should reset menu state
 	useEffect(() => {
 		setIsMenuOpen(false);
 		document.body.style.overflow = "";

@@ -1,6 +1,5 @@
-import { Form, useActionData, useNavigation } from "react-router";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { redirect } from "react-router";
+import { Form, redirect, useActionData, useNavigation } from "react-router";
 import { z } from "zod";
 import { authenticateUser } from "../../utils/auth.server";
 import { createUserSession, getUserSession } from "../../utils/session.server";
@@ -42,7 +41,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		return createUserSession(result.user.id, "/admin");
 	} catch (error) {
 		if (error instanceof z.ZodError) {
-			return { error: error.errors[0].message };
+			return { error: error.issues[0].message };
 		}
 		return { error: "An unexpected error occurred" };
 	}

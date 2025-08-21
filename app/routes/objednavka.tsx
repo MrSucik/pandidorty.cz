@@ -7,8 +7,8 @@ import {
 	type SubmitHandler,
 	useForm as useReactHookForm,
 } from "react-hook-form";
-import { useLoaderData } from "react-router";
 import type { LoaderFunctionArgs } from "react-router";
+import { useLoaderData } from "react-router";
 import { z } from "zod";
 import { getBlockedDates } from "../server/blocked-dates.server";
 
@@ -21,41 +21,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		blockedDates: blockedDateStrings,
 	};
 }
-
-// Helper function for date validation
-const isValidDeliveryDate = (
-	dateString: string,
-	blockedDates: string[],
-): boolean => {
-	try {
-		const today = startOfDay(new Date());
-		const minDate = addDays(today, 7);
-		const selectedDate = parseISO(dateString);
-		const dayOfWeek = selectedDate.getDay();
-
-		// Check if it's Sun-Wed (always blocked)
-		if (
-			dayOfWeek === 0 ||
-			dayOfWeek === 1 ||
-			dayOfWeek === 2 ||
-			dayOfWeek === 3
-		) {
-			return false;
-		}
-
-		// Check if date is manually blocked
-		if (blockedDates.includes(dateString)) {
-			return false;
-		}
-
-		return (
-			isAfter(selectedDate, minDate) ||
-			selectedDate.getTime() === minDate.getTime()
-		);
-	} catch {
-		return false;
-	}
-};
 
 // Check if we're in a browser environment
 const isBrowser = typeof window !== "undefined";
@@ -166,28 +131,20 @@ export default function OrderForm() {
 		date: z
 			.string()
 			.min(1, "Toto pole je povinné")
+			.refine((date) => {
+				const parsedDate = parseISO(date);
+				const dayOfWeek = parsedDate.getDay();
+				return dayOfWeek >= 4 || dayOfWeek === 0;
+			}, "Objednávky přijímáme pouze na čtvrtek, pátek a sobotu")
 			.refine(
-				(date) => isValidDeliveryDate(date, blockedDates),
-				(date) => {
-					const parsedDate = parseISO(date);
-					const dayOfWeek = parsedDate.getDay();
-
-					if (
-						dayOfWeek === 0 ||
-						dayOfWeek === 1 ||
-						dayOfWeek === 2 ||
-						dayOfWeek === 3
-					) {
-						return {
-							message: "Objednávky přijímáme pouze na čtvrtek, pátek a sobotu",
-						};
-					}
-					if (blockedDates.includes(date)) {
-						return { message: "Tento termín není dostupný" };
-					}
-					return { message: "Datum dodání musí být alespoň 7 dní od dnes" };
-				},
-			),
+				(date) => !blockedDates.includes(date),
+				"Tento termín není dostupný",
+			)
+			.refine((date) => {
+				const parsedDate = parseISO(date);
+				const minDate = addDays(new Date(), 7);
+				return parsedDate >= minDate;
+			}, "Datum dodání musí být alespoň 7 dní od dnes"),
 		orderCake: z.boolean(),
 		orderDessert: z.boolean(),
 		size: z.string(),

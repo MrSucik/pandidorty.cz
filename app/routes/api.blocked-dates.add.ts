@@ -51,7 +51,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			return Response.json(
 				{
 					error: "Invalid request data",
-					details: validation.error.errors,
+					details: validation.error.issues,
 				},
 				{ status: 400 },
 			);

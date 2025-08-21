@@ -1,7 +1,7 @@
 import { and, eq, gt } from "drizzle-orm";
 import { createCookieSessionStorage, redirect } from "react-router";
 import { db } from "../db";
-import { sessions, users } from "../db/schema";
+import { sessions } from "../db/schema";
 import { generateSessionToken } from "./auth.server";
 
 const SESSION_MAX_AGE = 60 * 60 * 24; // 24 hours in seconds

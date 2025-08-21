@@ -2,7 +2,7 @@ import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
 import { cs } from "date-fns/locale";
 import { Resend } from "resend";
 import { z } from "zod";
-import { type OrderFormData, createOrderFromForm } from "../db/orders";
+import { createOrderFromForm, type OrderFormData } from "../db/orders";
 import { isDateBlocked } from "./blocked-dates.server";
 
 // Verify RESEND_API_KEY is set at module load time
@@ -135,8 +135,8 @@ export async function submitOrder(
 	const validationResult = orderSchema.safeParse(orderData);
 
 	if (!validationResult.success) {
-		const errorMessages = validationResult.error.errors.map(
-			(err) => err.message,
+		const errorMessages = validationResult.error.issues.map(
+			(err: any) => err.message,
 		);
 		throw new Error(errorMessages.join(", "));
 	}

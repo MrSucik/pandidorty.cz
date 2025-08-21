@@ -1,6 +1,5 @@
 import { desc } from "drizzle-orm";
 import { db, users } from "../db";
-import type { User } from "../db/schema";
 
 export interface AdminUser {
 	id: number;

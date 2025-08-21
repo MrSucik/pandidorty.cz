@@ -1,10 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link, useLoaderData, useNavigate, useRevalidator } from "react-router";
 import type { LoaderFunctionArgs } from "react-router";
-
+import { Link, useLoaderData, useNavigate, useRevalidator } from "react-router";
 import { getBlockedDates } from "../../server/blocked-dates.server";
-import type { BlockedDateWithUser } from "../../server/blocked-dates.server";
 import { requireUserSession } from "../../utils/session.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {

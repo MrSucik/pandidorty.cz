@@ -32,7 +32,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			return Response.json(
 				{
 					error: "Invalid order ID",
-					details: paramsValidation.error.errors,
+					details: paramsValidation.error.issues,
 				},
 				{ status: 400 },
 			);
@@ -45,7 +45,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			return Response.json(
 				{
 					error: "Invalid request data",
-					details: bodyValidation.error.errors,
+					details: bodyValidation.error.issues,
 				},
 				{ status: 400 },
 			);

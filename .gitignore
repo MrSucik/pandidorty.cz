@@ -6,3 +6,7 @@
 /build/
 
 .env
+
+# Test artifacts
+/playwright-report/
+/test-results/

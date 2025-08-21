@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { type NewOrder, type OrderPhoto, db, orders } from "./index";
+import { db, type NewOrder, type OrderPhoto, orders } from "./index";
 import { saveOrderPhotos } from "./photos";
 
 // Generate a unique order number

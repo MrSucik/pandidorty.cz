@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, useLoaderData, useLocation, useNavigate } from "react-router";
 import type { LoaderFunctionArgs } from "react-router";
+import { Link, useLoaderData, useLocation, useNavigate } from "react-router";
 import OrderCard from "../../components/admin/OrderCard";
 import Pagination from "../../components/admin/Pagination";
 import { getOrdersPaged } from "../../server/get-orders.server";
@@ -84,7 +84,7 @@ function AdminOrders() {
 	const [searchInput, setSearchInput] = useState(searchParam);
 
 	// debounce: update URL 300ms after stop typing
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Debounce pattern requires specific deps
 	useEffect(() => {
 		const id = setTimeout(() => {
 			if (searchInput !== searchParam) {

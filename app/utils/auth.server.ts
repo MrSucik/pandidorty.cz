@@ -1,8 +1,8 @@
 import { randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
-import { and, eq, gt } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { sessions, users } from "../db/schema";
+import { users } from "../db/schema";
 
 const scryptAsync = promisify(scrypt);
 

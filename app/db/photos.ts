@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { type NewOrderPhoto, type OrderPhoto, db, orderPhotos } from "./index";
+import { db, type NewOrderPhoto, type OrderPhoto, orderPhotos } from "./index";
 
 // Configuration
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB

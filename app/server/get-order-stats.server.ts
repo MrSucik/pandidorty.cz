@@ -1,6 +1,6 @@
 // Dynamic imports to ensure server-only execution
 
-import { count, eq, isNotNull, isNull } from "drizzle-orm";
+import { count, isNotNull } from "drizzle-orm";
 import { db, orders } from "../db";
 
 export interface OrderStats {
