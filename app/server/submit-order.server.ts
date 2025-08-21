@@ -164,7 +164,6 @@ export async function submitOrder(
 	}
 
 	try {
-		console.log("📝 Processing order submission...");
 
 		// Handle file uploads (just for logging purposes)
 		const photoInfo = photos
@@ -176,37 +175,6 @@ export async function submitOrder(
 			}));
 
 		// ✅ Order validation passed - now save to database
-		console.log("✅ Order validation passed! Saving to database...");
-		console.log("👤 Customer Info:", {
-			name: orderData.name,
-			email: orderData.email,
-			phone: orderData.phone,
-			deliveryDate: orderData.date,
-			deliveryDateFormatted: format(
-				parseISO(orderData.date),
-				"dd.MM.yyyy (EEEE)",
-				{
-					locale: cs,
-				},
-			),
-		});
-
-		console.log("🛒 Order Details:", {
-			orderCake: orderData.orderCake,
-			orderDessert: orderData.orderDessert,
-			...(orderData.orderCake && {
-				cakeSize: orderData.size,
-				cakeFlavor: orderData.flavor,
-				cakeMessage: orderData.message || "No special message",
-			}),
-			...(orderData.orderDessert && {
-				dessertChoice: orderData.dessertChoice,
-			}),
-		});
-
-		if (photoInfo.length > 0) {
-			console.log("📸 Uploaded Photos:", photoInfo);
-		}
 
 		// 💾 Save order to database
 		const dbResult = await createOrderFromForm(
@@ -223,7 +191,6 @@ export async function submitOrder(
 
 		// At this point TypeScript knows dbResult.success is true
 		const savedOrder = dbResult.order;
-		console.log("💾 Order saved to database with ID:", savedOrder.id);
 
 		// 📧 Send notification emails
 		try {
@@ -291,7 +258,6 @@ ${attachmentInfo}
 				attachments: emailAttachments,
 			});
 
-			console.log("📧 Admin notification email sent successfully");
 
 			// Send customer confirmation email
 			await resend.emails.send({
@@ -316,7 +282,6 @@ Tým Pandí Dorty
 `,
 			});
 
-			console.log("📧 Customer confirmation email sent successfully");
 		} catch (emailError) {
 			console.error("⚠️ Error sending emails:", emailError);
 			// Don't throw here - the order was saved successfully
@@ -324,7 +289,6 @@ Tým Pandí Dorty
 		}
 
 		if (savedOrder.photos && savedOrder.photos.length > 0) {
-			console.log("📸 Photos saved:", savedOrder.photos.length);
 		}
 
 		// Return success response with real order data

@@ -93,21 +93,3 @@ export async function saveOrderPhotos(
 		};
 	}
 }
-
-// Get photos for an order
-export async function getOrderPhotos(orderId: number) {
-	return await db
-		.select()
-		.from(orderPhotos)
-		.where(eq(orderPhotos.orderId, orderId));
-}
-
-// Delete photo
-export async function deleteOrderPhoto(photoId: number) {
-	const [deletedPhoto] = await db
-		.delete(orderPhotos)
-		.where(eq(orderPhotos.id, photoId))
-		.returning();
-
-	return deletedPhoto;
-}
