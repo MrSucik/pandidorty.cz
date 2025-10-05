@@ -7,17 +7,14 @@ import {
 	type SubmitHandler,
 	useForm as useReactHookForm,
 } from "react-hook-form";
-import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { z } from "zod";
 import { getBlockedDates } from "../server/blocked-dates.server";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader() {
 	const blockedDates = await getBlockedDates();
-	const blockedDateStrings = blockedDates.map((bd) => bd.date);
-
 	return {
-		blockedDates: blockedDateStrings,
+		blockedDates: blockedDates.map((bd) => bd.date),
 	};
 }
 
@@ -25,14 +22,8 @@ interface ChristmasOrderResponse {
 	success: boolean;
 	message?: string;
 	error?: string;
-	orderId?: string;
 	orderDetails?: {
-		id: number;
 		orderNumber: string;
-		customerName: string;
-		deliveryDate: Date;
-		cakeBoxQty: number;
-		sweetbarBoxQty: number;
 		totalAmount: number;
 	};
 }

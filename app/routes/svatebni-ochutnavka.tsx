@@ -39,37 +39,38 @@ const submitWeddingTasting = async (
 	return result;
 };
 
-export default function WeddingTastingForm() {
-	const weddingTastingSchema = z
-		.object({
-			name: z
-				.string()
-				.min(1, "Toto pole je povinné")
-				.min(2, "Jméno musí mít alespoň 2 znaky"),
-			email: z
-				.string()
-				.min(1, "Toto pole je povinné")
-				.email("Zadejte platnou emailovou adresu"),
-			phone: z
-				.string()
-				.min(1, "Toto pole je povinné")
-				.min(9, "Telefon musí mít alespoň 9 číslic"),
-			cakeBox: z.boolean(),
-			sweetbarBox: z.boolean(),
-			quantity: z.number().int().min(1, "Množství musí být alespoň 1"),
-		})
-		.refine(
-			(data) => {
-				return data.cakeBox || data.sweetbarBox;
-			},
-			{
-				message:
-					"Vyberte prosím alespoň jednu ochutnávkovou krabičku (dort nebo sweetbar)",
-				path: ["cakeBox"],
-			},
-		);
+const weddingTastingSchema = z
+	.object({
+		name: z
+			.string()
+			.min(1, "Toto pole je povinné")
+			.min(2, "Jméno musí mít alespoň 2 znaky"),
+		email: z
+			.string()
+			.min(1, "Toto pole je povinné")
+			.email("Zadejte platnou emailovou adresu"),
+		phone: z
+			.string()
+			.min(1, "Toto pole je povinné")
+			.min(9, "Telefon musí mít alespoň 9 číslic"),
+		cakeBox: z.boolean(),
+		sweetbarBox: z.boolean(),
+		quantity: z.number().int().min(1, "Množství musí být alespoň 1"),
+	})
+	.refine(
+		(data) => {
+			return data.cakeBox || data.sweetbarBox;
+		},
+		{
+			message:
+				"Vyberte prosím alespoň jednu ochutnávkovou krabičku (dort nebo sweetbar)",
+			path: ["cakeBox"],
+		},
+	);
 
-	type WeddingTastingFormData = z.infer<typeof weddingTastingSchema>;
+type WeddingTastingFormData = z.infer<typeof weddingTastingSchema>;
+
+export default function WeddingTastingForm() {
 
 	const submitOrderMutation = useMutation({
 		mutationFn: submitWeddingTasting,

@@ -211,26 +211,35 @@ export default function OrderCard({ order }: Props) {
 								</>
 							) : order.orderKind === "wedding_tasting" ? (
 								<>
-									{order.orderCake && (
-										<div className="bg-pink-50 border border-pink-200 rounded px-3 py-2">
-											<div className="flex items-start gap-2">
-												<span className="text-lg flex-shrink-0">🎂</span>
+									{order.tastingCakeBoxQty !== null &&
+										order.tastingCakeBoxQty > 0 && (
+											<div className="bg-pink-50 border border-pink-200 rounded px-3 py-2">
 												<p className="text-sm font-medium text-pink-900">
-													☑ Ochutnávka dortů (množství:{" "}
-													{order.cakeSize || "N/A"})
+													Ochutnávková krabička dortů: {order.tastingCakeBoxQty}x
 												</p>
 											</div>
+										)}
+									{order.tastingSweetbarBoxQty !== null &&
+										order.tastingSweetbarBoxQty > 0 && (
+											<div className="bg-purple-50 border border-purple-200 rounded px-3 py-2">
+												<p className="text-sm font-medium text-purple-900">
+													Ochutnávková krabička sweetbar:{" "}
+													{order.tastingSweetbarBoxQty}x
+												</p>
+											</div>
+										)}
+									{order.tastingNotes && (
+										<div className="bg-blue-50 border border-blue-200 rounded px-3 py-2">
+											<p className="text-sm text-blue-900">
+												Poznámka: {order.tastingNotes}
+											</p>
 										</div>
 									)}
-									{order.orderDessert && (
-										<div className="bg-purple-50 border border-purple-200 rounded px-3 py-2">
-											<div className="flex items-start gap-2">
-												<span className="text-lg flex-shrink-0">🧁</span>
-												<p className="text-sm font-medium text-purple-900">
-													☑ Ochutnávka sweetbar (množství:{" "}
-													{order.dessertChoice || "N/A"})
-												</p>
-											</div>
+									{order.totalAmount && (
+										<div className="bg-green-50 border border-green-200 rounded px-3 py-2">
+											<p className="text-sm font-semibold text-green-900">
+												Celková částka: {order.totalAmount} Kč
+											</p>
 										</div>
 									)}
 								</>
