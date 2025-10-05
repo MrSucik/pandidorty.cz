@@ -5,6 +5,7 @@ export default [
 	route("cakes", "routes/cakes.tsx"),
 	route("gallery", "routes/gallery.tsx"),
 	route("objednavka", "routes/objednavka.tsx"),
+	route("vanocni-ochutnavka", "routes/vanocni-ochutnavka.tsx"),
 	route("admin", "routes/admin/index.tsx"),
 	route("admin/login", "routes/admin/login.tsx"),
 	route("admin/logout", "routes/admin/logout.tsx"),
@@ -13,6 +14,7 @@ export default [
 	route("admin/settings", "routes/admin/settings.tsx"),
 	route("photo/:photoId", "routes/photo.$photoId.ts"),
 	route("api/submit-order", "routes/api.submit-order.ts"),
+	route("api/submit-christmas-order", "routes/api.submit-christmas-order.ts"),
 	route("api/orders/:orderId/paid", "routes/api.orders.$orderId.paid.ts"),
 	route(
 		"api/orders/:orderId/delivered",
