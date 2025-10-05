@@ -31,6 +31,11 @@ export default function OrderCard({ order }: Props) {
 									🎄 Vánoční ochutnávka
 								</span>
 							)}
+							{order.orderKind === "wedding_tasting" && (
+								<span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+									💍 Svatební ochutnávka
+								</span>
+							)}
 							{isOverdue && (
 								<span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
 									<svg
@@ -202,6 +207,31 @@ export default function OrderCard({ order }: Props) {
 											<p className="text-sm font-semibold text-green-900">
 												Celková částka: {order.totalAmount} Kč
 											</p>
+										</div>
+									)}
+								</>
+							) : order.orderKind === "wedding_tasting" ? (
+								<>
+									{order.orderCake && (
+										<div className="bg-pink-50 border border-pink-200 rounded px-3 py-2">
+											<div className="flex items-start gap-2">
+												<span className="text-lg flex-shrink-0">🎂</span>
+												<p className="text-sm font-medium text-pink-900">
+													☑ Ochutnávka dortů (množství:{" "}
+													{order.cakeSize || "N/A"})
+												</p>
+											</div>
+										</div>
+									)}
+									{order.orderDessert && (
+										<div className="bg-purple-50 border border-purple-200 rounded px-3 py-2">
+											<div className="flex items-start gap-2">
+												<span className="text-lg flex-shrink-0">🧁</span>
+												<p className="text-sm font-medium text-purple-900">
+													☑ Ochutnávka sweetbar (množství:{" "}
+													{order.dessertChoice || "N/A"})
+												</p>
+											</div>
 										</div>
 									)}
 								</>

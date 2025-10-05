@@ -86,6 +86,12 @@ export default function Home() {
 							>
 								🎄 Vánoční ochutnávka →
 							</Link>
+							<Link
+								to="/svatebni-ochutnavka"
+								className="bg-purple-700 text-white px-8 py-3 rounded-lg hover:bg-purple-800 transition-colors inline-block font-medium shadow-md"
+							>
+								💍 Svatební ochutnávka →
+							</Link>
 						</div>
 					</div>
 				</main>
