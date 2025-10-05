@@ -1,4 +1,3 @@
-import { eq } from "drizzle-orm";
 import { db, type NewOrderPhoto, type OrderPhoto, orderPhotos } from "./index";
 
 // Configuration

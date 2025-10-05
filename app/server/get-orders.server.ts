@@ -19,12 +19,17 @@ export interface OrderWithPhotos {
 	customerEmail: string;
 	customerPhone: string | null;
 	deliveryDate: string;
+	orderKind: string;
 	orderCake: boolean;
 	orderDessert: boolean;
 	cakeSize: string | null;
 	cakeFlavor: string | null;
 	cakeMessage: string | null;
 	dessertChoice: string | null;
+	tastingCakeBoxQty: number | null;
+	tastingSweetbarBoxQty: number | null;
+	tastingNotes: string | null;
+	totalAmount: string | null;
 	paidAt: string | null;
 	deliveredAt: string | null;
 	createdAt: string;

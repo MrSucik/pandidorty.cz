@@ -164,9 +164,8 @@ export async function submitOrder(
 	}
 
 	try {
-
 		// Handle file uploads (just for logging purposes)
-		const photoInfo = photos
+		const _photoInfo = photos
 			.filter((file) => file.size > 0) // Filter out empty files
 			.map((file) => ({
 				name: file.name,
@@ -258,7 +257,6 @@ ${attachmentInfo}
 				attachments: emailAttachments,
 			});
 
-
 			// Send customer confirmation email
 			await resend.emails.send({
 				from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
@@ -281,7 +279,6 @@ S pozdravem,
 Tým Pandí Dorty
 `,
 			});
-
 		} catch (emailError) {
 			console.error("⚠️ Error sending emails:", emailError);
 			// Don't throw here - the order was saved successfully

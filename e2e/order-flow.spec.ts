@@ -115,8 +115,8 @@ test.describe("Order Flow", () => {
 		test("should handle file upload for cake orders", async ({ page }) => {
 			await page.route("/api/submit-order", async (route) => {
 				// Check if the request has multipart content
-				const contentType = route.request().headers()['content-type'] || '';
-				const hasPhotos = contentType.includes('multipart/form-data');
+				const contentType = route.request().headers()["content-type"] || "";
+				const hasPhotos = contentType.includes("multipart/form-data");
 
 				await route.fulfill({
 					status: 200,
@@ -198,7 +198,7 @@ test.describe("Order Flow", () => {
 			// Set up a delayed response to see the loading state
 			await page.route("/api/submit-order", async (route) => {
 				// Add a small delay to ensure we can see the loading state
-				await new Promise(resolve => setTimeout(resolve, 1000));
+				await new Promise((resolve) => setTimeout(resolve, 1000));
 				await route.fulfill({
 					status: 200,
 					contentType: "application/json",
@@ -220,18 +220,18 @@ test.describe("Order Flow", () => {
 
 			// Click submit and immediately check for loading state
 			const submitPromise = orderFormPage.submitButton.click();
-			
+
 			// Wait a bit for React to update
 			await page.waitForTimeout(100);
-			
+
 			// Check if button shows loading text (it might be too fast to catch)
 			const buttonText = await orderFormPage.submitButton.textContent();
-			
+
 			// Wait for submission to complete
 			await submitPromise;
 
 			// Either we caught the loading state or the submission was successful
-			if (buttonText !== 'Odesílám...') {
+			if (buttonText !== "Odesílám...") {
 				// If we didn't catch the loading state, at least verify success
 				await orderFormPage.verifySuccessMessage();
 			} else {

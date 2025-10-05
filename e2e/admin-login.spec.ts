@@ -7,7 +7,9 @@ test.describe("Admin Login", () => {
 
 	test("should display login form", async ({ page }) => {
 		// Check page title
-		await expect(page.getByRole("heading", { name: "Admin Login" })).toBeVisible();
+		await expect(
+			page.getByRole("heading", { name: "Admin Login" }),
+		).toBeVisible();
 
 		// Check form fields
 		await expect(page.locator('input[name="email"]')).toBeVisible();
@@ -19,7 +21,7 @@ test.describe("Admin Login", () => {
 		// Fill in invalid credentials
 		await page.locator('input[name="email"]').fill("invalid@example.com");
 		await page.locator('input[name="password"]').fill("wrongpassword");
-		
+
 		// Submit form
 		await page.getByRole("button", { name: "Sign in" }).click();
 
@@ -37,14 +39,18 @@ test.describe("Admin Login", () => {
 
 		// Should stay on login page
 		await expect(page).toHaveURL(/\/admin\/login/);
-		
+
 		// Check for HTML5 validation (required fields)
 		const emailInput = page.locator('input[name="email"]');
-		const emailValidity = await emailInput.evaluate((el: HTMLInputElement) => el.validity.valueMissing);
+		const emailValidity = await emailInput.evaluate(
+			(el: HTMLInputElement) => el.validity.valueMissing,
+		);
 		expect(emailValidity).toBeTruthy();
 	});
 
-	test.skip("should redirect to admin dashboard on successful login", async ({ page }) => {
+	test.skip("should redirect to admin dashboard on successful login", async ({
+		page,
+	}) => {
 		// Skip this test as it requires real credentials or proper mocking
 		// This would need to be tested with a test database or test user
 	});
@@ -62,31 +68,39 @@ test.describe("Admin Login", () => {
 		// Fill in credentials
 		await page.locator('input[name="email"]').fill("admin@example.com");
 		await page.locator('input[name="password"]').fill("password");
-		
+
 		// Submit form
 		await page.getByRole("button", { name: "Sign in" }).click();
 
 		// Should show error message
-		await expect(page.locator(".bg-red-50, .text-red-600")).toBeVisible({ timeout: 10000 });
+		await expect(page.locator(".bg-red-50, .text-red-600")).toBeVisible({
+			timeout: 10000,
+		});
 	});
 
-	test("should navigate to login from admin pages when not authenticated", async ({ page }) => {
+	test("should navigate to login from admin pages when not authenticated", async ({
+		page,
+	}) => {
 		// Try to access admin dashboard directly
 		await page.goto("/admin");
 
 		// Should redirect to login
 		await expect(page).toHaveURL(/\/admin\/login/);
-		await expect(page.getByRole("heading", { name: "Admin Login" })).toBeVisible();
+		await expect(
+			page.getByRole("heading", { name: "Admin Login" }),
+		).toBeVisible();
 	});
 
 	test("should handle logout correctly", async ({ page, context }) => {
 		// First, mock a successful login
-		await context.addCookies([{
-			name: "session",
-			value: "test-session",
-			domain: "localhost",
-			path: "/"
-		}]);
+		await context.addCookies([
+			{
+				name: "session",
+				value: "test-session",
+				domain: "localhost",
+				path: "/",
+			},
+		]);
 
 		// Mock the admin page to accept our session
 		await page.route("/admin", async (route) => {
@@ -101,7 +115,7 @@ test.describe("Admin Login", () => {
 							<a href="/admin/logout">Logout</a>
 						</body>
 					</html>
-				`
+				`,
 			});
 		});
 
@@ -110,15 +124,16 @@ test.describe("Admin Login", () => {
 			await route.fulfill({
 				status: 302,
 				headers: {
-					"Location": "/admin/login",
-					"Set-Cookie": "session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
-				}
+					Location: "/admin/login",
+					"Set-Cookie":
+						"session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+				},
 			});
 		});
 
 		// Go to admin dashboard
 		await page.goto("/admin");
-		
+
 		// Click logout
 		await page.getByRole("link", { name: "Logout" }).click();
 
@@ -126,7 +141,10 @@ test.describe("Admin Login", () => {
 		await expect(page).toHaveURL(/\/admin\/login/);
 	});
 
-	test.skip("should persist session across page refreshes", async ({ page, context }) => {
+	test.skip("should persist session across page refreshes", async ({
+		page,
+		context,
+	}) => {
 		// Skip this test as it requires real authentication
 		// This would need to be tested with a test database or test user
 	});

@@ -12,9 +12,9 @@ test.describe("Order API Integration", () => {
 				// Check request headers and body
 				const headers = route.request().headers();
 				const postData = route.request().postData();
-				
+
 				// Verify it's a form submission
-				expect(headers['content-type']).toContain('multipart/form-data');
+				expect(headers["content-type"]).toContain("multipart/form-data");
 				expect(postData).toBeTruthy();
 
 				await route.fulfill({
@@ -232,9 +232,9 @@ test.describe("Order API Integration", () => {
 				// Capture the post data
 				capturedPostData = route.request().postData();
 				const headers = route.request().headers();
-				
+
 				// Verify it's multipart form data
-				expect(headers['content-type']).toContain('multipart/form-data');
+				expect(headers["content-type"]).toContain("multipart/form-data");
 				expect(capturedPostData).toContain('name="name"');
 				expect(capturedPostData).toContain('name="email"');
 				expect(capturedPostData).toContain('name="phone"');
