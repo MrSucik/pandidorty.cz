@@ -140,8 +140,11 @@ export default function ChristmasOrderForm() {
 				)
 				.refine((date) => {
 					const parsedDate = parseISO(date);
-					const minDate = addDays(new Date(), 3);
-					return parsedDate >= minDate;
+					const minDate = addDays(startOfDay(new Date()), 3);
+					return (
+						isAfter(parsedDate, minDate) ||
+						parsedDate.getTime() === minDate.getTime()
+					);
 				}, "Datum vyzvednutí musí být alespoň 3 dny od dnes"),
 			cakeBoxQty: z.number().int().min(0),
 			sweetbarBoxQty: z.number().int().min(0),
@@ -462,7 +465,7 @@ export default function ChristmasOrderForm() {
 											type="number"
 											id="cakeBoxQty"
 											min="0"
-											{...register("cakeBoxQty")}
+											{...register("cakeBoxQty", { valueAsNumber: true })}
 											className={`w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-pink-500 focus:border-transparent ${errors.cakeBoxQty ? "border-red-300 bg-red-50" : "border-gray-300"}`}
 										/>
 										{errors.cakeBoxQty && (
@@ -488,7 +491,7 @@ export default function ChristmasOrderForm() {
 											type="number"
 											id="sweetbarBoxQty"
 											min="0"
-											{...register("sweetbarBoxQty")}
+											{...register("sweetbarBoxQty", { valueAsNumber: true })}
 											className={`w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-pink-500 focus:border-transparent ${errors.sweetbarBoxQty ? "border-red-300 bg-red-50" : "border-gray-300"}`}
 										/>
 									</div>

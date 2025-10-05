@@ -10,7 +10,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		const formData = await request.formData();
 		const result = await submitChristmasOrder(formData);
 
-		return result;
+		return Response.json(result);
 	} catch (error) {
 		console.error("Error in submit-christmas-order API route:", error);
 		return Response.json(
