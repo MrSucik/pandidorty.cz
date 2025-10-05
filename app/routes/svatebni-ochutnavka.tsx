@@ -193,7 +193,7 @@ export default function WeddingTastingForm() {
 						{/* Description section */}
 						<div className="p-6 bg-pink-50 rounded-lg border border-pink-200">
 							<p className="text-gray-700 leading-relaxed">
-								Text s ochutnávkou dortů / sweetbaru (popisek)
+								Chystáte svatbu a chcete si být jisti, že dorty a zákusky budou přesně podle vašich představ? Objednejte si naši svatební ochutnávku! Můžete si vybrat ochutnávku dortů, sweetbaru, nebo obojí. Ozveme se vám s podrobnostmi a domluvíme termín.
 							</p>
 						</div>
 
@@ -299,10 +299,6 @@ export default function WeddingTastingForm() {
 										Ochutnávka sweetbar
 									</label>
 								</div>
-
-								<p className="text-sm text-gray-500 italic">
-									← ať můžou zaškrtnout obojí
-								</p>
 
 								{errors.cakeBox && (
 									<p className="text-red-600 text-sm">
