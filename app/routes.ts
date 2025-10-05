@@ -5,7 +5,7 @@ export default [
 	route("cakes", "routes/cakes.tsx"),
 	route("gallery", "routes/gallery.tsx"),
 	route("objednavka", "routes/objednavka.tsx"),
-	route("vanocni-ochutnavka", "routes/vanocni-ochutnavka.tsx"),
+	route("vanocni-cukrovi", "routes/vanocni-cukrovi.tsx"),
 	route("svatebni-ochutnavka", "routes/svatebni-ochutnavka.tsx"),
 	route("admin", "routes/admin/index.tsx"),
 	route("admin/login", "routes/admin/login.tsx"),

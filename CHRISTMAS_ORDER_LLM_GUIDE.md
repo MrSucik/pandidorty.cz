@@ -85,7 +85,7 @@ If the workspace differs (e.g., additional seasonal code already present), adjus
 ---
 
 ## 6. Christmas Order Form UI
-1. Create new public route component: `app/routes/vanocni-ochutnavka.tsx` (adjust slug if business prefers different URL).
+1. Create new public route component: `app/routes/vanocni-cukrovi.tsx` (adjust slug if business prefers different URL).
    - Base on `app/routes/objednavka.tsx`, but remove cake customization, photo uploads, dessert text area, etc.
    - Use React Hook Form with `zodResolver` referencing the backend schema.
    - Form fields:
@@ -115,7 +115,7 @@ If the workspace differs (e.g., additional seasonal code already present), adjus
 
 ## 7. Navigation & Marketing Copy
 1. Home page (`app/routes/index.tsx`)
-   - Add CTA block or hero mention linking to `/vanocni-ochutnavka`.
+   - Add CTA block or hero mention linking to `/vanocni-cukrovi`.
    - Provide short Czech description of the Christmas tasting offering.
 
 2. Existing order page (`app/routes/objednavka.tsx`)

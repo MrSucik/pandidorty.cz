@@ -182,9 +182,9 @@ export async function submitChristmasOrder(
 			await resend.emails.send({
 				from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
 				to: ["mr.sucik@gmail.com", "pandidorty@gmail.com"],
-				subject: `🎄 Nová vánoční ochutnávka #${newOrder.orderNumber} - ${validated.name}`,
+				subject: `🎄 Nová vánoční cukrovía #${newOrder.orderNumber} - ${validated.name}`,
 				text: `
-Nová objednávka vánoční ochutnávky!
+Nová objednávka vánoční cukrovíy!
 
 Číslo objednávky: ${newOrder.orderNumber}
 Datum přijetí: ${format(new Date(), "dd.MM.yyyy HH:mm", { locale: cs })}
@@ -205,11 +205,11 @@ ${orderDetails}
 			await resend.emails.send({
 				from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
 				to: validated.email,
-				subject: `🎄 Potvrzení objednávky vánoční ochutnávky #${newOrder.orderNumber}`,
+				subject: `🎄 Potvrzení objednávky vánoční cukrovíy #${newOrder.orderNumber}`,
 				text: `
 Dobrý den ${validated.name},
 
-děkujeme za Vaši objednávku vánoční ochutnávky! Tímto potvrzujeme, že jsme ji přijali.
+děkujeme za Vaši objednávku vánoční cukrovíy! Tímto potvrzujeme, že jsme ji přijali.
 
 SHRNUTÍ OBJEDNÁVKY:
 Číslo objednávky: ${newOrder.orderNumber}
@@ -235,7 +235,7 @@ Tým Pandí Dorty
 		return {
 			success: true,
 			message:
-				"Děkujeme! Vaše objednávka vánoční ochutnávky byla úspěšně odeslána.",
+				"Děkujeme! Vaše objednávka vánoční cukrovíy byla úspěšně odeslána.",
 			orderId: newOrder.orderNumber,
 			orderDetails: {
 				id: newOrder.id,

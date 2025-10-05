@@ -28,7 +28,7 @@ export default function OrderCard({ order }: Props) {
 							</h3>
 							{order.orderKind === "christmas_tasting" && (
 								<span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-									🎄 Vánoční ochutnávka
+									🎄 Vánoční cukroví
 								</span>
 							)}
 							{order.orderKind === "wedding_tasting" && (
@@ -177,8 +177,7 @@ export default function OrderCard({ order }: Props) {
 											<div className="flex items-start gap-2">
 												<span className="text-lg flex-shrink-0">🎂</span>
 												<p className="text-sm font-medium text-pink-900">
-													Ochutnávková krabička dortů: {order.tastingCakeBoxQty}
-													x
+													Ochutnávková krabička dortů: {order.tastingCakeBoxQty}x
 												</p>
 											</div>
 										</div>

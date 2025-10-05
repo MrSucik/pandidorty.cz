@@ -231,7 +231,7 @@ export default function ChristmasOrderForm() {
 				<div className="max-w-4xl mx-auto px-4 py-12">
 					<div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-sm">
 						<h1 className="text-3xl md:text-4xl font-bold text-center mb-8 mt-12">
-							🎄 Vánoční Ochutnávka
+							🎄 Vánoční Cukroví
 						</h1>
 
 						<div className="text-center p-8">
@@ -298,10 +298,10 @@ export default function ChristmasOrderForm() {
 			<div className="max-w-4xl mx-auto px-4 py-12">
 				<div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-sm">
 					<h1 className="text-3xl md:text-4xl font-bold text-center mb-4 mt-12">
-						🎄 Vánoční Ochutnávka
+						🎄 Vánoční Cukroví
 					</h1>
 					<p className="text-center text-gray-600 mb-8">
-						Objednejte si naše speciální vánoční ochutnávkové krabičky
+						Objednejte si naše speciální vánoční cukroví
 					</p>
 
 					<form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

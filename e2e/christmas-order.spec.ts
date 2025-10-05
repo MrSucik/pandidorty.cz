@@ -8,18 +8,18 @@ test.describe("Christmas Tasting Order Flow", () => {
 
 		// Check that Christmas order link exists
 		const christmasLink = page.getByRole("link", {
-			name: /Vánoční ochutnávka/i,
+			name: /Vánoční cukroví/i,
 		});
 		await expect(christmasLink).toBeVisible();
 
 		// Click and navigate to Christmas order page
 		await christmasLink.click();
-		await expect(page).toHaveURL("/vanocni-ochutnavka");
-		await expect(page.locator("h1")).toContainText("Vánoční Ochutnávka");
+		await expect(page).toHaveURL("/vanocni-cukrovi");
+		await expect(page.locator("h1")).toContainText("Vánoční Cukroví");
 	});
 
 	test("should display form with required fields", async ({ page }) => {
-		await page.goto("/vanocni-ochutnavka");
+		await page.goto("/vanocni-cukrovi");
 
 		// Verify form elements are present
 		await expect(page.locator("#name")).toBeVisible();
@@ -32,7 +32,7 @@ test.describe("Christmas Tasting Order Flow", () => {
 	});
 
 	test("should validate at least one box is selected", async ({ page }) => {
-		await page.goto("/vanocni-ochutnavka");
+		await page.goto("/vanocni-cukrovi");
 
 		// Fill contact info but leave quantities at 0
 		await page.fill("#name", "Test User");
@@ -55,7 +55,7 @@ test.describe("Christmas Tasting Order Flow", () => {
 	});
 
 	test("should calculate total amount correctly", async ({ page }) => {
-		await page.goto("/vanocni-ochutnavka");
+		await page.goto("/vanocni-cukrovi");
 
 		// Set quantities
 		await page.fill("#cakeBoxQty", "2");
@@ -75,7 +75,7 @@ test.describe("Christmas Tasting Order Flow", () => {
 				contentType: "application/json",
 				body: JSON.stringify({
 					success: true,
-					message: "Objednávka vánoční ochutnávky byla úspěšně odeslána!",
+					message: "Objednávka vánočního cukroví byla úspěšně odeslána!",
 					orderId: "XMAS-test-123",
 					orderDetails: {
 						id: 1,
@@ -90,7 +90,7 @@ test.describe("Christmas Tasting Order Flow", () => {
 			});
 		});
 
-		await page.goto("/vanocni-ochutnavka");
+		await page.goto("/vanocni-cukrovi");
 
 		// Fill form
 		await page.fill("#name", "Test User");
@@ -122,7 +122,7 @@ test.describe("Christmas Tasting Order Flow", () => {
 	});
 
 	test("should validate minimum date (3 days from now)", async ({ page }) => {
-		await page.goto("/vanocni-ochutnavka");
+		await page.goto("/vanocni-cukrovi");
 
 		// Fill contact info
 		await page.fill("#name", "Test User");
@@ -158,7 +158,7 @@ test.describe("Christmas Tasting Order Flow", () => {
 			});
 		});
 
-		await page.goto("/vanocni-ochutnavka");
+		await page.goto("/vanocni-cukrovi");
 
 		// Fill form
 		await page.fill("#name", "Test User");
