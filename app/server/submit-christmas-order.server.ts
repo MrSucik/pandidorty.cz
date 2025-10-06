@@ -51,7 +51,6 @@ const christmasOrderSchema = z
 			),
 		cakeBoxQty: z.coerce.number().int().min(0).default(0),
 		sweetbarBoxQty: z.coerce.number().int().min(0).default(0),
-		notes: z.string().optional().default(""),
 	})
 	.refine(
 		(data) => {
@@ -100,7 +99,6 @@ export async function submitChristmasOrder(
 		date: formData.get("date") as string,
 		cakeBoxQty: formData.get("cakeBoxQty"),
 		sweetbarBoxQty: formData.get("sweetbarBoxQty"),
-		notes: (formData.get("notes") as string) || "",
 	};
 
 	// Validate with Zod
@@ -147,7 +145,7 @@ export async function submitChristmasOrder(
 				dessertChoice: null,
 				tastingCakeBoxQty: validated.cakeBoxQty,
 				tastingSweetbarBoxQty: validated.sweetbarBoxQty,
-				tastingNotes: validated.notes || null,
+				tastingNotes: null,
 				shippingAddress: null,
 				billingAddress: null,
 				totalAmount: totalAmount.toString(),
@@ -173,10 +171,6 @@ export async function submitChristmasOrder(
 			}
 
 			orderDetails += `\n\nCelková částka: ${totalAmount} Kč`;
-
-			if (validated.notes) {
-				orderDetails += `\n\nPoznámka zákazníka:\n${validated.notes}`;
-			}
 
 			// Send admin notification email
 			await resend.emails.send({

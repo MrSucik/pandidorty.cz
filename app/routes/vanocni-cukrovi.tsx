@@ -139,7 +139,6 @@ export default function ChristmasOrderForm() {
 				}, "Datum vyzvednutí musí být alespoň 3 dny od dnes"),
 			cakeBoxQty: z.number().int().min(0),
 			sweetbarBoxQty: z.number().int().min(0),
-			notes: z.string(),
 		})
 		.refine(
 			(data) => {
@@ -182,7 +181,6 @@ export default function ChristmasOrderForm() {
 			date: defaultDate,
 			cakeBoxQty: 0,
 			sweetbarBoxQty: 0,
-			notes: "",
 		},
 	});
 
@@ -499,22 +497,6 @@ export default function ChristmasOrderForm() {
 											</div>
 										</div>
 									)}
-								</div>
-
-								<div className="mt-6">
-									<label
-										className="block text-sm font-medium mb-2"
-										htmlFor="notes"
-									>
-										Poznámka (volitelné)
-									</label>
-									<textarea
-										id="notes"
-										rows={3}
-										{...register("notes")}
-										placeholder="Zde můžete uvést jakékoliv speciální požadavky..."
-										className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-									/>
 								</div>
 							</div>
 						</div>

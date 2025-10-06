@@ -28,7 +28,6 @@ test.describe("Christmas Tasting Order Flow", () => {
 		await expect(page.locator("#date")).toBeVisible();
 		await expect(page.locator("#cakeBoxQty")).toBeVisible();
 		await expect(page.locator("#sweetbarBoxQty")).toBeVisible();
-		await expect(page.locator("#notes")).toBeVisible();
 	});
 
 	test("should validate at least one box is selected", async ({ page }) => {
@@ -104,7 +103,6 @@ test.describe("Christmas Tasting Order Flow", () => {
 
 		await page.fill("#cakeBoxQty", "1");
 		await page.fill("#sweetbarBoxQty", "1");
-		await page.fill("#notes", "Test poznámka");
 
 		// Submit
 		await page.click('button[type="submit"]');
