@@ -324,7 +324,9 @@ export default function ChristmasOrderForm() {
 									{CHRISTMAS_PAYMENT_INFO.description}
 								</p>
 								<p className="text-sm text-gray-600">
-									Po obdržení platby vám zašleme finální potvrzení
+									{orderDetails?.totalAmount && orderDetails.totalAmount < CHRISTMAS_PAYMENT_INFO.deposit
+										? "Po obdržení platby vám zašleme finální potvrzení."
+										: "Po obdržení zálohy vám zašleme finální potvrzení."}
 								</p>
 							</div>
 

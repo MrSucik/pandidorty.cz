@@ -1,6 +1,6 @@
 import { addDays, format } from "date-fns";
 import { cs } from "date-fns/locale";
-import { count, eq } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import { Resend } from "resend";
 import { z } from "zod";
 import { db, orders } from "../db";
@@ -8,12 +8,8 @@ import { db, orders } from "../db";
 // Maximum capacity for wedding tasting orders
 const MAX_WEDDING_TASTING_CAPACITY = 15;
 
-// Verify RESEND_API_KEY is set at module load time
-if (!process.env.RESEND_API_KEY) {
-	throw new Error(
-		"RESEND_API_KEY environment variable is not set. Email functionality will not work.",
-	);
-}
+// Check if email is configured (but don't crash if not)
+const isEmailConfigured = !!process.env.RESEND_API_KEY;
 
 // Function to get current wedding tasting order count
 async function getCurrentWeddingTastingCount(): Promise<number> {
@@ -52,7 +48,8 @@ const weddingTastingSchema = z
 		phone: z
 			.string()
 			.min(1, "Telefon je povinný")
-			.min(9, "Telefon musí mít alespoň 9 číslic"),
+			.min(9, "Telefon musí mít alespoň 9 číslic")
+			.regex(/^[0-9+\s()-]+$/, "Zadejte platné telefonní číslo"),
 		cakeBox: z.boolean(),
 		sweetbarBox: z.boolean(),
 	})
@@ -115,22 +112,31 @@ export async function submitWeddingTasting(
 	const validated = validationResult.data;
 
 	try {
-		// Check current capacity
-		const currentCount = await getCurrentWeddingTastingCount();
-		if (currentCount >= MAX_WEDDING_TASTING_CAPACITY) {
-			throw new Error(
-				`Omlouváme se, ale kapacita pro svatební ochutnávky je již naplněna (${MAX_WEDDING_TASTING_CAPACITY} objednávek). Zkuste to prosím později nebo nás kontaktujte přímo.`,
-			);
-		}
-		const orderNumber = generateOrderNumber();
+		// Use transaction to ensure atomic capacity check and insert
+		const newOrder = await db.transaction(async (tx) => {
+			// Lock the table for this transaction to prevent race conditions
+			const [{ currentCount }] = await tx
+				.select({ currentCount: count() })
+				.from(orders)
+				.where(eq(orders.orderKind, "wedding_tasting"))
+				.for("update");
 
-		// Save order to database
-		// Note: We set a default delivery date (7 days from now) since it's not collected in the form
-		const defaultDeliveryDate = addDays(new Date(), 7);
+			// Check capacity within the transaction
+			if (currentCount >= MAX_WEDDING_TASTING_CAPACITY) {
+				throw new Error(
+					`Omlouváme se, ale kapacita pro svatební ochutnávky je již naplněna (${MAX_WEDDING_TASTING_CAPACITY} objednávek). Zkuste to prosím později nebo nás kontaktujte přímo.`,
+				);
+			}
 
-		const [newOrder] = await db
-			.insert(orders)
-			.values({
+			const orderNumber = generateOrderNumber();
+
+			// Save order to database
+			// Note: We set a default delivery date (7 days from now) since it's not collected in the form
+			const defaultDeliveryDate = addDays(new Date(), 7);
+
+			const [inserted] = await tx
+				.insert(orders)
+				.values({
 				orderNumber,
 				customerName: validated.name,
 				customerEmail: validated.email,
@@ -155,6 +161,9 @@ export async function submitWeddingTasting(
 			})
 			.returning();
 
+			return inserted;
+		});
+
 		// Send notification emails
 		try {
 			const resend = new Resend(process.env.RESEND_API_KEY);
@@ -170,8 +179,10 @@ export async function submitWeddingTasting(
 				orderDetails += "\n- ☑ Ochutnávková krabička sweetbar";
 			}
 
-			// Send admin notification email
-			await resend.emails.send({
+			// Send notification emails if configured
+			if (isEmailConfigured) {
+				// Send admin notification email
+				await resend.emails.send({
 				from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
 				to: ["mr.sucik@gmail.com", "pandidorty@gmail.com"],
 				subject: `💍 Nová svatební ochutnávka #${newOrder.orderNumber} - ${validated.name}`,
@@ -212,7 +223,10 @@ Pokud budete mít jakékoliv dotazy, neváhejte nás kontaktovat na pandidorty@g
 S pozdravem,
 Tým Pandí Dorty
 `,
-			});
+				});
+			} else {
+				console.warn("⚠️ Email not configured - skipping notification emails");
+			}
 		} catch (emailError) {
 			console.error("⚠️ Error sending emails:", emailError);
 			// Don't throw here - the order was saved successfully
@@ -234,6 +248,13 @@ Tým Pandí Dorty
 		};
 	} catch (error) {
 		console.error("💥 Error processing wedding tasting order:", error);
+
+		// Preserve specific error messages (like capacity full)
+		if (error instanceof Error) {
+			throw error;
+		}
+
+		// Generic fallback for unexpected errors
 		throw new Error(
 			"Došlo k chybě při zpracování objednávky. Zkuste to prosím později.",
 		);

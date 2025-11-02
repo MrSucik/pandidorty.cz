@@ -206,11 +206,11 @@ export async function submitChristmasOrder(
 				dessertChoice: null,
 				tastingCakeBoxQty: null,
 				tastingSweetbarBoxQty: null,
-				tastingNotes: orderSummary, // Store the order summary here
+				tastingNotes: null, // Only for tasting orders
 				shippingAddress: null,
 				billingAddress: null,
 				totalAmount: totalAmount.toString(),
-				notes: [customerNotes, adminNote].filter(Boolean).join("\n\n"),
+				notes: customerNotes || null, // Store customer notes properly
 				createdById: null,
 				updatedById: null,
 			})

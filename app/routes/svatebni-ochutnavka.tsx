@@ -17,19 +17,24 @@ export async function loader() {
 	return { capacity };
 }
 
-interface WeddingTastingResponse {
-	success: boolean;
-	message?: string;
-	error?: string;
-	orderId?: string;
-	orderDetails?: {
-		id: number;
-		orderNumber: string;
-		customerName: string;
-		cakeBox: boolean;
-		sweetbarBox: boolean;
-	};
-}
+// Define schema for runtime validation
+const weddingTastingResponseSchema = z.object({
+	success: z.boolean(),
+	message: z.string().optional(),
+	error: z.string().optional(),
+	orderId: z.string().optional(),
+	orderDetails: z
+		.object({
+			id: z.number(),
+			orderNumber: z.string(),
+			customerName: z.string(),
+			cakeBox: z.boolean(),
+			sweetbarBox: z.boolean(),
+		})
+		.optional(),
+});
+
+type WeddingTastingResponse = z.infer<typeof weddingTastingResponseSchema>;
 
 const submitWeddingTasting = async (
 	formData: FormData,
@@ -39,7 +44,17 @@ const submitWeddingTasting = async (
 		body: formData,
 	});
 
-	const result = (await response.json()) as WeddingTastingResponse;
+	const data = await response.json();
+
+	// Validate response at runtime
+	const validationResult = weddingTastingResponseSchema.safeParse(data);
+
+	if (!validationResult.success) {
+		console.error("Invalid API response:", validationResult.error);
+		throw new Error("Neplatná odpověď ze serveru.");
+	}
+
+	const result = validationResult.data;
 
 	if (!response.ok) {
 		throw new Error(result.error || "Došlo k chybě při odesílání formuláře.");
@@ -61,7 +76,8 @@ const weddingTastingSchema = z
 		phone: z
 			.string()
 			.min(1, "Toto pole je povinné")
-			.min(9, "Telefon musí mít alespoň 9 číslic"),
+			.min(9, "Telefon musí mít alespoň 9 číslic")
+			.regex(/^[0-9+\s()-]+$/, "Zadejte platné telefonní číslo"),
 		cakeBox: z.boolean(),
 		sweetbarBox: z.boolean(),
 	})

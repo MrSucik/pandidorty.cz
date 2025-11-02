@@ -11,7 +11,7 @@ export const WEDDING_TASTING_DATA = {
 			"vanilkový korpus, pistáciový krém + mango&marakuja curd a maliny",
 			"čokoládový korpus, karamelový krém + jahody a karamel",
 		],
-		maxOrders: 15, // Maximum orders per type as requested by client
+		maxOrders: 15, // Note: This is informational only. Actual capacity is app-wide (15 total orders)
 	},
 	sweetbarBox: {
 		name: "Ochutnávka sweetbaru",
@@ -33,7 +33,7 @@ export const WEDDING_TASTING_DATA = {
 			"tiramisu v kelímku",
 			"brownies",
 		],
-		maxOrders: 15, // Maximum orders per type as requested by client
+		maxOrders: 15, // Note: This is informational only. Actual capacity is app-wide (15 total orders)
 	},
 	payment: {
 		deposit: 450, // Deposit amount in CZK
