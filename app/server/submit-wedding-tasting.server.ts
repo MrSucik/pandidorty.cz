@@ -1,6 +1,6 @@
 import { addDays, format } from "date-fns";
 import { cs } from "date-fns/locale";
-import { count, eq, sql } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { z } from "zod";
 import { db, orders } from "../db";
@@ -112,31 +112,23 @@ export async function submitWeddingTasting(
 	const validated = validationResult.data;
 
 	try {
-		// Use transaction to ensure atomic capacity check and insert
-		const newOrder = await db.transaction(async (tx) => {
-			// Lock the table for this transaction to prevent race conditions
-			const [{ currentCount }] = await tx
-				.select({ currentCount: count() })
-				.from(orders)
-				.where(eq(orders.orderKind, "wedding_tasting"))
-				.for("update");
+		// Simple capacity check (no transaction needed for low volume)
+		const currentCount = await getCurrentWeddingTastingCount();
+		if (currentCount >= MAX_WEDDING_TASTING_CAPACITY) {
+			throw new Error(
+				`Omlouváme se, ale kapacita pro svatební ochutnávky je již naplněna (${MAX_WEDDING_TASTING_CAPACITY} objednávek). Zkuste to prosím později nebo nás kontaktujte přímo.`,
+			);
+		}
 
-			// Check capacity within the transaction
-			if (currentCount >= MAX_WEDDING_TASTING_CAPACITY) {
-				throw new Error(
-					`Omlouváme se, ale kapacita pro svatební ochutnávky je již naplněna (${MAX_WEDDING_TASTING_CAPACITY} objednávek). Zkuste to prosím později nebo nás kontaktujte přímo.`,
-				);
-			}
+		const orderNumber = generateOrderNumber();
 
-			const orderNumber = generateOrderNumber();
+		// Save order to database
+		// Note: We set a default delivery date (7 days from now) since it's not collected in the form
+		const defaultDeliveryDate = addDays(new Date(), 7);
 
-			// Save order to database
-			// Note: We set a default delivery date (7 days from now) since it's not collected in the form
-			const defaultDeliveryDate = addDays(new Date(), 7);
-
-			const [inserted] = await tx
-				.insert(orders)
-				.values({
+		const [newOrder] = await db
+			.insert(orders)
+			.values({
 				orderNumber,
 				customerName: validated.name,
 				customerEmail: validated.email,
@@ -160,9 +152,6 @@ export async function submitWeddingTasting(
 				updatedById: null,
 			})
 			.returning();
-
-			return inserted;
-		});
 
 		// Send notification emails
 		try {
