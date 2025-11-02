@@ -136,7 +136,7 @@ export async function submitOrder(
 
 	if (!validationResult.success) {
 		const errorMessages = validationResult.error.issues.map(
-			(err: any) => err.message,
+			(err) => err.message,
 		);
 		throw new Error(errorMessages.join(", "));
 	}

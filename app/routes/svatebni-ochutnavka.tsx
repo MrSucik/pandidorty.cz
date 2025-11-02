@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import {
 	type SubmitHandler,
 	useForm as useReactHookForm,
@@ -80,6 +80,11 @@ type WeddingTastingFormData = z.infer<typeof weddingTastingSchema>;
 
 export default function WeddingTastingForm() {
 	const { capacity } = useLoaderData<typeof loader>();
+	const nameId = useId();
+	const emailId = useId();
+	const phoneId = useId();
+	const cakeBoxId = useId();
+	const sweetbarBoxId = useId();
 
 	const submitOrderMutation = useMutation({
 		mutationFn: submitWeddingTasting,
@@ -261,8 +266,8 @@ export default function WeddingTastingForm() {
 										{WEDDING_TASTING_DATA.cakeBox.description}:
 									</p>
 									<ul className="text-sm space-y-1">
-										{WEDDING_TASTING_DATA.cakeBox.items.map((item, index) => (
-											<li key={index} className="ml-4">
+										{WEDDING_TASTING_DATA.cakeBox.items.map((item) => (
+											<li key={item} className="ml-4">
 												✨ {item}
 											</li>
 										))}
@@ -279,8 +284,8 @@ export default function WeddingTastingForm() {
 									</p>
 									<ul className="text-sm space-y-1">
 										{WEDDING_TASTING_DATA.sweetbarBox.items.map(
-											(item, index) => (
-												<li key={index} className="ml-4">
+											(item) => (
+												<li key={item} className="ml-4">
 													✨ {item}
 												</li>
 											),
@@ -315,13 +320,13 @@ export default function WeddingTastingForm() {
 								<div>
 									<label
 										className="block text-sm font-medium mb-2"
-										htmlFor="name"
+										htmlFor={nameId}
 									>
 										Jméno a příjmení *
 									</label>
 									<input
 										type="text"
-										id="name"
+										id={nameId}
 										{...register("name")}
 										className={`w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-pink-500 focus:border-transparent ${errors.name ? "border-red-300 bg-red-50" : "border-gray-300"}`}
 									/>
@@ -335,13 +340,13 @@ export default function WeddingTastingForm() {
 								<div>
 									<label
 										className="block text-sm font-medium mb-2"
-										htmlFor="email"
+										htmlFor={emailId}
 									>
 										E-mail *
 									</label>
 									<input
 										type="email"
-										id="email"
+										id={emailId}
 										{...register("email")}
 										className={`w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-pink-500 focus:border-transparent ${errors.email ? "border-red-300 bg-red-50" : "border-gray-300"}`}
 									/>
@@ -356,13 +361,13 @@ export default function WeddingTastingForm() {
 							<div>
 								<label
 									className="block text-sm font-medium mb-2"
-									htmlFor="phone"
+									htmlFor={phoneId}
 								>
 									Telefon *
 								</label>
 								<input
 									type="tel"
-									id="phone"
+									id={phoneId}
 									{...register("phone")}
 									className={`w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-pink-500 focus:border-transparent ${errors.phone ? "border-red-300 bg-red-50" : "border-gray-300"}`}
 								/>
@@ -384,11 +389,11 @@ export default function WeddingTastingForm() {
 								<div className="flex items-center gap-3">
 									<input
 										type="checkbox"
-										id="cakeBox"
+										id={cakeBoxId}
 										{...register("cakeBox")}
 										className="w-5 h-5 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
 									/>
-									<label htmlFor="cakeBox" className="text-base font-medium">
+									<label htmlFor={cakeBoxId} className="text-base font-medium">
 										{WEDDING_TASTING_DATA.cakeBox.name} (
 										{WEDDING_TASTING_DATA.cakeBox.price} Kč)
 									</label>
@@ -397,12 +402,12 @@ export default function WeddingTastingForm() {
 								<div className="flex items-center gap-3">
 									<input
 										type="checkbox"
-										id="sweetbarBox"
+										id={sweetbarBoxId}
 										{...register("sweetbarBox")}
 										className="w-5 h-5 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
 									/>
 									<label
-										htmlFor="sweetbarBox"
+										htmlFor={sweetbarBoxId}
 										className="text-base font-medium"
 									>
 										{WEDDING_TASTING_DATA.sweetbarBox.name} (

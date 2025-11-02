@@ -17,7 +17,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 function AdminSettings() {
-	const { blockedDates, user } = useLoaderData<typeof loader>();
+	const { blockedDates } = useLoaderData<typeof loader>();
 	const revalidator = useRevalidator();
 	const navigate = useNavigate();
 	const [date, setDate] = useState("");
