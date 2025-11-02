@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import { z } from "zod";
 import { db, orders } from "../db";
 import { isDateBlocked } from "./blocked-dates.server";
-import { CHRISTMAS_SWEETS_OPTIONS } from "../data/christmas-sweets";
+import { CHRISTMAS_SWEETS_OPTIONS, CHRISTMAS_PAYMENT_INFO } from "../data/christmas-sweets";
 
 // Verify RESEND_API_KEY is set at module load time
 if (!process.env.RESEND_API_KEY) {
@@ -255,9 +255,9 @@ Datum vyzvednutí: ${format(parseISO(validated.date), "dd.MM.yyyy (EEEE)", { loc
 ${orderDetails}
 
 PLATEBNÍ INSTRUKCE:
-Pro dokončení objednávky prosím uhraďte zálohu 450 Kč pomocí QR kódu, který najdete v potvrzovací zprávě na webu, nebo převodem na náš účet. Po obdržení platby Vám zašleme finální potvrzení.
+Pro dokončení objednávky prosím uhraďte zálohu ${CHRISTMAS_PAYMENT_INFO.deposit} Kč pomocí QR kódu, který najdete v potvrzovací zprávě na webu, nebo převodem na náš účet. Po obdržení platby Vám zašleme finální potvrzení.
 
-Doplatek ${totalAmount - 450} Kč uhradíte při vyzvednutí.
+Doplatek ${totalAmount - CHRISTMAS_PAYMENT_INFO.deposit} Kč uhradíte při vyzvednutí.
 
 Pokud budete mít jakékoliv dotazy, neváhejte nás kontaktovat na pandidorty@gmail.com.
 

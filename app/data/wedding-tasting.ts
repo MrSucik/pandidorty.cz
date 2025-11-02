@@ -37,7 +37,9 @@ export const WEDDING_TASTING_DATA = {
   },
   payment: {
     deposit: 450, // Deposit amount in CZK
-    description: "Objednávka je platná až po uhrazení zálohy 450 Kč převodem na účet, doplatek je pak v hotovosti na místě při převzetí",
+    get description() {
+      return `Objednávka je platná až po uhrazení zálohy ${this.deposit} Kč převodem na účet, doplatek je pak v hotovosti na místě při převzetí`;
+    },
     qrCodePath: "/payments/payment-qr.jpg", // Universal QR code for all payments
   },
   pickup: {

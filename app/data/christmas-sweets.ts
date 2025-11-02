@@ -90,7 +90,9 @@ export type ChristmasSweetOption =
 
 export const CHRISTMAS_PAYMENT_INFO = {
   deposit: 450, // Deposit amount in CZK
-  description: "Objednávka je platná až po uhrazení zálohy 450 Kč převodem na účet",
+  get description() {
+    return `Objednávka je platná až po uhrazení zálohy ${this.deposit} Kč převodem na účet`;
+  },
   qrCodePath: "/payments/payment-qr.jpg", // Universal QR code for all payments
 } as const;
 
