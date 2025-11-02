@@ -73,12 +73,18 @@ export default function Home() {
 							říct svou představu a společně vymyslíme sladké překvapení na
 							míru.
 						</p>
-						<div className="mt-6 mb-8">
+						<div className="mt-6 mb-8 flex flex-col sm:flex-row gap-4">
 							<Link
 								to="/objednavka"
 								className="bg-blue-800 text-white px-8 py-3 rounded-lg hover:bg-blue-900 transition-colors inline-block font-medium shadow-md"
 							>
 								Objednávkový formulář →
+							</Link>
+							<Link
+								to="/svatebni-ochutnavka"
+								className="bg-purple-700 text-white px-8 py-3 rounded-lg hover:bg-purple-800 transition-colors inline-block font-medium shadow-md"
+							>
+								💍 Svatební ochutnávka →
 							</Link>
 						</div>
 					</div>

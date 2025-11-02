@@ -50,6 +50,13 @@
 			"when": 1748574508443,
 			"tag": "0006_optimal_molecule_man",
 			"breakpoints": true
+		},
+		{
+			"idx": 7,
+			"version": "7",
+			"when": 1759665791370,
+			"tag": "0007_smooth_bishop",
+			"breakpoints": true
 		}
 	]
 }
