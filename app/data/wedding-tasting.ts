@@ -1,3 +1,5 @@
+import { zonedTimeToUtc } from "date-fns-tz";
+
 export const WEDDING_TASTING_DATA = {
 	cakeBox: {
 		name: "Ochutnávka dortů",
@@ -46,6 +48,7 @@ export const WEDDING_TASTING_DATA = {
 		date: "v sobotu 29.11.",
 		time: "od 10-11 hod",
 		location: "v Ostravě-Porubě (Maďarská 6088/18)",
+		pickupDate: zonedTimeToUtc("2025-11-29", "Europe/Prague"), // Fixed pickup date for all orders (converted to UTC from Prague timezone)
 	},
 	orderDeadline: "do úterý 25.11. anebo do naplnění kapacity",
 	message: "Děkujeme a budeme se na Vás moc těšit!",
