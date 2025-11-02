@@ -102,7 +102,6 @@ const createChristmasFormSchema = (blockedDates: string[]) => {
 						parsedDate.getTime() === minDate.getTime()
 					);
 				}, "Datum vyzvednutí musí být alespoň 3 dny od dnes"),
-			notes: z.string().optional(),
 			...candyQuantities,
 		})
 		.refine(
@@ -156,7 +155,6 @@ export default function ChristmasOrderForm() {
 			email: "",
 			phone: "",
 			date: defaultDate,
-			notes: "",
 			...Object.fromEntries(
 				CHRISTMAS_SWEETS_OPTIONS.map((sweet) => [`quantity_${sweet.id}`, 0]),
 			),
@@ -196,7 +194,6 @@ export default function ChristmasOrderForm() {
 		formData.append("email", value.email);
 		formData.append("phone", value.phone);
 		formData.append("date", value.date);
-		if (value.notes) formData.append("notes", value.notes);
 
 		// Add selected sweets and quantities
 		const selectedSweets: string[] = [];
@@ -534,6 +531,7 @@ export default function ChristmasOrderForm() {
 														type="number"
 														min="0"
 														max="50"
+														step="1"
 														{...register(`quantity_${sweet.id}` as any, {
 															valueAsNumber: true,
 														})}
@@ -549,20 +547,6 @@ export default function ChristmasOrderForm() {
 										);
 									})}
 								</div>
-							</div>
-
-							{/* Notes section */}
-							<div className="bg-white/80 rounded-lg p-5 border border-gray-100 shadow-sm">
-								<h2 className="text-xl font-semibold mb-4 text-blue-900 border-b pb-2">
-									Poznámky (volitelné)
-								</h2>
-								<textarea
-									id="notes"
-									{...register("notes")}
-									rows={3}
-									placeholder="Zde můžete napsat speciální požadavky nebo poznámky k objednávce..."
-									className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-								/>
 							</div>
 
 							{/* Order summary */}

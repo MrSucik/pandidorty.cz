@@ -46,6 +46,7 @@ export const WEDDING_TASTING_DATA = {
 		date: "v sobotu 29.11.",
 		time: "od 10-11 hod",
 		location: "v Ostravě-Porubě (Maďarská 6088/18)",
+		pickupDate: new Date("2025-11-29"), // Fixed pickup date for all orders
 	},
 	orderDeadline: "do úterý 25.11. anebo do naplnění kapacity",
 	message: "Děkujeme a budeme se na Vás moc těšit!",

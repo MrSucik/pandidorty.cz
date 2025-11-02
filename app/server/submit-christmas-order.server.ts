@@ -62,7 +62,6 @@ const christmasOrderSchema = z
 				isValidPickupDate,
 				"Datum vyzvednutí musí být alespoň 3 dny od dnes",
 			),
-		notes: z.string().max(1000, "Poznámka je příliš dlouhá").optional(),
 		...createQuantitySchema(),
 	})
 	.refine(
@@ -123,12 +122,6 @@ export async function submitChristmasOrder(
 		date: formData.get("date") as string,
 	};
 
-	// Extract notes if provided
-	const rawNotes = formData.get("notes");
-	if (typeof rawNotes === "string" && rawNotes.trim().length > 0) {
-		orderData.notes = rawNotes;
-	}
-
 	// Extract quantities for each candy type
 	for (const sweet of CHRISTMAS_SWEETS_OPTIONS) {
 		const quantityKey = `quantity_${sweet.id}`;
@@ -181,10 +174,6 @@ export async function submitChristmasOrder(
 		)
 		.join("; ");
 
-	// Prepare customer notes and admin note
-	const customerNotes = validated.notes?.trim();
-	const adminNote = `Vánoční cukroví - celková hmotnost: ${totalWeight}g`;
-
 	try {
 		const orderNumber = generateOrderNumber();
 
@@ -210,7 +199,7 @@ export async function submitChristmasOrder(
 				shippingAddress: null,
 				billingAddress: null,
 				totalAmount: totalAmount.toString(),
-				notes: customerNotes || null, // Store customer notes properly
+				notes: null,
 				createdById: null,
 				updatedById: null,
 			})
@@ -254,7 +243,7 @@ Telefon: ${validated.phone}
 DATUM VYZVEDNUTÍ:
 ${format(parseISO(validated.date), "dd.MM.yyyy (EEEE)", { locale: cs })}
 
-${orderDetails}${customerNotes ? `\nPOZNÁMKA OD ZÁKAZNÍKA:\n${customerNotes}\n` : ""}
+${orderDetails}
 `,
 			});
 
@@ -272,7 +261,7 @@ SHRNUTÍ OBJEDNÁVKY:
 Číslo objednávky: ${newOrder.orderNumber}
 Datum vyzvednutí: ${format(parseISO(validated.date), "dd.MM.yyyy (EEEE)", { locale: cs })}
 
-${orderDetails}${customerNotes ? `\nVAŠE POZNÁMKA:\n${customerNotes}\n` : ""}
+${orderDetails}
 
 PLATEBNÍ INSTRUKCE:
 Pro dokončení objednávky prosím uhraďte ${totalAmount < CHRISTMAS_PAYMENT_INFO.deposit ? `částku ${totalAmount} Kč` : `zálohu ${CHRISTMAS_PAYMENT_INFO.deposit} Kč`} pomocí QR kódu, který najdete v potvrzovací zprávě na webu, nebo převodem na náš účet. Po obdržení platby Vám zašleme finální potvrzení.

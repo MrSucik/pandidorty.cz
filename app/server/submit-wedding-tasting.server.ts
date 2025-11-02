@@ -1,8 +1,9 @@
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 import { cs } from "date-fns/locale";
 import { count, eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { z } from "zod";
+import { WEDDING_TASTING_DATA } from "../data/wedding-tasting";
 import { db, orders } from "../db";
 
 // Maximum capacity for wedding tasting orders
@@ -123,8 +124,8 @@ export async function submitWeddingTasting(
 		const orderNumber = generateOrderNumber();
 
 		// Save order to database
-		// Note: We set a default delivery date (7 days from now) since it's not collected in the form
-		const defaultDeliveryDate = addDays(new Date(), 7);
+		// Use the fixed pickup date from config
+		const deliveryDate = WEDDING_TASTING_DATA.pickup.pickupDate;
 
 		const [newOrder] = await db
 			.insert(orders)
@@ -133,7 +134,7 @@ export async function submitWeddingTasting(
 				customerName: validated.name,
 				customerEmail: validated.email,
 				customerPhone: validated.phone,
-				deliveryDate: defaultDeliveryDate,
+				deliveryDate,
 				orderKind: "wedding_tasting",
 				orderCake: validated.cakeBox,
 				orderDessert: validated.sweetbarBox,
