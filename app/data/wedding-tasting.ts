@@ -40,17 +40,17 @@ export const WEDDING_TASTING_DATA = {
 	payment: {
 		deposit: 450, // Deposit amount in CZK
 		get description() {
-			return `Objednávka je platná až po uhrazení zálohy ${this.deposit} Kč převodem na účet, doplatek je pak v hotovosti na místě při převzetí`;
+			return `Objednávka je platná až po uhrazení zálohy ${this.deposit} Kč převodem na účet, doplatek je pak v hotovosti na místě při prevzetí`;
 		},
 		qrCodePath: "/payments/payment-qr.jpg", // Universal QR code for all payments
 	},
 	pickup: {
-		date: "v sobotu 29.11.",
-		time: "od 10-11 hod",
+		date: "v sobotu 8.11.",
+		time: "od 11-12 hod",
 		location: "v Ostravě-Porubě (Maďarská 6088/18)",
-		pickupDate: zonedTimeToUtc("2025-11-29", "Europe/Prague"), // Fixed pickup date for all orders (converted to UTC from Prague timezone)
+		pickupDate: zonedTimeToUtc("2025-11-08", "Europe/Prague"), // Fixed pickup date for all orders (converted to UTC from Prague timezone)
 	},
-	orderDeadline: "do úterý 25.11. anebo do naplnění kapacity",
+	orderDeadline: "do úterý 4.11. anebo do naplnění kapacity",
 	message: "Děkujeme a budeme se na Vás moc těšit!",
 } as const;
 
