@@ -10,7 +10,9 @@ import { z } from "zod";
 import { WEDDING_TASTING_DATA } from "../data/wedding-tasting";
 
 export async function loader() {
-	const { getWeddingTastingCapacity } = await import("../server/submit-wedding-tasting.server");
+	const { getWeddingTastingCapacity } = await import(
+		"../server/submit-wedding-tasting.server"
+	);
 	const capacity = await getWeddingTastingCapacity();
 	return { capacity };
 }
@@ -160,7 +162,8 @@ export default function WeddingTastingForm() {
 									💳 Platba zálohy
 								</h3>
 								<p className="text-gray-700 mb-4">
-									Pro dokončení objednávky prosím uhraďte zálohu <strong>{WEDDING_TASTING_DATA.payment.deposit} Kč</strong>
+									Pro dokončení objednávky prosím uhraďte zálohu{" "}
+									<strong>{WEDDING_TASTING_DATA.payment.deposit} Kč</strong>
 								</p>
 								<div className="flex justify-center mb-4">
 									<img
@@ -206,13 +209,15 @@ export default function WeddingTastingForm() {
 					{capacity.isAvailable ? (
 						<div className="bg-green-50 border border-green-300 rounded-lg p-4 mb-6 text-center">
 							<p className="text-green-800">
-								📊 Zbývá <strong>{capacity.remaining}</strong> volných míst z celkové kapacity {capacity.max} objednávek
+								📊 Zbývá <strong>{capacity.remaining}</strong> volných míst z
+								celkové kapacity {capacity.max} objednávek
 							</p>
 						</div>
 					) : (
 						<div className="bg-red-50 border border-red-300 rounded-lg p-4 mb-6 text-center">
 							<p className="text-red-800 font-semibold">
-								⚠️ Omlouváme se, ale kapacita pro svatební ochutnávky je již naplněna
+								⚠️ Omlouváme se, ale kapacita pro svatební ochutnávky je již
+								naplněna
 							</p>
 							<p className="text-red-600 text-sm mt-2">
 								Zkuste to prosím později nebo nás kontaktujte přímo
@@ -241,41 +246,58 @@ export default function WeddingTastingForm() {
 						{/* Description section */}
 						<div className="p-6 bg-pink-50 rounded-lg border border-pink-200 space-y-6">
 							<p className="text-gray-700 leading-relaxed">
-								Chystáte svatbu a chcete si být jisti, že dorty a zákusky budou přesně podle vašich představ? Objednejte si naši svatební ochutnávku!
+								Chystáte svatbu a chcete si být jisti, že dorty a zákusky budou
+								přesně podle vašich představ? Objednejte si naši svatební
+								ochutnávku!
 							</p>
 
 							<div className="space-y-4">
 								<div className="bg-white/70 p-4 rounded-lg">
 									<h3 className="font-semibold text-lg mb-2">
-										🍰 {WEDDING_TASTING_DATA.cakeBox.name} - {WEDDING_TASTING_DATA.cakeBox.price} Kč
+										🍰 {WEDDING_TASTING_DATA.cakeBox.name} -{" "}
+										{WEDDING_TASTING_DATA.cakeBox.price} Kč
 									</h3>
-									<p className="text-sm text-gray-600 mb-2">{WEDDING_TASTING_DATA.cakeBox.description}:</p>
+									<p className="text-sm text-gray-600 mb-2">
+										{WEDDING_TASTING_DATA.cakeBox.description}:
+									</p>
 									<ul className="text-sm space-y-1">
 										{WEDDING_TASTING_DATA.cakeBox.items.map((item, index) => (
-											<li key={index} className="ml-4">✨ {item}</li>
+											<li key={index} className="ml-4">
+												✨ {item}
+											</li>
 										))}
 									</ul>
 								</div>
 
 								<div className="bg-white/70 p-4 rounded-lg">
 									<h3 className="font-semibold text-lg mb-2">
-										🧁 {WEDDING_TASTING_DATA.sweetbarBox.name} - {WEDDING_TASTING_DATA.sweetbarBox.price} Kč
+										🧁 {WEDDING_TASTING_DATA.sweetbarBox.name} -{" "}
+										{WEDDING_TASTING_DATA.sweetbarBox.price} Kč
 									</h3>
-									<p className="text-sm text-gray-600 mb-2">{WEDDING_TASTING_DATA.sweetbarBox.description}:</p>
+									<p className="text-sm text-gray-600 mb-2">
+										{WEDDING_TASTING_DATA.sweetbarBox.description}:
+									</p>
 									<ul className="text-sm space-y-1">
-										{WEDDING_TASTING_DATA.sweetbarBox.items.map((item, index) => (
-											<li key={index} className="ml-4">✨ {item}</li>
-										))}
+										{WEDDING_TASTING_DATA.sweetbarBox.items.map(
+											(item, index) => (
+												<li key={index} className="ml-4">
+													✨ {item}
+												</li>
+											),
+										)}
 									</ul>
 								</div>
 							</div>
 
 							<div className="border-t pt-4 space-y-2 text-sm">
 								<p className="text-gray-700">
-									💌 Objednávky přijímáme pouze přes webové stránky {WEDDING_TASTING_DATA.orderDeadline}
+									💌 Objednávky přijímáme pouze přes webové stránky{" "}
+									{WEDDING_TASTING_DATA.orderDeadline}
 								</p>
 								<p className="text-gray-700">
-									📍 Vyzvednutí proběhne {WEDDING_TASTING_DATA.pickup.date} {WEDDING_TASTING_DATA.pickup.time} {WEDDING_TASTING_DATA.pickup.location}
+									📍 Vyzvednutí proběhne {WEDDING_TASTING_DATA.pickup.date}{" "}
+									{WEDDING_TASTING_DATA.pickup.time}{" "}
+									{WEDDING_TASTING_DATA.pickup.location}
 								</p>
 								<p className="text-red-600 font-medium">
 									❗ {WEDDING_TASTING_DATA.payment.description}
@@ -367,7 +389,8 @@ export default function WeddingTastingForm() {
 										className="w-5 h-5 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
 									/>
 									<label htmlFor="cakeBox" className="text-base font-medium">
-										{WEDDING_TASTING_DATA.cakeBox.name} ({WEDDING_TASTING_DATA.cakeBox.price} Kč)
+										{WEDDING_TASTING_DATA.cakeBox.name} (
+										{WEDDING_TASTING_DATA.cakeBox.price} Kč)
 									</label>
 								</div>
 
@@ -382,7 +405,8 @@ export default function WeddingTastingForm() {
 										htmlFor="sweetbarBox"
 										className="text-base font-medium"
 									>
-										{WEDDING_TASTING_DATA.sweetbarBox.name} ({WEDDING_TASTING_DATA.sweetbarBox.price} Kč)
+										{WEDDING_TASTING_DATA.sweetbarBox.name} (
+										{WEDDING_TASTING_DATA.sweetbarBox.price} Kč)
 									</label>
 								</div>
 
@@ -398,7 +422,11 @@ export default function WeddingTastingForm() {
 						<div className="text-center pt-4">
 							<button
 								type="submit"
-								disabled={!capacity.isAvailable || isSubmitting || submitOrderMutation.isPending}
+								disabled={
+									!capacity.isAvailable ||
+									isSubmitting ||
+									submitOrderMutation.isPending
+								}
 								className="bg-blue-800 text-white px-8 py-3 rounded-lg hover:bg-blue-900 transition-colors relative disabled:opacity-50 font-medium"
 							>
 								{submitOrderMutation.isPending || isSubmitting ? (

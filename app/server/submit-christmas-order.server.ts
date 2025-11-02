@@ -2,9 +2,12 @@ import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
 import { cs } from "date-fns/locale";
 import { Resend } from "resend";
 import { z } from "zod";
+import {
+	CHRISTMAS_PAYMENT_INFO,
+	CHRISTMAS_SWEETS_OPTIONS,
+} from "../data/christmas-sweets";
 import { db, orders } from "../db";
 import { isDateBlocked } from "./blocked-dates.server";
-import { CHRISTMAS_SWEETS_OPTIONS, CHRISTMAS_PAYMENT_INFO } from "../data/christmas-sweets";
 
 // Verify RESEND_API_KEY is set at module load time
 if (!process.env.RESEND_API_KEY) {
@@ -31,7 +34,11 @@ const isValidPickupDate = (dateString: string): boolean => {
 const createQuantitySchema = () => {
 	const quantityFields: Record<string, z.ZodTypeAny> = {};
 	for (const sweet of CHRISTMAS_SWEETS_OPTIONS) {
-		quantityFields[`quantity_${sweet.id}`] = z.coerce.number().int().min(0).default(0);
+		quantityFields[`quantity_${sweet.id}`] = z.coerce
+			.number()
+			.int()
+			.min(0)
+			.default(0);
 	}
 	return quantityFields;
 };
@@ -162,7 +169,9 @@ export async function submitChristmasOrder(
 
 	// Create a summary string for the database
 	const orderSummary = orderItems
-		.map((item) => `${item.name}: ${item.quantity}x100g (${item.totalPrice} Kč)`)
+		.map(
+			(item) => `${item.name}: ${item.quantity}x100g (${item.totalPrice} Kč)`,
+		)
 		.join("; ");
 
 	try {

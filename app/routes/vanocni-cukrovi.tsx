@@ -9,8 +9,11 @@ import {
 } from "react-hook-form";
 import { useLoaderData } from "react-router";
 import { z } from "zod";
+import {
+	CHRISTMAS_PAYMENT_INFO,
+	CHRISTMAS_SWEETS_OPTIONS,
+} from "../data/christmas-sweets";
 import { getBlockedDates } from "../server/blocked-dates.server";
-import { CHRISTMAS_SWEETS_OPTIONS, CHRISTMAS_PAYMENT_INFO } from "../data/christmas-sweets";
 
 export async function loader() {
 	const blockedDates = await getBlockedDates();
@@ -57,7 +60,11 @@ const createChristmasFormSchema = (blockedDates: string[]) => {
 	// Create an object with all candy IDs as keys with number validation
 	const candyQuantities: Record<string, z.ZodTypeAny> = {};
 	for (const sweet of CHRISTMAS_SWEETS_OPTIONS) {
-		candyQuantities[`quantity_${sweet.id}`] = z.number().int().min(0).default(0);
+		candyQuantities[`quantity_${sweet.id}`] = z
+			.number()
+			.int()
+			.min(0)
+			.default(0);
 	}
 
 	return z
@@ -96,12 +103,12 @@ const createChristmasFormSchema = (blockedDates: string[]) => {
 			(data) => {
 				// Check if at least one candy has quantity > 0
 				return CHRISTMAS_SWEETS_OPTIONS.some(
-					sweet => (data as any)[`quantity_${sweet.id}`] > 0
+					(sweet) => (data as any)[`quantity_${sweet.id}`] > 0,
 				);
 			},
 			{
 				message: "Vyberte alespoň jeden druh cukroví",
-			}
+			},
 		);
 };
 
@@ -145,7 +152,7 @@ export default function ChristmasOrderForm() {
 			date: defaultDate,
 			notes: "",
 			...Object.fromEntries(
-				CHRISTMAS_SWEETS_OPTIONS.map(sweet => [`quantity_${sweet.id}`, 0])
+				CHRISTMAS_SWEETS_OPTIONS.map((sweet) => [`quantity_${sweet.id}`, 0]),
 			),
 		},
 	});
@@ -156,13 +163,13 @@ export default function ChristmasOrderForm() {
 	// Calculate total price
 	const totalAmount = CHRISTMAS_SWEETS_OPTIONS.reduce((total, sweet) => {
 		const quantity = (quantities as any)[`quantity_${sweet.id}`] || 0;
-		return total + (quantity * sweet.pricePer100g);
+		return total + quantity * sweet.pricePer100g;
 	}, 0);
 
 	// Get ordered items for display
 	const orderedItems = CHRISTMAS_SWEETS_OPTIONS.filter(
-		sweet => (quantities as any)[`quantity_${sweet.id}`] > 0
-	).map(sweet => ({
+		(sweet) => (quantities as any)[`quantity_${sweet.id}`] > 0,
+	).map((sweet) => ({
 		...sweet,
 		quantity: (quantities as any)[`quantity_${sweet.id}`],
 		subtotal: (quantities as any)[`quantity_${sweet.id}`] * sweet.pricePer100g,
@@ -234,13 +241,20 @@ export default function ChristmasOrderForm() {
 								</p>
 							</div>
 
-							{orderDetails && orderDetails.orderedSweets && (
+							{orderDetails?.orderedSweets && (
 								<div className="bg-green-50 rounded-lg p-6 mb-8 text-left max-w-2xl mx-auto">
-									<h3 className="text-lg font-semibold mb-4">Shrnutí objednávky:</h3>
+									<h3 className="text-lg font-semibold mb-4">
+										Shrnutí objednávky:
+									</h3>
 									<div className="space-y-2">
 										{orderDetails.orderedSweets.map((item) => (
-											<div key={item.id} className="flex justify-between text-sm">
-												<span>{item.name} ({item.quantity * 100}g)</span>
+											<div
+												key={item.id}
+												className="flex justify-between text-sm"
+											>
+												<span>
+													{item.name} ({item.quantity * 100}g)
+												</span>
 												<span className="font-medium">{item.price} Kč</span>
 											</div>
 										))}
@@ -248,7 +262,9 @@ export default function ChristmasOrderForm() {
 									<div className="border-t mt-4 pt-4">
 										<div className="flex justify-between font-semibold text-lg">
 											<span>Celková cena:</span>
-											<span className="text-green-700">{orderDetails.totalAmount} Kč</span>
+											<span className="text-green-700">
+												{orderDetails.totalAmount} Kč
+											</span>
 										</div>
 									</div>
 								</div>
@@ -443,7 +459,10 @@ export default function ChristmasOrderForm() {
 													<div className="text-sm text-yellow-700 space-y-1">
 														{futureBlockedDates.map((date) => (
 															<div key={date}>
-																• {format(parseISO(date), "EEEE d. MMMM yyyy", { locale: cs })}
+																•{" "}
+																{format(parseISO(date), "EEEE d. MMMM yyyy", {
+																	locale: cs,
+																})}
 															</div>
 														))}
 													</div>
@@ -464,7 +483,8 @@ export default function ChristmasOrderForm() {
 
 								<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 									{CHRISTMAS_SWEETS_OPTIONS.map((sweet) => {
-										const quantity = (quantities as any)[`quantity_${sweet.id}`] || 0;
+										const quantity =
+											(quantities as any)[`quantity_${sweet.id}`] || 0;
 										const subtotal = quantity * sweet.pricePer100g;
 
 										return (
@@ -472,18 +492,23 @@ export default function ChristmasOrderForm() {
 												key={sweet.id}
 												className="bg-white rounded-lg p-4 border border-gray-200 hover:border-pink-300 transition-colors"
 											>
-												<h3 className="font-semibold text-sm mb-1">{sweet.name}</h3>
+												<h3 className="font-semibold text-sm mb-1">
+													{sweet.name}
+												</h3>
 												<p className="text-xs text-gray-500 mb-2">
-													{sweet.pricePer100g} Kč / 100g • ~{sweet.approxPiecesPer100g} ks
+													{sweet.pricePer100g} Kč / 100g • ~
+													{sweet.approxPiecesPer100g} ks
 												</p>
 												<div className="flex items-center gap-2">
-													<label className="text-xs text-gray-600">Množství (×100g):</label>
+													<label className="text-xs text-gray-600">
+														Množství (×100g):
+													</label>
 													<input
 														type="number"
 														min="0"
 														max="50"
 														{...register(`quantity_${sweet.id}` as any, {
-															valueAsNumber: true
+															valueAsNumber: true,
 														})}
 														className="w-20 px-2 py-1 text-sm border rounded focus:ring-1 focus:ring-pink-500"
 													/>
@@ -516,11 +541,18 @@ export default function ChristmasOrderForm() {
 							{/* Order summary */}
 							{orderedItems.length > 0 && (
 								<div className="bg-green-50 rounded-lg p-5 border border-green-200">
-									<h3 className="text-lg font-semibold mb-3">Shrnutí objednávky:</h3>
+									<h3 className="text-lg font-semibold mb-3">
+										Shrnutí objednávky:
+									</h3>
 									<div className="space-y-2">
 										{orderedItems.map((item) => (
-											<div key={item.id} className="flex justify-between text-sm">
-												<span>{item.name} ({item.quantity * 100}g)</span>
+											<div
+												key={item.id}
+												className="flex justify-between text-sm"
+											>
+												<span>
+													{item.name} ({item.quantity * 100}g)
+												</span>
 												<span className="font-medium">{item.subtotal} Kč</span>
 											</div>
 										))}
@@ -539,7 +571,11 @@ export default function ChristmasOrderForm() {
 						<div className="text-center pt-4">
 							<button
 								type="submit"
-								disabled={isSubmitting || submitOrderMutation.isPending || totalAmount === 0}
+								disabled={
+									isSubmitting ||
+									submitOrderMutation.isPending ||
+									totalAmount === 0
+								}
 								className="bg-green-700 text-white px-8 py-3 rounded-lg hover:bg-green-800 transition-colors relative disabled:opacity-50 font-medium"
 							>
 								{submitOrderMutation.isPending || isSubmitting ? (

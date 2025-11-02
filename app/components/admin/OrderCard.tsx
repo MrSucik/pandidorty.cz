@@ -177,7 +177,8 @@ export default function OrderCard({ order }: Props) {
 											<div className="flex items-start gap-2">
 												<span className="text-lg flex-shrink-0">🎂</span>
 												<p className="text-sm font-medium text-pink-900">
-													Ochutnávková krabička dortů: {order.tastingCakeBoxQty}x
+													Ochutnávková krabička dortů: {order.tastingCakeBoxQty}
+													x
 												</p>
 											</div>
 										</div>
@@ -215,7 +216,8 @@ export default function OrderCard({ order }: Props) {
 										order.tastingCakeBoxQty > 0 && (
 											<div className="bg-pink-50 border border-pink-200 rounded px-3 py-2">
 												<p className="text-sm font-medium text-pink-900">
-													Ochutnávková krabička dortů: {order.tastingCakeBoxQty}x
+													Ochutnávková krabička dortů: {order.tastingCakeBoxQty}
+													x
 												</p>
 											</div>
 										)}

@@ -1,9 +1,9 @@
 import { addDays, format } from "date-fns";
 import { cs } from "date-fns/locale";
+import { count, eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { z } from "zod";
 import { db, orders } from "../db";
-import { count, eq } from "drizzle-orm";
 
 // Maximum capacity for wedding tasting orders
 const MAX_WEDDING_TASTING_CAPACITY = 15;
@@ -119,7 +119,7 @@ export async function submitWeddingTasting(
 		const currentCount = await getCurrentWeddingTastingCount();
 		if (currentCount >= MAX_WEDDING_TASTING_CAPACITY) {
 			throw new Error(
-				`Omlouváme se, ale kapacita pro svatební ochutnávky je již naplněna (${MAX_WEDDING_TASTING_CAPACITY} objednávek). Zkuste to prosím později nebo nás kontaktujte přímo.`
+				`Omlouváme se, ale kapacita pro svatební ochutnávky je již naplněna (${MAX_WEDDING_TASTING_CAPACITY} objednávek). Zkuste to prosím později nebo nás kontaktujte přímo.`,
 			);
 		}
 		const orderNumber = generateOrderNumber();
