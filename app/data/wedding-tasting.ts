@@ -16,7 +16,7 @@ export const WEDDING_TASTING_DATA = {
 	sweetbarBox: {
 		name: "Ochutnávka sweetbaru",
 		price: 750,
-		description: "Krabička obsahuje 16 nejoblíbenějších zákusků",
+		description: "Krabička obsahuje 14 nejoblíbenějších zákusků",
 		items: [
 			"karamelový mini větrníček",
 			"malinová a karamelová makronka",
@@ -43,11 +43,11 @@ export const WEDDING_TASTING_DATA = {
 		qrCodePath: "/payments/payment-qr.jpg", // Universal QR code for all payments
 	},
 	pickup: {
-		date: "v sobotu 25.10.",
+		date: "v sobotu 29.11.",
 		time: "od 10-11 hod",
 		location: "v Ostravě-Porubě (Maďarská 6088/18)",
 	},
-	orderDeadline: "do úterý 21.10. anebo do naplnění kapacity",
+	orderDeadline: "do úterý 25.11. anebo do naplnění kapacity",
 	message: "Děkujeme a budeme se na Vás moc těšit!",
 } as const;
 

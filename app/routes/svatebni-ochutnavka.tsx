@@ -283,13 +283,11 @@ export default function WeddingTastingForm() {
 										{WEDDING_TASTING_DATA.sweetbarBox.description}:
 									</p>
 									<ul className="text-sm space-y-1">
-										{WEDDING_TASTING_DATA.sweetbarBox.items.map(
-											(item) => (
-												<li key={item} className="ml-4">
-													✨ {item}
-												</li>
-											),
-										)}
+										{WEDDING_TASTING_DATA.sweetbarBox.items.map((item) => (
+											<li key={item} className="ml-4">
+												✨ {item}
+											</li>
+										))}
 									</ul>
 								</div>
 							</div>

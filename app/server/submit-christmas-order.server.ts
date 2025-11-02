@@ -62,10 +62,7 @@ const christmasOrderSchema = z
 				isValidPickupDate,
 				"Datum vyzvednutí musí být alespoň 3 dny od dnes",
 			),
-		notes: z
-			.string()
-			.max(1000, "Poznámka je příliš dlouhá")
-			.optional(),
+		notes: z.string().max(1000, "Poznámka je příliš dlouhá").optional(),
 		...createQuantitySchema(),
 	})
 	.refine(
@@ -278,9 +275,9 @@ Datum vyzvednutí: ${format(parseISO(validated.date), "dd.MM.yyyy (EEEE)", { loc
 ${orderDetails}${customerNotes ? `\nVAŠE POZNÁMKA:\n${customerNotes}\n` : ""}
 
 PLATEBNÍ INSTRUKCE:
-Pro dokončení objednávky prosím uhraďte zálohu ${CHRISTMAS_PAYMENT_INFO.deposit} Kč pomocí QR kódu, který najdete v potvrzovací zprávě na webu, nebo převodem na náš účet. Po obdržení platby Vám zašleme finální potvrzení.
+Pro dokončení objednávky prosím uhraďte ${totalAmount < CHRISTMAS_PAYMENT_INFO.deposit ? `částku ${totalAmount} Kč` : `zálohu ${CHRISTMAS_PAYMENT_INFO.deposit} Kč`} pomocí QR kódu, který najdete v potvrzovací zprávě na webu, nebo převodem na náš účet. Po obdržení platby Vám zašleme finální potvrzení.
 
-Doplatek ${totalAmount - CHRISTMAS_PAYMENT_INFO.deposit} Kč uhradíte při vyzvednutí.
+${totalAmount > CHRISTMAS_PAYMENT_INFO.deposit ? `Doplatek ${totalAmount - CHRISTMAS_PAYMENT_INFO.deposit} Kč uhradíte při vyzvednutí.` : ""}
 
 Pokud budete mít jakékoliv dotazy, neváhejte nás kontaktovat na pandidorty@gmail.com.
 

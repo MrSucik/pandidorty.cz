@@ -26,15 +26,21 @@ interface ChristmasOrderResponse {
 	success: boolean;
 	message?: string;
 	error?: string;
+	orderId?: string;
 	orderDetails?: {
+		id: number;
 		orderNumber: string;
-		totalAmount: number;
-		orderedSweets: Array<{
-			id: string;
+		customerName: string;
+		deliveryDate: Date;
+		orderItems: Array<{
+			sweetId: string;
 			name: string;
-			quantity: number;
-			price: number;
+			quantity: number; // in 100g units
+			pricePerUnit: number;
+			totalPrice: number;
 		}>;
+		totalAmount: number;
+		totalWeight: number; // in grams
 	};
 }
 
@@ -241,21 +247,23 @@ export default function ChristmasOrderForm() {
 								</p>
 							</div>
 
-							{orderDetails?.orderedSweets && (
+							{orderDetails?.orderItems && (
 								<div className="bg-green-50 rounded-lg p-6 mb-8 text-left max-w-2xl mx-auto">
 									<h3 className="text-lg font-semibold mb-4">
 										Shrnutí objednávky:
 									</h3>
 									<div className="space-y-2">
-										{orderDetails.orderedSweets.map((item) => (
+										{orderDetails.orderItems.map((item) => (
 											<div
-												key={item.id}
+												key={item.sweetId}
 												className="flex justify-between text-sm"
 											>
 												<span>
 													{item.name} ({item.quantity * 100}g)
 												</span>
-												<span className="font-medium">{item.price} Kč</span>
+												<span className="font-medium">
+													{item.totalPrice} Kč
+												</span>
 											</div>
 										))}
 									</div>
@@ -273,14 +281,31 @@ export default function ChristmasOrderForm() {
 							{/* QR Code Payment Section */}
 							<div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 mb-8">
 								<h3 className="text-xl font-semibold mb-4 text-gray-900">
-									💳 Platba objednávky
+									💳 Platba zálohy
 								</h3>
 								<p className="text-gray-700 mb-4">
-									Pro dokončení objednávky prosím uhraďte částku{" "}
+									Pro dokončení objednávky prosím uhraďte{" "}
+									{orderDetails?.totalAmount &&
+									orderDetails.totalAmount < CHRISTMAS_PAYMENT_INFO.deposit
+										? "částku"
+										: "zálohu"}{" "}
 									<strong className="text-2xl text-blue-800">
-										{orderDetails?.totalAmount} Kč
+										{orderDetails?.totalAmount &&
+										orderDetails.totalAmount < CHRISTMAS_PAYMENT_INFO.deposit
+											? orderDetails.totalAmount
+											: CHRISTMAS_PAYMENT_INFO.deposit}{" "}
+										Kč
 									</strong>
 								</p>
+								{orderDetails?.totalAmount &&
+									orderDetails.totalAmount > CHRISTMAS_PAYMENT_INFO.deposit && (
+										<p className="text-sm text-gray-600 mb-4">
+											Doplatek{" "}
+											{orderDetails.totalAmount -
+												CHRISTMAS_PAYMENT_INFO.deposit}{" "}
+											Kč uhradíte při vyzvednutí.
+										</p>
+									)}
 
 								<div className="bg-white rounded-lg p-4 inline-block mb-4">
 									<p className="text-sm text-gray-600 mb-2">
