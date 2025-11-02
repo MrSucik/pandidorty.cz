@@ -27,10 +27,6 @@ const isValidPickupDate = (dateString: string): boolean => {
 	}
 };
 
-const christmasSweetMap = new Map(
-	CHRISTMAS_SWEETS_OPTIONS.map((option) => [option.id, option]),
-);
-
 // Create dynamic schema for candy quantities
 const createQuantitySchema = () => {
 	const quantityFields: Record<string, z.ZodTypeAny> = {};

@@ -1,4 +1,4 @@
-import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
+import { addDays, format } from "date-fns";
 import { cs } from "date-fns/locale";
 import { Resend } from "resend";
 import { z } from "zod";
@@ -40,20 +40,6 @@ export async function getWeddingTastingCapacity(): Promise<{
 		isAvailable: remaining > 0,
 	};
 }
-
-// Helper function for date validation (at least 3 days from now)
-const _isValidPickupDate = (dateString: string): boolean => {
-	try {
-		const selectedDate = parseISO(dateString);
-		const minDate = addDays(startOfDay(new Date()), 3);
-		return (
-			isAfter(selectedDate, minDate) ||
-			selectedDate.getTime() === minDate.getTime()
-		);
-	} catch {
-		return false;
-	}
-};
 
 // Zod schema for wedding tasting order validation
 const weddingTastingSchema = z
