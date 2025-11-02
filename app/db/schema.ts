@@ -56,6 +56,11 @@ export const orders = pgTable(
 		customerPhone: varchar("customer_phone", { length: 50 }),
 		deliveryDate: timestamp("delivery_date").notNull(),
 
+		// Order kind (regular or seasonal)
+		orderKind: varchar("order_kind", { length: 50 })
+			.notNull()
+			.default("regular"),
+
 		// Order type flags
 		orderCake: boolean("order_cake").notNull().default(false),
 		orderDessert: boolean("order_dessert").notNull().default(false),
@@ -67,6 +72,11 @@ export const orders = pgTable(
 
 		// Dessert details
 		dessertChoice: varchar("dessert_choice", { length: 255 }),
+
+		// Seasonal tasting order details
+		tastingCakeBoxQty: integer("tasting_cake_box_qty"),
+		tastingSweetbarBoxQty: integer("tasting_sweetbar_box_qty"),
+		tastingNotes: text("tasting_notes"),
 
 		// Legacy fields (keeping for compatibility)
 		shippingAddress: text("shipping_address"),

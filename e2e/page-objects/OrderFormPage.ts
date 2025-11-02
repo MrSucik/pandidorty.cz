@@ -24,8 +24,12 @@ export class OrderFormPage {
 		this.emailInput = page.locator("#email");
 		this.phoneInput = page.locator("#phone");
 		this.dateInput = page.locator("#date");
-		this.orderCakeCheckbox = page.locator('input[type="checkbox"][name="orderCake"]');
-		this.orderDessertCheckbox = page.locator('input[type="checkbox"][name="orderDessert"]');
+		this.orderCakeCheckbox = page.locator(
+			'input[type="checkbox"][name="orderCake"]',
+		);
+		this.orderDessertCheckbox = page.locator(
+			'input[type="checkbox"][name="orderDessert"]',
+		);
 		this.sizeInput = page.locator("#size");
 		this.flavorInput = page.locator("#flavor");
 		this.dessertChoiceTextarea = page.locator("#dessertChoice");
