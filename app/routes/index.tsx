@@ -81,12 +81,6 @@ export default function Home() {
 								Objednávkový formulář →
 							</Link>
 							<Link
-								to="/vanocni-cukrovi"
-								className="bg-green-700 text-white px-8 py-3 rounded-lg hover:bg-green-800 transition-colors inline-block font-medium shadow-md"
-							>
-								🎄 Vánoční cukroví →
-							</Link>
-							<Link
 								to="/svatebni-ochutnavka"
 								className="bg-purple-700 text-white px-8 py-3 rounded-lg hover:bg-purple-800 transition-colors inline-block font-medium shadow-md"
 							>
