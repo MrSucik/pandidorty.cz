@@ -253,7 +253,7 @@ export default function OrderCard({ order }: Props) {
 												<span className="text-lg flex-shrink-0">🎂</span>
 												<div className="flex-1 min-w-0">
 													<p className="text-sm font-medium text-blue-900 break-words">
-														{order.cakeSize} • {order.cakeFlavor}
+														{order.cakeSize ?? "N/A"} • {order.cakeFlavor ?? "N/A"}
 													</p>
 													{order.cakeMessage && (
 														<p className="text-xs text-blue-700 mt-0.5 italic break-words">
@@ -269,7 +269,7 @@ export default function OrderCard({ order }: Props) {
 											<div className="flex items-start gap-2">
 												<span className="text-lg flex-shrink-0">🧁</span>
 												<p className="text-sm font-medium text-green-900 break-words">
-													{order.dessertChoice}
+													{order.dessertChoice ?? "N/A"}
 												</p>
 											</div>
 										</div>
