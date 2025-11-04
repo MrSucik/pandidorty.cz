@@ -26,16 +26,6 @@ export default function OrderCard({ order }: Props) {
 							<h3 className="text-base font-bold text-gray-900">
 								{order.orderNumber}
 							</h3>
-							{order.orderKind === "christmas_tasting" && (
-								<span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-									🎄 Vánoční cukroví
-								</span>
-							)}
-							{order.orderKind === "wedding_tasting" && (
-								<span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-									💍 Svatební ochutnávka
-								</span>
-							)}
 							{isOverdue && (
 								<span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
 									<svg
@@ -170,111 +160,32 @@ export default function OrderCard({ order }: Props) {
 							Objednávka
 						</h4>
 						<div className="space-y-2">
-							{order.orderKind === "christmas_tasting" ? (
-								<>
-									{order.tastingCakeBoxQty && order.tastingCakeBoxQty > 0 && (
-										<div className="bg-pink-50 border border-pink-200 rounded px-3 py-2">
-											<div className="flex items-start gap-2">
-												<span className="text-lg flex-shrink-0">🎂</span>
-												<p className="text-sm font-medium text-pink-900">
-													Ochutnávková krabička dortů: {order.tastingCakeBoxQty}
-													x
-												</p>
-											</div>
-										</div>
-									)}
-									{order.tastingSweetbarBoxQty &&
-										order.tastingSweetbarBoxQty > 0 && (
-											<div className="bg-purple-50 border border-purple-200 rounded px-3 py-2">
-												<div className="flex items-start gap-2">
-													<span className="text-lg flex-shrink-0">🧁</span>
-													<p className="text-sm font-medium text-purple-900">
-														Ochutnávková krabička sweetbar:{" "}
-														{order.tastingSweetbarBoxQty}x
-													</p>
-												</div>
-											</div>
-										)}
-									{order.tastingNotes && (
-										<div className="bg-gray-50 border border-gray-200 rounded px-3 py-2">
-											<p className="text-xs text-gray-700 italic">
-												Poznámka: {order.tastingNotes}
+							{order.orderCake && (
+								<div className="bg-blue-50 border border-blue-200 rounded px-3 py-2">
+									<div className="flex items-start gap-2">
+										<span className="text-lg flex-shrink-0">🎂</span>
+										<div className="flex-1 min-w-0">
+											<p className="text-sm font-medium text-blue-900 break-words">
+												{order.cakeSize ?? "N/A"} • {order.cakeFlavor ?? "N/A"}
 											</p>
-										</div>
-									)}
-									{order.totalAmount && (
-										<div className="bg-green-50 border border-green-200 rounded px-3 py-2">
-											<p className="text-sm font-semibold text-green-900">
-												Celková částka: {order.totalAmount} Kč
-											</p>
-										</div>
-									)}
-								</>
-							) : order.orderKind === "wedding_tasting" ? (
-								<>
-									{order.tastingCakeBoxQty !== null &&
-										order.tastingCakeBoxQty > 0 && (
-											<div className="bg-pink-50 border border-pink-200 rounded px-3 py-2">
-												<p className="text-sm font-medium text-pink-900">
-													Ochutnávková krabička dortů: {order.tastingCakeBoxQty}
-													x
+											{order.cakeMessage && (
+												<p className="text-xs text-blue-700 mt-0.5 italic break-words">
+													"{order.cakeMessage}"
 												</p>
-											</div>
-										)}
-									{order.tastingSweetbarBoxQty !== null &&
-										order.tastingSweetbarBoxQty > 0 && (
-											<div className="bg-purple-50 border border-purple-200 rounded px-3 py-2">
-												<p className="text-sm font-medium text-purple-900">
-													Ochutnávková krabička sweetbar:{" "}
-													{order.tastingSweetbarBoxQty}x
-												</p>
-											</div>
-										)}
-									{order.tastingNotes && (
-										<div className="bg-blue-50 border border-blue-200 rounded px-3 py-2">
-											<p className="text-sm text-blue-900">
-												Poznámka: {order.tastingNotes}
-											</p>
+											)}
 										</div>
-									)}
-									{order.totalAmount && (
-										<div className="bg-green-50 border border-green-200 rounded px-3 py-2">
-											<p className="text-sm font-semibold text-green-900">
-												Celková částka: {order.totalAmount} Kč
-											</p>
-										</div>
-									)}
-								</>
-							) : (
-								<>
-									{order.orderCake && (
-										<div className="bg-blue-50 border border-blue-200 rounded px-3 py-2">
-											<div className="flex items-start gap-2">
-												<span className="text-lg flex-shrink-0">🎂</span>
-												<div className="flex-1 min-w-0">
-													<p className="text-sm font-medium text-blue-900 break-words">
-														{order.cakeSize ?? "N/A"} • {order.cakeFlavor ?? "N/A"}
-													</p>
-													{order.cakeMessage && (
-														<p className="text-xs text-blue-700 mt-0.5 italic break-words">
-															"{order.cakeMessage}"
-														</p>
-													)}
-												</div>
-											</div>
-										</div>
-									)}
-									{order.orderDessert && (
-										<div className="bg-green-50 border border-green-200 rounded px-3 py-2">
-											<div className="flex items-start gap-2">
-												<span className="text-lg flex-shrink-0">🧁</span>
-												<p className="text-sm font-medium text-green-900 break-words">
-													{order.dessertChoice ?? "N/A"}
-												</p>
-											</div>
-										</div>
-									)}
-								</>
+									</div>
+								</div>
+							)}
+							{order.orderDessert && (
+								<div className="bg-green-50 border border-green-200 rounded px-3 py-2">
+									<div className="flex items-start gap-2">
+										<span className="text-lg flex-shrink-0">🧁</span>
+										<p className="text-sm font-medium text-green-900 break-words">
+											{order.dessertChoice ?? "N/A"}
+										</p>
+									</div>
+								</div>
 							)}
 						</div>
 					</div>
