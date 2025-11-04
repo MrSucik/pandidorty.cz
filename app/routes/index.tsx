@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
+// Feature flags from environment variables
+const FEATURE_WEDDING_TASTING = process.env.FEATURE_WEDDING_TASTING === "true";
+const FEATURE_CHRISTMAS_ORDER = process.env.FEATURE_CHRISTMAS_ORDER === "true";
+
 export default function Home() {
 	const [currentSlide, setCurrentSlide] = useState(0);
 	const sliderRef = useRef<HTMLDivElement>(null);
@@ -80,12 +84,22 @@ export default function Home() {
 							>
 								Objednávkový formulář →
 							</Link>
-							<Link
-								to="/svatebni-ochutnavka"
-								className="bg-purple-700 text-white px-8 py-3 rounded-lg hover:bg-purple-800 transition-colors inline-block font-medium shadow-md"
-							>
-								💍 Svatební ochutnávka →
-							</Link>
+							{FEATURE_WEDDING_TASTING && (
+								<Link
+									to="/svatebni-ochutnavka"
+									className="bg-purple-700 text-white px-8 py-3 rounded-lg hover:bg-purple-800 transition-colors inline-block font-medium shadow-md"
+								>
+									💍 Svatební ochutnávka →
+								</Link>
+							)}
+							{FEATURE_CHRISTMAS_ORDER && (
+								<Link
+									to="/vanocni-cukrovi"
+									className="bg-green-700 text-white px-8 py-3 rounded-lg hover:bg-green-800 transition-colors inline-block font-medium shadow-md"
+								>
+									🎄 Vánoční cukroví →
+								</Link>
+							)}
 						</div>
 					</div>
 				</main>
