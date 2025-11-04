@@ -1,6 +1,10 @@
 import { index, type RouteConfig, route } from "@react-router/dev/routes";
 
-export default [
+// Feature flags from environment variables
+const FEATURE_WEDDING_TASTING = process.env.FEATURE_WEDDING_TASTING === "true";
+const FEATURE_CHRISTMAS_ORDER = process.env.FEATURE_CHRISTMAS_ORDER === "true";
+
+const baseRoutes: RouteConfig = [
 	index("routes/index.tsx"),
 	route("cakes", "routes/cakes.tsx"),
 	route("gallery", "routes/gallery.tsx"),
@@ -21,4 +25,22 @@ export default [
 	route("api/blocked-dates/add", "routes/api.blocked-dates.add.ts"),
 	route("api/blocked-dates/remove", "routes/api.blocked-dates.remove.ts"),
 	route("api/test-email", "routes/api.test-email.ts"),
-] satisfies RouteConfig;
+];
+
+// Conditionally add wedding tasting routes
+const weddingRoutes: RouteConfig = FEATURE_WEDDING_TASTING
+	? [
+			route("svatebni-ochutnavka", "routes/svatebni-ochutnavka.tsx"),
+			route("api/submit-wedding-tasting", "routes/api.submit-wedding-tasting.ts"),
+		]
+	: [];
+
+// Conditionally add Christmas order routes
+const christmasRoutes: RouteConfig = FEATURE_CHRISTMAS_ORDER
+	? [
+			route("vanocni-cukrovi", "routes/vanocni-cukrovi.tsx"),
+			route("api/submit-christmas-order", "routes/api.submit-christmas-order.ts"),
+		]
+	: [];
+
+export default [...baseRoutes, ...weddingRoutes, ...christmasRoutes] satisfies RouteConfig;
