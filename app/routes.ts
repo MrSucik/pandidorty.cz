@@ -1,8 +1,8 @@
 import { index, type RouteConfig, route } from "@react-router/dev/routes";
-
-// Feature flags from environment variables
-const FEATURE_WEDDING_TASTING = process.env.FEATURE_WEDDING_TASTING === "true";
-const FEATURE_CHRISTMAS_ORDER = process.env.FEATURE_CHRISTMAS_ORDER === "true";
+import {
+	FEATURE_CHRISTMAS_ORDER,
+	FEATURE_WEDDING_TASTING,
+} from "./config/features";
 
 const baseRoutes: RouteConfig = [
 	index("routes/index.tsx"),
