@@ -84,20 +84,20 @@ export default function Home() {
 							>
 								Objednávkový formulář →
 							</Link>
-							{FEATURE_WEDDING_TASTING && (
-								<Link
-									to="/svatebni-ochutnavka"
-									className="bg-purple-700 text-white px-8 py-3 rounded-lg hover:bg-purple-800 transition-colors inline-block font-medium shadow-md"
-								>
-									💍 Svatební ochutnávka →
-								</Link>
-							)}
 							{FEATURE_CHRISTMAS_ORDER && (
 								<Link
 									to="/vanocni-cukrovi"
 									className="bg-green-700 text-white px-8 py-3 rounded-lg hover:bg-green-800 transition-colors inline-block font-medium shadow-md"
 								>
 									🎄 Vánoční cukroví →
+								</Link>
+							)}
+							{FEATURE_WEDDING_TASTING && (
+								<Link
+									to="/svatebni-ochutnavka"
+									className="bg-purple-700 text-white px-8 py-3 rounded-lg hover:bg-purple-800 transition-colors inline-block font-medium shadow-md"
+								>
+									💍 Svatební ochutnávka →
 								</Link>
 							)}
 						</div>
