@@ -1,8 +1,8 @@
 import { index, type RouteConfig, route } from "@react-router/dev/routes";
-
-// Feature flags - hardcoded configuration
-const FEATURE_WEDDING_TASTING = false;
-const FEATURE_CHRISTMAS_ORDER = true;
+import {
+	FEATURE_CHRISTMAS_ORDER,
+	FEATURE_WEDDING_TASTING,
+} from "./config/features";
 
 const baseRoutes: RouteConfig = [
 	index("routes/index.tsx"),

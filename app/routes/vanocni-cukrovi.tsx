@@ -14,8 +14,14 @@ import {
 	CHRISTMAS_SWEETS_OPTIONS,
 } from "../data/christmas-sweets";
 import { getBlockedDates } from "../server/blocked-dates.server";
+import { FEATURE_CHRISTMAS_ORDER } from "../config/features";
 
 export async function loader() {
+	// Return 404 if the feature is disabled
+	if (!FEATURE_CHRISTMAS_ORDER) {
+		throw new Response(null, { status: 404, statusText: "Not Found" });
+	}
+
 	const blockedDates = await getBlockedDates();
 	return {
 		blockedDates: blockedDates.map((bd) => bd.date),

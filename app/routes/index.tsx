@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-
-// Feature flags - hardcoded configuration
-const FEATURE_WEDDING_TASTING = false;
-const FEATURE_CHRISTMAS_ORDER = true;
+import {
+	FEATURE_CHRISTMAS_ORDER,
+	FEATURE_WEDDING_TASTING,
+} from "../config/features";
 
 export default function Home() {
 	const [currentSlide, setCurrentSlide] = useState(0);
