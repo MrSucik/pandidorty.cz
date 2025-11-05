@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
-// Feature flags from environment variables
-const FEATURE_WEDDING_TASTING = process.env.FEATURE_WEDDING_TASTING === "true";
-const FEATURE_CHRISTMAS_ORDER = process.env.FEATURE_CHRISTMAS_ORDER === "true";
+// Feature flags - hardcoded configuration
+const FEATURE_WEDDING_TASTING = false;
+const FEATURE_CHRISTMAS_ORDER = true;
 
 export default function Home() {
 	const [currentSlide, setCurrentSlide] = useState(0);
