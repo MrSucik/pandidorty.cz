@@ -1,13 +1,14 @@
-import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
-import { cs } from "date-fns/locale";
 import { Resend } from "resend";
 import { z } from "zod";
 import {
-	CHRISTMAS_PAYMENT_INFO,
+	CHRISTMAS_ORDER_CONFIG,
 	CHRISTMAS_SWEETS_OPTIONS,
 } from "../data/christmas-sweets";
 import { db, orders } from "../db";
-import { isDateBlocked } from "./blocked-dates.server";
+
+// Placeholder date for orders without a specific pickup date
+// Set to far future to indicate it needs to be scheduled
+const PLACEHOLDER_DELIVERY_DATE = new Date("2099-12-31");
 
 // Verify RESEND_API_KEY is set at module load time
 if (!process.env.RESEND_API_KEY) {
@@ -15,20 +16,6 @@ if (!process.env.RESEND_API_KEY) {
 		"RESEND_API_KEY environment variable is not set. Email functionality will not work.",
 	);
 }
-
-// Helper function for date validation (at least 3 days from now)
-const isValidPickupDate = (dateString: string): boolean => {
-	try {
-		const selectedDate = parseISO(dateString);
-		const minDate = addDays(startOfDay(new Date()), 3);
-		return (
-			isAfter(selectedDate, minDate) ||
-			selectedDate.getTime() === minDate.getTime()
-		);
-	} catch {
-		return false;
-	}
-};
 
 // Create dynamic schema for candy quantities
 const createQuantitySchema = () => {
@@ -55,13 +42,6 @@ const christmasOrderSchema = z
 			.string()
 			.min(1, "Telefon je povinný")
 			.min(9, "Telefon musí mít alespoň 9 číslic"),
-		date: z
-			.string()
-			.min(1, "Datum vyzvednutí je povinné")
-			.refine(
-				isValidPickupDate,
-				"Datum vyzvednutí musí být alespoň 3 dny od dnes",
-			),
 		...createQuantitySchema(),
 	})
 	.refine(
@@ -75,6 +55,20 @@ const christmasOrderSchema = z
 		},
 		{
 			message: "Vyberte alespoň jedno cukroví",
+		},
+	)
+	.refine(
+		(data) => {
+			// Calculate total order amount and check minimum
+			let totalAmount = 0;
+			for (const sweet of CHRISTMAS_SWEETS_OPTIONS) {
+				const quantity = (data as any)[`quantity_${sweet.id}`] || 0;
+				totalAmount += quantity * sweet.pricePer100g;
+			}
+			return totalAmount >= CHRISTMAS_ORDER_CONFIG.minimumOrder;
+		},
+		{
+			message: `Minimální hodnota objednávky je ${CHRISTMAS_ORDER_CONFIG.minimumOrder} Kč`,
 		},
 	);
 
@@ -94,7 +88,6 @@ export interface SubmitChristmasOrderResult {
 		id: number;
 		orderNumber: string;
 		customerName: string;
-		deliveryDate: Date;
 		orderItems: ChristmasCandyOrderItem[];
 		totalAmount: number;
 		totalWeight: number; // in grams
@@ -119,7 +112,6 @@ export async function submitChristmasOrder(
 		name: formData.get("name") as string,
 		email: formData.get("email") as string,
 		phone: formData.get("phone") as string,
-		date: formData.get("date") as string,
 	};
 
 	// Extract quantities for each candy type
@@ -139,12 +131,6 @@ export async function submitChristmasOrder(
 	}
 
 	const validated = validationResult.data;
-
-	// Check if the selected date is blocked
-	const dateIsBlocked = await isDateBlocked(validated.date);
-	if (dateIsBlocked) {
-		throw new Error("Vybraný termín není dostupný. Zvolte prosím jiný termín.");
-	}
 
 	// Build order items list with only selected candies
 	const orderItems: ChristmasCandyOrderItem[] = [];
@@ -185,7 +171,7 @@ export async function submitChristmasOrder(
 				customerName: validated.name,
 				customerEmail: validated.email,
 				customerPhone: validated.phone,
-				deliveryDate: new Date(validated.date),
+				deliveryDate: PLACEHOLDER_DELIVERY_DATE,
 				orderKind: "christmas_sweets", // Changed from "christmas_tasting"
 				orderCake: false,
 				orderDessert: false,
@@ -233,15 +219,11 @@ export async function submitChristmasOrder(
 Nová objednávka vánočního cukroví!
 
 Číslo objednávky: ${newOrder.orderNumber}
-Datum přijetí: ${format(new Date(), "dd.MM.yyyy HH:mm", { locale: cs })}
 
 KONTAKTNÍ ÚDAJE:
 Jméno: ${validated.name}
 Email: ${validated.email}
 Telefon: ${validated.phone}
-
-DATUM VYZVEDNUTÍ:
-${format(parseISO(validated.date), "dd.MM.yyyy (EEEE)", { locale: cs })}
 
 ${orderDetails}
 `,
@@ -259,14 +241,15 @@ děkujeme za Vaši objednávku vánočního cukroví! Tímto potvrzujeme, že js
 
 SHRNUTÍ OBJEDNÁVKY:
 Číslo objednávky: ${newOrder.orderNumber}
-Datum vyzvednutí: ${format(parseISO(validated.date), "dd.MM.yyyy (EEEE)", { locale: cs })}
 
 ${orderDetails}
 
 PLATEBNÍ INSTRUKCE:
-Pro dokončení objednávky prosím uhraďte ${totalAmount < CHRISTMAS_PAYMENT_INFO.deposit ? `částku ${totalAmount} Kč` : `zálohu ${CHRISTMAS_PAYMENT_INFO.deposit} Kč`} pomocí QR kódu, který najdete v potvrzovací zprávě na webu, nebo převodem na náš účet. Po obdržení platby Vám zašleme finální potvrzení.
+Pro dokončení objednávky prosím uhraďte ${totalAmount < CHRISTMAS_ORDER_CONFIG.deposit ? `částku ${totalAmount} Kč` : `zálohu ${CHRISTMAS_ORDER_CONFIG.deposit} Kč`} pomocí QR kódu, který najdete v potvrzovací zprávě na webu, nebo převodem na náš účet. Po obdržení platby Vám zašleme finální potvrzení.
 
-${totalAmount > CHRISTMAS_PAYMENT_INFO.deposit ? `Doplatek ${totalAmount - CHRISTMAS_PAYMENT_INFO.deposit} Kč uhradíte při vyzvednutí.` : ""}
+${totalAmount > CHRISTMAS_ORDER_CONFIG.deposit ? `Doplatek ${totalAmount - CHRISTMAS_ORDER_CONFIG.deposit} Kč uhradíte při vyzvednutí.` : ""}
+
+Termín vyzvednutí domluvíme individuálně.
 
 Pokud budete mít jakékoliv dotazy, neváhejte nás kontaktovat na pandidorty@gmail.com.
 
@@ -289,7 +272,6 @@ Tým Pandí Dorty
 				id: newOrder.id,
 				orderNumber: newOrder.orderNumber,
 				customerName: newOrder.customerName,
-				deliveryDate: newOrder.deliveryDate,
 				orderItems,
 				totalAmount,
 				totalWeight,
