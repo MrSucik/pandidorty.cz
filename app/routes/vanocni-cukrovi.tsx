@@ -344,7 +344,7 @@ export default function ChristmasOrderForm() {
 
 						<p>Letos jsme připravili 14 druhů, ze kterých si můžete namíchat svůj výběr po 100 g. Mezi druhy najdete klasiku, která k Vánocům patří, i pár netradičních kousků pro zpestření.</p>
 
-						<p>Objednávky přijímáme pouze přes objednávkový formulář na webových stránkách, a to do 1. 12. nebo do naplnění kapacity. Objednávka je platná po uhrazení zálohy 500 Kč na účet.</p>
+						<p>Objednávky přijímáme pouze přes objednávkový formulář na webových stránkách, a to do 1. 12. nebo do naplnění kapacity. Objednávka je platná po uhrazení zálohy 500 Kč na účet. Minimální hodnota objednávky je 700 Kč.</p>
 
 						<p>Cukroví bude k vyzvednutí v pondělí 22. 12. ve 13-15 hodin.</p>
 
