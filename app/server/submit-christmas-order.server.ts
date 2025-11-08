@@ -291,7 +291,7 @@ ${orderDetails}
 		<h3 style="margin-top: 0; color: #92400e;">💳 PLATEBNÍ INSTRUKCE:</h3>
 		<p>Pro dokončení objednávky prosím uhraďte <strong style="font-size: 1.2em; color: #1e40af;">${paymentDetails.paymentDescription}</strong> pomocí QR kódu níže nebo převodem na náš účet.</p>
 
-		${paymentDetails.hasBalance ? `<p style="background-color: #fff; padding: 10px; border-radius: 5px;"><strong>Doplatek ${paymentDetails.balanceDue} Kč</strong> uhradíte při vyzvednutí.</p>` : ""}
+		${paymentDetails.hasBalance ? `<p style="background-color: #fff; padding: 10px; border-radius: 5px;">Doplatek uhradíte při vyzvednutí.</p>` : ""}
 
 		<div style="text-align: center; margin: 20px 0;">
 			<p style="margin-bottom: 10px;"><strong>Naskenujte QR kód ve vaší bankovní aplikaci:</strong></p>
@@ -323,7 +323,7 @@ ${orderDetails}
 PLATEBNÍ INSTRUKCE:
 Pro dokončení objednávky prosím uhraďte ${paymentDetails.paymentDescription} pomocí QR kódu nebo převodem na náš účet. ${paymentDetails.confirmationMessage}
 
-${paymentDetails.hasBalance ? `Doplatek ${paymentDetails.balanceDue} Kč uhradíte při vyzvednutí.` : ""}
+${paymentDetails.hasBalance ? `Doplatek uhradíte při vyzvednutí.` : ""}
 
 QR kód pro platbu najdete v HTML verzi tohoto emailu nebo na potvrzovací stránce.
 

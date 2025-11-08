@@ -285,8 +285,7 @@ export default function ChristmasOrderForm() {
 										</p>
 										{paymentDetails?.hasBalance && (
 											<p className="text-sm text-gray-600 mb-4">
-												Doplatek {paymentDetails.balanceDue} Kč uhradíte při
-												vyzvednutí.
+												Doplatek uhradíte při vyzvednutí.
 											</p>
 										)}
 
@@ -444,18 +443,17 @@ export default function ChristmasOrderForm() {
 										className="block text-sm font-medium mb-2"
 										htmlFor="note"
 									>
-										Poznámka (např. jméno, na které je objednávka)
+										Poznámka
 									</label>
 									<textarea
 										id="note"
 										rows={3}
 										{...register("note")}
-										placeholder="Zadejte poznámku k objednávce..."
+										placeholder="Zadejte jméno, na které je objednávka..."
 										className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none"
 									/>
 									<p className="text-sm text-gray-500 mt-1">
-										Např. "Pro Janu Novákovou" - pomůže nám s identifikací
-										objednávky
+										Do poznámky nám prosím napište jméno, na které je objednávka.
 									</p>
 								</div>
 							</div>
