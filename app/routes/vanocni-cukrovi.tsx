@@ -338,9 +338,18 @@ export default function ChristmasOrderForm() {
 					<h1 className="text-3xl md:text-4xl font-bold text-center mb-4 mt-12">
 						🎄 Vánoční Cukroví
 					</h1>
-					<p className="text-center text-gray-600 mb-8">
-						Vyberte si z naší nabídky vánočního cukroví
-					</p>
+
+					<div className="max-w-3xl mx-auto mb-8 text-gray-700 space-y-3 text-center leading-relaxed">
+						<p>Blíží se Vánoce a s nimi i vůně domácího cukroví!</p>
+
+						<p>Letos jsme připravili 14 druhů, ze kterých si můžete namíchat svůj výběr po 100 g. Mezi druhy najdete klasiku, která k Vánocům patří, i pár netradičních kousků pro zpestření.</p>
+
+						<p>Objednávky přijímáme pouze přes objednávkový formulář na webových stránkách, a to do 1. 12. nebo do naplnění kapacity. Objednávka je platná po uhrazení zálohy 500 Kč na účet.</p>
+
+						<p>Cukroví bude k vyzvednutí v pondělí 22. 12. ve 13-15 hodin.</p>
+
+						<p>Těšíme se, až si naše cukroví najde místo i na Vašem svátečním stole🩵</p>
+					</div>
 
 					<form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 						{/* Form-level error */}
