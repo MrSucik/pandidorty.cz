@@ -107,5 +107,5 @@ export const CHRISTMAS_ORDER_CONFIG = {
 	get description() {
 		return `Objednávka je platná až po uhrazení zálohy ${this.deposit} Kč převodem na účet`;
 	},
-	qrCodePath: "/payments/payment-qr.jpg", // Universal QR code for all payments
+	qrCodePath: "/payments/payment-qr-christmas.jpg", // Christmas-specific QR code
 } as const;
