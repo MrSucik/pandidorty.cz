@@ -1,20 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { addDays, format, isAfter, parseISO, startOfDay } from "date-fns";
-import { cs } from "date-fns/locale";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
 	type SubmitHandler,
 	useForm as useReactHookForm,
 } from "react-hook-form";
-import { useLoaderData } from "react-router";
 import { z } from "zod";
 import {
-	CHRISTMAS_PAYMENT_INFO,
+	CHRISTMAS_ORDER_CONFIG,
 	CHRISTMAS_SWEETS_OPTIONS,
 } from "../data/christmas-sweets";
-import { getBlockedDates } from "../server/blocked-dates.server";
 import { FEATURE_CHRISTMAS_ORDER } from "../config/features";
+import { calculatePaymentDetails } from "../utils/payment-helpers";
 
 export async function loader() {
 	// Return 404 if the feature is disabled
@@ -22,10 +19,7 @@ export async function loader() {
 		throw new Response(null, { status: 404, statusText: "Not Found" });
 	}
 
-	const blockedDates = await getBlockedDates();
-	return {
-		blockedDates: blockedDates.map((bd) => bd.date),
-	};
+	return {};
 }
 
 interface ChristmasOrderResponse {
@@ -37,7 +31,6 @@ interface ChristmasOrderResponse {
 		id: number;
 		orderNumber: string;
 		customerName: string;
-		deliveryDate: Date;
 		orderItems: Array<{
 			sweetId: string;
 			name: string;
@@ -68,7 +61,7 @@ const submitChristmasOrder = async (
 };
 
 // Create dynamic schema for candy quantities
-const createChristmasFormSchema = (blockedDates: string[]) => {
+const createChristmasFormSchema = () => {
 	// Create an object with all candy IDs as keys with number validation
 	const candyQuantities: Record<string, z.ZodTypeAny> = {};
 	for (const sweet of CHRISTMAS_SWEETS_OPTIONS) {
@@ -93,21 +86,7 @@ const createChristmasFormSchema = (blockedDates: string[]) => {
 				.string()
 				.min(1, "Toto pole je povinné")
 				.min(9, "Telefon musí mít alespoň 9 číslic"),
-			date: z
-				.string()
-				.min(1, "Toto pole je povinné")
-				.refine(
-					(date) => !blockedDates.includes(date),
-					"Tento termín není dostupný",
-				)
-				.refine((date) => {
-					const parsedDate = parseISO(date);
-					const minDate = addDays(startOfDay(new Date()), 3);
-					return (
-						isAfter(parsedDate, minDate) ||
-						parsedDate.getTime() === minDate.getTime()
-					);
-				}, "Datum vyzvednutí musí být alespoň 3 dny od dnes"),
+			note: z.string().optional(),
 			...candyQuantities,
 		})
 		.refine(
@@ -120,31 +99,31 @@ const createChristmasFormSchema = (blockedDates: string[]) => {
 			{
 				message: "Vyberte alespoň jeden druh cukroví",
 			},
+		)
+		.refine(
+			(data) => {
+				// Calculate total order amount
+				let totalAmount = 0;
+				for (const sweet of CHRISTMAS_SWEETS_OPTIONS) {
+					const quantity = (data as any)[`quantity_${sweet.id}`] || 0;
+					totalAmount += quantity * sweet.pricePer100g;
+				}
+				return totalAmount >= CHRISTMAS_ORDER_CONFIG.minimumOrder;
+			},
+			{
+				message: `Minimální hodnota objednávky je ${CHRISTMAS_ORDER_CONFIG.minimumOrder} Kč`,
+			},
 		);
 };
 
 type ChristmasFormData = z.infer<ReturnType<typeof createChristmasFormSchema>>;
 
 export default function ChristmasOrderForm() {
-	const { blockedDates } = useLoaderData<typeof loader>();
-	const [showBlockedDates, setShowBlockedDates] = useState(false);
-
-	// Initialize default date (3 days from now)
-	const today = startOfDay(new Date());
-	const minDate = addDays(today, 3);
-	const defaultDate = format(minDate, "yyyy-MM-dd", { locale: cs });
-
-	// Get future blocked dates
-	const futureBlockedDates = blockedDates.filter((dateStr) => {
-		const date = parseISO(dateStr);
-		return isAfter(date, today) || date.getTime() === today.getTime();
-	});
-
 	const submitOrderMutation = useMutation({
 		mutationFn: submitChristmasOrder,
 	});
 
-	const christmasFormSchema = createChristmasFormSchema(blockedDates);
+	const christmasFormSchema = createChristmasFormSchema();
 
 	const {
 		register,
@@ -160,7 +139,7 @@ export default function ChristmasOrderForm() {
 			name: "",
 			email: "",
 			phone: "",
-			date: defaultDate,
+			note: "",
 			...Object.fromEntries(
 				CHRISTMAS_SWEETS_OPTIONS.map((sweet) => [`quantity_${sweet.id}`, 0]),
 			),
@@ -199,7 +178,7 @@ export default function ChristmasOrderForm() {
 		formData.append("name", value.name);
 		formData.append("email", value.email);
 		formData.append("phone", value.phone);
-		formData.append("date", value.date);
+		formData.append("note", value.note || "");
 
 		// Add selected sweets and quantities
 		const selectedSweets: string[] = [];
@@ -282,56 +261,58 @@ export default function ChristmasOrderForm() {
 							)}
 
 							{/* QR Code Payment Section */}
-							<div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 mb-8">
-								<h3 className="text-xl font-semibold mb-4 text-gray-900">
-									💳 Platba zálohy
-								</h3>
-								<p className="text-gray-700 mb-4">
-									Pro dokončení objednávky prosím uhraďte{" "}
-									{orderDetails?.totalAmount &&
-									orderDetails.totalAmount < CHRISTMAS_PAYMENT_INFO.deposit
-										? "částku"
-										: "zálohu"}{" "}
-									<strong className="text-2xl text-blue-800">
-										{orderDetails?.totalAmount &&
-										orderDetails.totalAmount < CHRISTMAS_PAYMENT_INFO.deposit
-											? orderDetails.totalAmount
-											: CHRISTMAS_PAYMENT_INFO.deposit}{" "}
-										Kč
-									</strong>
-								</p>
-								{orderDetails?.totalAmount &&
-									orderDetails.totalAmount > CHRISTMAS_PAYMENT_INFO.deposit && (
-										<p className="text-sm text-gray-600 mb-4">
-											Doplatek{" "}
-											{orderDetails.totalAmount -
-												CHRISTMAS_PAYMENT_INFO.deposit}{" "}
-											Kč uhradíte při vyzvednutí.
+							{(() => {
+								const paymentDetails = orderDetails?.totalAmount
+									? calculatePaymentDetails(
+											orderDetails.totalAmount,
+											CHRISTMAS_ORDER_CONFIG.deposit,
+										)
+									: null;
+
+								return (
+									<div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 mb-8">
+										<h3 className="text-xl font-semibold mb-4 text-gray-900">
+											💳 Platba zálohy
+										</h3>
+										<p className="text-gray-700 mb-4">
+											Pro dokončení objednávky prosím uhraďte{" "}
+											{paymentDetails?.requiresDeposit ? "zálohu" : "částku"}{" "}
+											<strong className="text-2xl text-blue-800">
+												{paymentDetails?.amountDue ||
+													CHRISTMAS_ORDER_CONFIG.deposit}{" "}
+												Kč
+											</strong>
 										</p>
-									)}
+										{paymentDetails?.hasBalance && (
+											<p className="text-sm text-gray-600 mb-4">
+												Doplatek {paymentDetails.balanceDue} Kč uhradíte při
+												vyzvednutí.
+											</p>
+										)}
 
-								<div className="bg-white rounded-lg p-4 inline-block mb-4">
-									<p className="text-sm text-gray-600 mb-2">
-										Naskenujte QR kód ve vaší bankovní aplikaci
-									</p>
-									<div className="flex justify-center mb-4">
-										<img
-											src={CHRISTMAS_PAYMENT_INFO.qrCodePath}
-											alt="QR kód pro platbu"
-											className="max-w-xs w-full border-2 border-gray-300 rounded-lg shadow-lg"
-										/>
+										<div className="bg-white rounded-lg p-4 inline-block mb-4">
+											<p className="text-sm text-gray-600 mb-2">
+												Naskenujte QR kód ve vaší bankovní aplikaci
+											</p>
+											<div className="flex justify-center mb-4">
+												<img
+													src={CHRISTMAS_ORDER_CONFIG.qrCodePath}
+													alt="QR kód pro platbu"
+													className="max-w-xs w-full border-2 border-gray-300 rounded-lg shadow-lg"
+												/>
+											</div>
+										</div>
+
+										<p className="text-sm text-gray-600">
+											{CHRISTMAS_ORDER_CONFIG.description}
+										</p>
+										<p className="text-sm text-gray-600">
+											{paymentDetails?.confirmationMessage ||
+												"Po obdržení platby vám zašleme finální potvrzení."}
+										</p>
 									</div>
-								</div>
-
-								<p className="text-sm text-gray-600">
-									{CHRISTMAS_PAYMENT_INFO.description}
-								</p>
-								<p className="text-sm text-gray-600">
-									{orderDetails?.totalAmount && orderDetails.totalAmount < CHRISTMAS_PAYMENT_INFO.deposit
-										? "Po obdržení platby vám zašleme finální potvrzení."
-										: "Po obdržení zálohy vám zašleme finální potvrzení."}
-								</p>
-							</div>
+								);
+							})()}
 
 							<a
 								href="/"
@@ -447,58 +428,26 @@ export default function ChristmasOrderForm() {
 											</p>
 										)}
 									</div>
+								</div>
 
-									<div>
-										<label
-											className="block text-sm font-medium mb-2"
-											htmlFor="date"
-										>
-											Datum vyzvednutí *
-										</label>
-										<input
-											type="date"
-											id="date"
-											min={defaultDate}
-											{...register("date", {
-												onChange: (e) => {
-													const selectedDate = e.target.value;
-													if (blockedDates.includes(selectedDate)) {
-														setShowBlockedDates(true);
-													} else {
-														setShowBlockedDates(false);
-													}
-												},
-											})}
-											className={`w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-pink-500 focus:border-transparent ${errors.date ? "border-red-300 bg-red-50" : "border-gray-300"}`}
-										/>
-										<p className="text-sm text-gray-500 mt-1">
-											Vyzvednutí minimálně 3 dny předem
-										</p>
-										{errors.date && (
-											<p className="text-red-600 text-sm mt-1">
-												{errors.date.message}
-											</p>
-										)}
-										{(showBlockedDates ||
-											errors.date?.message?.includes("není dostupný")) &&
-											futureBlockedDates.length > 0 && (
-												<div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-													<p className="text-sm font-medium text-yellow-800 mb-2">
-														Následující termíny nejsou dostupné:
-													</p>
-													<div className="text-sm text-yellow-700 space-y-1">
-														{futureBlockedDates.map((date) => (
-															<div key={date}>
-																•{" "}
-																{format(parseISO(date), "EEEE d. MMMM yyyy", {
-																	locale: cs,
-																})}
-															</div>
-														))}
-													</div>
-												</div>
-											)}
-									</div>
+								<div className="mt-6">
+									<label
+										className="block text-sm font-medium mb-2"
+										htmlFor="note"
+									>
+										Poznámka (např. jméno, na které je objednávka)
+									</label>
+									<textarea
+										id="note"
+										rows={3}
+										{...register("note")}
+										placeholder="Zadejte poznámku k objednávce..."
+										className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none"
+									/>
+									<p className="text-sm text-gray-500 mt-1">
+										Např. "Pro Janu Novákovou" - pomůže nám s identifikací
+										objednávky
+									</p>
 								</div>
 							</div>
 

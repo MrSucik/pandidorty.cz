@@ -101,7 +101,8 @@ export const CHRISTMAS_SWEETS_OPTIONS = [
 
 export type ChristmasSweetOption = (typeof CHRISTMAS_SWEETS_OPTIONS)[number];
 
-export const CHRISTMAS_PAYMENT_INFO = {
+export const CHRISTMAS_ORDER_CONFIG = {
+	minimumOrder: 700, // Minimum order amount in CZK
 	deposit: 450, // Deposit amount in CZK
 	get description() {
 		return `Objednávka je platná až po uhrazení zálohy ${this.deposit} Kč převodem na účet`;
