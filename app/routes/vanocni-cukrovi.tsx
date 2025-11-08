@@ -11,6 +11,7 @@ import {
 	CHRISTMAS_SWEETS_OPTIONS,
 } from "../data/christmas-sweets";
 import { FEATURE_CHRISTMAS_ORDER } from "../config/features";
+import { calculatePaymentDetails } from "../utils/payment-helpers";
 
 export async function loader() {
 	// Return 404 if the feature is disabled
@@ -85,6 +86,7 @@ const createChristmasFormSchema = () => {
 				.string()
 				.min(1, "Toto pole je povinné")
 				.min(9, "Telefon musí mít alespoň 9 číslic"),
+			note: z.string().optional(),
 			...candyQuantities,
 		})
 		.refine(
@@ -137,6 +139,7 @@ export default function ChristmasOrderForm() {
 			name: "",
 			email: "",
 			phone: "",
+			note: "",
 			...Object.fromEntries(
 				CHRISTMAS_SWEETS_OPTIONS.map((sweet) => [`quantity_${sweet.id}`, 0]),
 			),
@@ -175,6 +178,7 @@ export default function ChristmasOrderForm() {
 		formData.append("name", value.name);
 		formData.append("email", value.email);
 		formData.append("phone", value.phone);
+		formData.append("note", value.note || "");
 
 		// Add selected sweets and quantities
 		const selectedSweets: string[] = [];
@@ -257,56 +261,58 @@ export default function ChristmasOrderForm() {
 							)}
 
 							{/* QR Code Payment Section */}
-							<div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 mb-8">
-								<h3 className="text-xl font-semibold mb-4 text-gray-900">
-									💳 Platba zálohy
-								</h3>
-								<p className="text-gray-700 mb-4">
-									Pro dokončení objednávky prosím uhraďte{" "}
-									{orderDetails?.totalAmount &&
-									orderDetails.totalAmount < CHRISTMAS_ORDER_CONFIG.deposit
-										? "částku"
-										: "zálohu"}{" "}
-									<strong className="text-2xl text-blue-800">
-										{orderDetails?.totalAmount &&
-										orderDetails.totalAmount < CHRISTMAS_ORDER_CONFIG.deposit
-											? orderDetails.totalAmount
-											: CHRISTMAS_ORDER_CONFIG.deposit}{" "}
-										Kč
-									</strong>
-								</p>
-								{orderDetails?.totalAmount &&
-									orderDetails.totalAmount > CHRISTMAS_ORDER_CONFIG.deposit && (
-										<p className="text-sm text-gray-600 mb-4">
-											Doplatek{" "}
-											{orderDetails.totalAmount -
-												CHRISTMAS_ORDER_CONFIG.deposit}{" "}
-											Kč uhradíte při vyzvednutí.
+							{(() => {
+								const paymentDetails = orderDetails?.totalAmount
+									? calculatePaymentDetails(
+											orderDetails.totalAmount,
+											CHRISTMAS_ORDER_CONFIG.deposit,
+										)
+									: null;
+
+								return (
+									<div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 mb-8">
+										<h3 className="text-xl font-semibold mb-4 text-gray-900">
+											💳 Platba zálohy
+										</h3>
+										<p className="text-gray-700 mb-4">
+											Pro dokončení objednávky prosím uhraďte{" "}
+											{paymentDetails?.requiresDeposit ? "zálohu" : "částku"}{" "}
+											<strong className="text-2xl text-blue-800">
+												{paymentDetails?.amountDue ||
+													CHRISTMAS_ORDER_CONFIG.deposit}{" "}
+												Kč
+											</strong>
 										</p>
-									)}
+										{paymentDetails?.hasBalance && (
+											<p className="text-sm text-gray-600 mb-4">
+												Doplatek {paymentDetails.balanceDue} Kč uhradíte při
+												vyzvednutí.
+											</p>
+										)}
 
-								<div className="bg-white rounded-lg p-4 inline-block mb-4">
-									<p className="text-sm text-gray-600 mb-2">
-										Naskenujte QR kód ve vaší bankovní aplikaci
-									</p>
-									<div className="flex justify-center mb-4">
-										<img
-											src={CHRISTMAS_ORDER_CONFIG.qrCodePath}
-											alt="QR kód pro platbu"
-											className="max-w-xs w-full border-2 border-gray-300 rounded-lg shadow-lg"
-										/>
+										<div className="bg-white rounded-lg p-4 inline-block mb-4">
+											<p className="text-sm text-gray-600 mb-2">
+												Naskenujte QR kód ve vaší bankovní aplikaci
+											</p>
+											<div className="flex justify-center mb-4">
+												<img
+													src={CHRISTMAS_ORDER_CONFIG.qrCodePath}
+													alt="QR kód pro platbu"
+													className="max-w-xs w-full border-2 border-gray-300 rounded-lg shadow-lg"
+												/>
+											</div>
+										</div>
+
+										<p className="text-sm text-gray-600">
+											{CHRISTMAS_ORDER_CONFIG.description}
+										</p>
+										<p className="text-sm text-gray-600">
+											{paymentDetails?.confirmationMessage ||
+												"Po obdržení platby vám zašleme finální potvrzení."}
+										</p>
 									</div>
-								</div>
-
-								<p className="text-sm text-gray-600">
-									{CHRISTMAS_ORDER_CONFIG.description}
-								</p>
-								<p className="text-sm text-gray-600">
-									{orderDetails?.totalAmount && orderDetails.totalAmount < CHRISTMAS_ORDER_CONFIG.deposit
-										? "Po obdržení platby vám zašleme finální potvrzení."
-										: "Po obdržení zálohy vám zašleme finální potvrzení."}
-								</p>
-							</div>
+								);
+							})()}
 
 							<a
 								href="/"
@@ -422,6 +428,26 @@ export default function ChristmasOrderForm() {
 											</p>
 										)}
 									</div>
+								</div>
+
+								<div className="mt-6">
+									<label
+										className="block text-sm font-medium mb-2"
+										htmlFor="note"
+									>
+										Poznámka (např. jméno, na které je objednávka)
+									</label>
+									<textarea
+										id="note"
+										rows={3}
+										{...register("note")}
+										placeholder="Zadejte poznámku k objednávce..."
+										className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none"
+									/>
+									<p className="text-sm text-gray-500 mt-1">
+										Např. "Pro Janu Novákovou" - pomůže nám s identifikací
+										objednávky
+									</p>
 								</div>
 							</div>
 
