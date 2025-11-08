@@ -86,7 +86,6 @@ const createChristmasFormSchema = () => {
 				.string()
 				.min(1, "Toto pole je povinné")
 				.min(9, "Telefon musí mít alespoň 9 číslic"),
-			note: z.string().optional(),
 			...candyQuantities,
 		})
 		.refine(
@@ -139,7 +138,6 @@ export default function ChristmasOrderForm() {
 			name: "",
 			email: "",
 			phone: "",
-			note: "",
 			...Object.fromEntries(
 				CHRISTMAS_SWEETS_OPTIONS.map((sweet) => [`quantity_${sweet.id}`, 0]),
 			),
@@ -178,7 +176,6 @@ export default function ChristmasOrderForm() {
 		formData.append("name", value.name);
 		formData.append("email", value.email);
 		formData.append("phone", value.phone);
-		formData.append("note", value.note || "");
 
 		// Add selected sweets and quantities
 		const selectedSweets: string[] = [];
@@ -436,25 +433,6 @@ export default function ChristmasOrderForm() {
 											</p>
 										)}
 									</div>
-								</div>
-
-								<div className="mt-6">
-									<label
-										className="block text-sm font-medium mb-2"
-										htmlFor="note"
-									>
-										Poznámka
-									</label>
-									<textarea
-										id="note"
-										rows={3}
-										{...register("note")}
-										placeholder="Zadejte jméno, na které je objednávka..."
-										className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none"
-									/>
-									<p className="text-sm text-gray-500 mt-1">
-										Do poznámky nám prosím napište jméno, na které je objednávka.
-									</p>
 								</div>
 							</div>
 

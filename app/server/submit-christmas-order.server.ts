@@ -43,7 +43,6 @@ const christmasOrderSchema = z
 			.string()
 			.min(1, "Telefon je povinný")
 			.min(9, "Telefon musí mít alespoň 9 číslic"),
-		note: z.string().optional(),
 		...createQuantitySchema(),
 	})
 	.refine(
@@ -114,7 +113,6 @@ export async function submitChristmasOrder(
 		name: formData.get("name") as string,
 		email: formData.get("email") as string,
 		phone: formData.get("phone") as string,
-		note: formData.get("note") as string,
 	};
 
 	// Extract quantities for each candy type
@@ -188,7 +186,7 @@ export async function submitChristmasOrder(
 				shippingAddress: null,
 				billingAddress: null,
 				totalAmount: totalAmount.toString(),
-				notes: validated.note || null,
+				notes: null,
 				createdById: null,
 				updatedById: null,
 			})
