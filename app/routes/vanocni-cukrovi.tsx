@@ -299,8 +299,11 @@ export default function ChristmasOrderForm() {
 											</div>
 										</div>
 
-										<p className="text-sm text-gray-600">
+										<p className="text-sm text-gray-600 mb-2">
 											{CHRISTMAS_ORDER_CONFIG.description}
+										</p>
+										<p className="text-sm text-gray-700 font-semibold mb-2">
+											⚠️ Do poznámky k platbě prosím uveďte své jméno, abychom mohli párovat platbu s vaší objednávkou.
 										</p>
 										<p className="text-sm text-gray-600">
 											{paymentDetails?.confirmationMessage ||
