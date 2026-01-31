@@ -6,7 +6,7 @@ import { z } from "zod";
 import { db, orders } from "../db";
 
 // Maximum capacity for wedding tasting orders
-const MAX_WEDDING_TASTING_CAPACITY = 15;
+const MAX_WEDDING_TASTING_CAPACITY = 23;
 
 // Check if email is configured (but don't crash if not)
 const isEmailConfigured = !!process.env.RESEND_API_KEY;
