@@ -114,12 +114,19 @@ export async function submitWeddingTasting(
 	try {
 		// Use transaction to ensure atomic capacity check and insert
 		const newOrder = await db.transaction(async (tx) => {
-			// Lock the table for this transaction to prevent race conditions
-			const [{ currentCount }] = await tx
-				.select({ currentCount: count() })
+			// Lock existing wedding_tasting rows to prevent race conditions
+			// Note: FOR UPDATE cannot be used with aggregate functions, so we lock rows first, then count
+			await tx
+				.select({ id: orders.id })
 				.from(orders)
 				.where(eq(orders.orderKind, "wedding_tasting"))
 				.for("update");
+
+			// Now count the locked rows
+			const [{ currentCount }] = await tx
+				.select({ currentCount: count() })
+				.from(orders)
+				.where(eq(orders.orderKind, "wedding_tasting"));
 
 			// Check capacity within the transaction
 			if (currentCount >= MAX_WEDDING_TASTING_CAPACITY) {
