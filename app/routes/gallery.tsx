@@ -1,3 +1,29 @@
+import { useState } from "react";
+
+function GalleryImage({ path, index }: { path: string; index: number }) {
+	const [loaded, setLoaded] = useState(false);
+
+	return (
+		<div
+			className={`masonry-item relative rounded-lg overflow-hidden ${
+				loaded ? "" : "bg-gray-200 animate-pulse aspect-[3/4]"
+			}`}
+			style={{ contain: "layout style paint" }}
+		>
+			<img
+				src={path}
+				alt={`Dort ${index + 1}`}
+				loading="lazy"
+				decoding="async"
+				onLoad={() => setLoaded(true)}
+				className={`w-full h-auto rounded-lg block transition-opacity duration-300 hover:scale-[1.02] ${
+					loaded ? "opacity-100" : "opacity-0 absolute inset-0"
+				}`}
+			/>
+		</div>
+	);
+}
+
 export default function Gallery() {
 	// Get all images from 1-199 that exist in the gallery directory
 	const images = Array.from({ length: 199 }, (_, i) => i + 1)
@@ -26,14 +52,7 @@ export default function Gallery() {
 
 					<div className="masonry-grid">
 						{images.map((path, index) => (
-							<div key={path} className="masonry-item">
-								<img
-									src={path}
-									alt={`Dort ${index + 1}`}
-									loading="lazy"
-									className="w-full h-auto rounded-lg block transition-transform duration-200 hover:scale-[1.02]"
-								/>
-							</div>
+							<GalleryImage key={path} path={path} index={index} />
 						))}
 					</div>
 				</div>
