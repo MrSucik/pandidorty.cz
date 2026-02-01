@@ -5,19 +5,20 @@ function GalleryImage({ path, index }: { path: string; index: number }) {
 
 	return (
 		<div
-			className={`masonry-item relative rounded-lg overflow-hidden ${
-				loaded ? "" : "bg-gray-200 animate-pulse aspect-[3/4]"
-			}`}
+			className="masonry-item relative rounded-lg overflow-hidden aspect-[3/4]"
 			style={{ contain: "layout style paint" }}
 		>
+			{!loaded && (
+				<div className="absolute inset-0 bg-gray-200 animate-pulse rounded-lg" />
+			)}
 			<img
 				src={path}
 				alt={`Dort ${index + 1}`}
 				loading="lazy"
 				decoding="async"
 				onLoad={() => setLoaded(true)}
-				className={`w-full h-auto rounded-lg block transition-opacity duration-300 hover:scale-[1.02] ${
-					loaded ? "opacity-100" : "opacity-0 absolute inset-0"
+				className={`w-full h-full object-cover rounded-lg block transition-opacity duration-300 hover:scale-[1.02] ${
+					loaded ? "opacity-100" : "opacity-0"
 				}`}
 			/>
 		</div>
