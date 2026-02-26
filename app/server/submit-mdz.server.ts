@@ -173,8 +173,6 @@ export async function submitMdz(
 
 		// Send notification emails
 		try {
-			const resend = new Resend(process.env.RESEND_API_KEY);
-
 			// Prepare order details
 			let orderDetails = "Objednané položky:\n";
 
@@ -188,6 +186,8 @@ export async function submitMdz(
 
 			// Send notification emails if configured
 			if (isEmailConfigured) {
+				const resend = new Resend(process.env.RESEND_API_KEY);
+
 				// Send admin notification email
 				await resend.emails.send({
 				from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
