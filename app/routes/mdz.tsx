@@ -183,6 +183,10 @@ export default function MdzForm() {
 								<p className="text-sm text-gray-600">
 									Naskenujte QR kód pomocí bankovní aplikace pro rychlou platbu
 								</p>
+								<p className="text-sm text-gray-700 mt-2 font-semibold">
+									Do poznámky k platbě prosím uveďte jméno, na které je
+									objednávka napsána.
+								</p>
 								<p className="text-sm text-red-600 mt-2 font-medium">
 									{MDZ_DATA.payment.description}
 								</p>
