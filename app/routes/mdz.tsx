@@ -213,27 +213,27 @@ export default function MdzForm() {
 					</p>
 
 					{/* Product gallery */}
-					<div className="mb-8 space-y-3">
-						<div className="overflow-hidden rounded-xl shadow-md">
+					<div className="mb-8 grid grid-cols-3 gap-2">
+						<div className="col-span-2 overflow-hidden rounded-xl shadow-md">
 							<img
 								src="/mdz/set-with-flowers.webp"
 								alt="Speciální set zákusků s kytice od Nedbalek"
-								className="w-full aspect-[4/5] object-cover"
+								className="w-full h-full object-cover"
 							/>
 						</div>
-						<div className="grid grid-cols-2 gap-3">
-							<div className="overflow-hidden rounded-xl shadow-md">
+						<div className="flex flex-col gap-2">
+							<div className="overflow-hidden rounded-xl shadow-md flex-1">
 								<img
 									src="/mdz/desserts.webp"
 									alt="XXL tartaletka a čokoládový větrník"
-									className="w-full aspect-square object-cover"
+									className="w-full h-full object-cover"
 								/>
 							</div>
-							<div className="overflow-hidden rounded-xl shadow-md">
+							<div className="overflow-hidden rounded-xl shadow-md flex-1">
 								<img
 									src="/mdz/team.webp"
 									alt="Pandí Dorty a Nedbalky"
-									className="w-full aspect-square object-cover"
+									className="w-full h-full object-cover"
 								/>
 							</div>
 						</div>
