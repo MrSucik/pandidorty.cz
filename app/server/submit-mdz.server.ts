@@ -1,15 +1,12 @@
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 import { cs } from "date-fns/locale";
-import { count, eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { z } from "zod";
 import { MDZ_DATA } from "../data/mdz";
 import { db, orders } from "../db";
 
-// Check if email is configured (but don't crash if not)
 const isEmailConfigured = !!process.env.RESEND_API_KEY;
 
-// Zod schema for MDZ order validation
 const mdzSchema = z.object({
 	name: z
 		.string()
@@ -39,7 +36,6 @@ export interface SubmitMdzResult {
 	};
 }
 
-// Generate a unique order number
 function generateOrderNumber(): string {
 	const timestamp = Date.now();
 	const random = Math.floor(Math.random() * 1000)
@@ -48,11 +44,9 @@ function generateOrderNumber(): string {
 	return `MDZ-${timestamp}-${random}`;
 }
 
-// Main function to be called from the API route
 export async function submitMdz(
 	formData: FormData,
 ): Promise<SubmitMdzResult> {
-	// Extract form fields
 	const orderData = {
 		name: formData.get("name") as string,
 		email: formData.get("email") as string,
@@ -60,7 +54,6 @@ export async function submitMdz(
 		productChoice: formData.get("productChoice") as string,
 	};
 
-	// Validate with Zod
 	const validationResult = mdzSchema.safeParse(orderData);
 
 	if (!validationResult.success) {
@@ -78,7 +71,8 @@ export async function submitMdz(
 
 	try {
 		const orderNumber = generateOrderNumber();
-		const defaultDeliveryDate = addDays(new Date(), 7);
+		// MDZ pickup is March 8, 2026
+		const deliveryDate = new Date(2026, 2, 8);
 
 		const [newOrder] = await db
 			.insert(orders)
@@ -87,9 +81,9 @@ export async function submitMdz(
 				customerName: validated.name,
 				customerEmail: validated.email,
 				customerPhone: validated.phone,
-				deliveryDate: defaultDeliveryDate,
+				deliveryDate,
 				orderKind: "mdz",
-				orderCake: withFlowers,
+				orderCake: false,
 				orderDessert: true,
 				cakeSize: null,
 				cakeFlavor: null,
@@ -107,16 +101,12 @@ export async function submitMdz(
 			})
 			.returning();
 
-		// Send notification emails
 		try {
-			const orderDetailsText = withFlowers
-				? `${MDZ_DATA.products.withFlowers.name} (${MDZ_DATA.products.withFlowers.price} Kč)`
-				: `${MDZ_DATA.products.dessertsOnly.name} (${MDZ_DATA.products.dessertsOnly.price} Kč)`;
+			const orderDetailsText = `${product.name} (${product.price} Kč)`;
 
 			if (isEmailConfigured) {
 				const resend = new Resend(process.env.RESEND_API_KEY);
 
-				// Send admin notification email
 				await resend.emails.send({
 					from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
 					to: ["mr.sucik@gmail.com", "pandidorty@gmail.com"],
@@ -137,7 +127,6 @@ ${orderDetailsText}
 `,
 				});
 
-				// Send customer confirmation email
 				await resend.emails.send({
 					from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
 					to: validated.email,
@@ -169,6 +158,19 @@ Tým Pandí Dorty
 			}
 		} catch (emailError) {
 			console.error("Error sending emails:", emailError);
+			return {
+				success: true,
+				message:
+					"Objednávka byla uložena, ale nepodařilo se odeslat potvrzovací email. Kontaktujte nás prosím na pandidorty@gmail.com.",
+				orderId: newOrder.orderNumber,
+				orderDetails: {
+					id: newOrder.id,
+					orderNumber: newOrder.orderNumber,
+					customerName: newOrder.customerName,
+					productChoice: validated.productChoice,
+					price: product.price,
+				},
+			};
 		}
 
 		return {
@@ -186,11 +188,6 @@ Tým Pandí Dorty
 		};
 	} catch (error) {
 		console.error("Error processing MDZ order:", error);
-
-		if (error instanceof Error) {
-			throw error;
-		}
-
 		throw new Error(
 			"Došlo k chybě při zpracování objednávky. Zkuste to prosím později.",
 		);

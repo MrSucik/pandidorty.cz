@@ -8,7 +8,6 @@ import {
 import { z } from "zod";
 import { MDZ_DATA } from "../data/mdz";
 
-// Define schema for runtime validation
 const mdzResponseSchema = z.object({
 	success: z.boolean(),
 	message: z.string().optional(),
@@ -27,15 +26,30 @@ const mdzResponseSchema = z.object({
 
 type MdzResponse = z.infer<typeof mdzResponseSchema>;
 
-const submitMdzOrder = async (
+async function submitMdzOrder(
 	formData: FormData,
-): Promise<MdzResponse> => {
+): Promise<MdzResponse> {
 	const response = await fetch("/api/submit-mdz", {
 		method: "POST",
 		body: formData,
 	});
 
-	const data = await response.json();
+	let data: unknown;
+	try {
+		data = await response.json();
+	} catch {
+		throw new Error(
+			"Server neodpověděl správně. Zkuste to prosím znovu nebo nás kontaktujte.",
+		);
+	}
+
+	if (!response.ok) {
+		const errorMessage =
+			typeof data === "object" && data !== null && "error" in data
+				? String((data as Record<string, unknown>).error)
+				: "Došlo k chybě při odesílání formuláře.";
+		throw new Error(errorMessage);
+	}
 
 	const validationResult = mdzResponseSchema.safeParse(data);
 
@@ -44,14 +58,8 @@ const submitMdzOrder = async (
 		throw new Error("Neplatná odpověď ze serveru.");
 	}
 
-	const result = validationResult.data;
-
-	if (!response.ok) {
-		throw new Error(result.error || "Došlo k chybě při odesílání formuláře.");
-	}
-
-	return result;
-};
+	return validationResult.data;
+}
 
 const mdzFormSchema = z.object({
 	name: z
@@ -85,9 +93,8 @@ export default function MdzForm() {
 		mutationFn: submitMdzOrder,
 	});
 
-	// Scroll to top when the order is successfully submitted
 	useEffect(() => {
-		if (typeof window !== "undefined" && submitOrderMutation.isSuccess) {
+		if (submitOrderMutation.isSuccess) {
 			window.scrollTo({ top: 0, behavior: "smooth" });
 		}
 	}, [submitOrderMutation.isSuccess]);
@@ -124,7 +131,6 @@ export default function MdzForm() {
 		});
 	};
 
-	// Success state UI
 	if (submitOrderMutation.isSuccess && submitOrderMutation.data) {
 		const orderDetails = submitOrderMutation.data.orderDetails;
 
@@ -143,7 +149,7 @@ export default function MdzForm() {
 						<div className="text-center p-8">
 							<div className="mb-8">
 								<h2 className="text-2xl font-semibold text-green-600 mb-4">
-									{submitOrderMutation.data?.message ||
+									{submitOrderMutation.data.message ||
 										"Objednávka byla úspěšně odeslána!"}
 								</h2>
 								<p className="text-lg text-gray-700 mb-2">
@@ -204,7 +210,6 @@ export default function MdzForm() {
 					</h1>
 
 					<form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-						{/* Form-level error */}
 						{Object.keys(errors).length > 0 && (
 							<div className="bg-red-50 text-red-600 p-4 rounded-lg">
 								{Object.values(errors)
@@ -214,14 +219,12 @@ export default function MdzForm() {
 							</div>
 						)}
 
-						{/* TanStack Query mutation error */}
 						{submitOrderMutation.error && (
 							<div className="bg-red-50 text-red-600 p-4 rounded-lg">
 								{submitOrderMutation.error.message}
 							</div>
 						)}
 
-						{/* Description section */}
 						<div className="p-6 bg-pink-50 rounded-lg border border-pink-200 space-y-6">
 							<p className="text-gray-700 leading-relaxed">
 								K příležitosti Mezinárodního dne žen jsme vytvořili speciální set
@@ -250,11 +253,11 @@ export default function MdzForm() {
 									Vyzvednutí proběhne {MDZ_DATA.pickupDate}:
 								</p>
 								<ul className="text-gray-700 ml-4 space-y-1">
-									{MDZ_DATA.pickup.map((location) => (
-										<li key={location.label}>
-											{location.label}
-											{"location" in location ? ` (${location.location})` : ""}
-											: {location.time}
+									{MDZ_DATA.pickup.map((pickup) => (
+										<li key={pickup.label}>
+											{pickup.label}
+											{"location" in pickup ? ` (${pickup.location})` : ""}
+											: {pickup.time}
 										</li>
 									))}
 								</ul>
@@ -272,7 +275,6 @@ export default function MdzForm() {
 							</p>
 						</div>
 
-						{/* Contact information section */}
 						<div className="space-y-4">
 							<h2 className="text-xl font-semibold text-gray-900 border-b pb-2">
 								Kontaktní údaje
@@ -341,7 +343,6 @@ export default function MdzForm() {
 							</div>
 						</div>
 
-						{/* Selection section */}
 						<div className="space-y-4">
 							<h2 className="text-xl font-semibold text-gray-900 border-b pb-2">
 								Výběr objednávky
@@ -387,14 +388,10 @@ export default function MdzForm() {
 							</div>
 						</div>
 
-						{/* Submit button */}
 						<div className="text-center pt-4">
 							<button
 								type="submit"
-								disabled={
-									isSubmitting ||
-									submitOrderMutation.isPending
-								}
+								disabled={isSubmitting || submitOrderMutation.isPending}
 								className="bg-blue-800 text-white px-8 py-3 rounded-lg hover:bg-blue-900 transition-colors relative disabled:opacity-50 font-medium"
 							>
 								{submitOrderMutation.isPending || isSubmitting ? (
