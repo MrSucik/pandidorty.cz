@@ -13,6 +13,10 @@ import {
 import { FEATURE_CHRISTMAS_ORDER } from "../config/features";
 import { calculatePaymentDetails } from "../utils/payment-helpers";
 
+export function meta() {
+	return [{ title: "Vánoční cukroví | Pandí Dorty" }];
+}
+
 export async function loader() {
 	// Return 404 if the feature is disabled
 	if (!FEATURE_CHRISTMAS_ORDER) {

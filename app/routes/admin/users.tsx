@@ -4,6 +4,10 @@ import type { AdminUser } from "../../server/get-admin-users.server";
 import { getAdminUsers } from "../../server/get-admin-users.server";
 import { requireUserSession } from "../../utils/session.server";
 
+export function meta() {
+	return [{ title: "Uživatelé | Admin | Pandí Dorty" }];
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const session = await requireUserSession(request);
 

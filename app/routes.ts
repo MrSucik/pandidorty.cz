@@ -1,6 +1,7 @@
 import { index, type RouteConfig, route } from "@react-router/dev/routes";
 import {
 	FEATURE_CHRISTMAS_ORDER,
+	FEATURE_MDZ,
 	FEATURE_WEDDING_TASTING,
 } from "./config/features";
 
@@ -43,4 +44,12 @@ const christmasRoutes: RouteConfig = FEATURE_CHRISTMAS_ORDER
 		]
 	: [];
 
-export default [...baseRoutes, ...weddingRoutes, ...christmasRoutes] satisfies RouteConfig;
+// Conditionally add MDZ (Mezinárodní den žen) routes
+const mdzRoutes: RouteConfig = FEATURE_MDZ
+	? [
+			route("mdz", "routes/mdz.tsx"),
+			route("api/submit-mdz", "routes/api.submit-mdz.ts"),
+		]
+	: [];
+
+export default [...baseRoutes, ...weddingRoutes, ...christmasRoutes, ...mdzRoutes] satisfies RouteConfig;

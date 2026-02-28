@@ -2,8 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import {
 	FEATURE_CHRISTMAS_ORDER,
+	FEATURE_MDZ,
 	FEATURE_WEDDING_TASTING,
 } from "../config/features";
+
+export function meta() {
+	return [{ title: "Pandí Dorty | Domácí dorty a zákusky v Ostravě" }];
+}
 
 export default function Home() {
 	const [currentSlide, setCurrentSlide] = useState(0);
@@ -98,6 +103,14 @@ export default function Home() {
 									className="bg-purple-700 text-white px-8 py-3 rounded-lg hover:bg-purple-800 transition-colors inline-block font-medium shadow-md"
 								>
 									💍 Svatební ochutnávka →
+								</Link>
+							)}
+							{FEATURE_MDZ && (
+								<Link
+									to="/mdz"
+									className="bg-pink-600 text-white px-8 py-3 rounded-lg hover:bg-pink-700 transition-colors inline-block font-medium shadow-md"
+								>
+									🌷 Den žen →
 								</Link>
 							)}
 						</div>
