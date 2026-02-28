@@ -12,6 +12,10 @@ import { useLoaderData } from "react-router";
 import { z } from "zod";
 import { getBlockedDates } from "../server/blocked-dates.server";
 
+export function meta() {
+	return [{ title: "Objednávka | Pandí Dorty" }];
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const blockedDates = await getBlockedDates();
 	// Convert to array of date strings for easier client-side usage

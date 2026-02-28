@@ -6,6 +6,10 @@ import {
 	FEATURE_WEDDING_TASTING,
 } from "../config/features";
 
+export function meta() {
+	return [{ title: "Pandí Dorty | Domácí dorty a zákusky v Ostravě" }];
+}
+
 export default function Home() {
 	const [currentSlide, setCurrentSlide] = useState(0);
 	const sliderRef = useRef<HTMLDivElement>(null);

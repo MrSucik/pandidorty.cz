@@ -4,6 +4,10 @@ import { z } from "zod";
 import { authenticateUser } from "../../utils/auth.server";
 import { createUserSession, getUserSession } from "../../utils/session.server";
 
+export function meta() {
+	return [{ title: "Přihlášení | Admin | Pandí Dorty" }];
+}
+
 const loginSchema = z.object({
 	email: z.string().email("Invalid email address"),
 	password: z.string().min(1, "Password is required"),

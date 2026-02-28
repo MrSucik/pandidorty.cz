@@ -1,5 +1,9 @@
 import { useState } from "react";
 
+export function meta() {
+	return [{ title: "Galerie | Pandí Dorty" }];
+}
+
 function GalleryImage({ path, index }: { path: string; index: number }) {
 	const [loaded, setLoaded] = useState(false);
 
