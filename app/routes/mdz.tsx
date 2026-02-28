@@ -205,9 +205,39 @@ export default function MdzForm() {
 
 			<div className="max-w-2xl mx-auto px-4 py-12">
 				<div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-sm">
-					<h1 className="text-3xl md:text-4xl font-bold text-center mb-8 mt-12">
+					<h1 className="text-3xl md:text-4xl font-bold text-center mb-2 mt-12">
 						MDŽ nabídka
 					</h1>
+					<p className="text-center text-pink-400 text-sm tracking-widest uppercase mb-8">
+						Mezinárodní den žen 2026
+					</p>
+
+					{/* Product gallery */}
+					<div className="mb-8 space-y-3">
+						<div className="overflow-hidden rounded-xl shadow-md">
+							<img
+								src="/mdz/set-with-flowers.webp"
+								alt="Speciální set zákusků s kytice od Nedbalek"
+								className="w-full aspect-[4/5] object-cover"
+							/>
+						</div>
+						<div className="grid grid-cols-2 gap-3">
+							<div className="overflow-hidden rounded-xl shadow-md">
+								<img
+									src="/mdz/desserts.webp"
+									alt="XXL tartaletka a čokoládový větrník"
+									className="w-full aspect-square object-cover"
+								/>
+							</div>
+							<div className="overflow-hidden rounded-xl shadow-md">
+								<img
+									src="/mdz/team.webp"
+									alt="Pandí Dorty a Nedbalky"
+									className="w-full aspect-square object-cover"
+								/>
+							</div>
+						</div>
+					</div>
 
 					<form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 						{Object.keys(errors).length > 0 && (
