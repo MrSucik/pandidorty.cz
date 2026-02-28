@@ -6,7 +6,7 @@ export const MDZ_DATA = {
 		},
 		dessertsOnly: {
 			name: "Pouze zákusky",
-			price: 160,
+			price: 170,
 		},
 	},
 	boxContents: [
@@ -14,9 +14,9 @@ export const MDZ_DATA = {
 		"čokoládový větrník s mandlovo-malinovým krémem",
 	],
 	payment: {
-		deposit: 160,
+		deposit: 170,
 		description:
-			"Objednávka je platná po uhrazení zálohy 160 Kč.",
+			"Objednávka je platná po uhrazení zálohy 170 Kč.",
 		qrCodePath: "/payments/mdz-qr.jpg",
 	},
 	pickup: [
