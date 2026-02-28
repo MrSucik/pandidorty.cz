@@ -1,54 +1,38 @@
 export const MDZ_DATA = {
-	cakeBox: {
-		name: "Krabička dortů",
-		price: 550,
-		description: "Krabička obsahuje 6 nejoblíbenějších příchutí",
-		items: [
-			"vanilkový korpus, vanilkový krém + rozvar z lesního ovoce",
-			"čokoládový korpus, čokoládový krém + maliny",
-			"red velvet korpus, vanilkový krém + maliny",
-			"čokoládový korpus, krém kokos & bílá čokoláda",
-			"vanilkový korpus, pistáciový krém + mango&marakuja curd a maliny",
-			"čokoládový korpus, karamelový krém + jahody a karamel",
-		],
-		maxOrders: 23, // Note: This is informational only. Actual capacity is app-wide (23 total orders)
-	},
-	sweetbarBox: {
-		name: "Krabička zákusků",
-		price: 750,
-		description: "Krabička obsahuje 16 nejoblíbenějších zákusků",
-		items: [
-			"karamelový mini větrníček",
-			"malinová a karamelová makronka",
-			"pistáciová a čokoládovo-karamelová tartaletka",
-			"oříškový francouzský větrníček",
-			"žloutkový věneček",
-			"panna cotta vanilka & lesní ovoce",
-			"perníčkový cake pop",
-			"čokoládový dortový nanuk",
-			"red velvet cupcake",
-			"mini cheesecake čokoláda & lesní ovoce",
-			"Míša kelímek",
-			"pavlova mango & marakuja",
-			"tiramisu v kelímku",
-			"brownies",
-		],
-		maxOrders: 23, // Note: This is informational only. Actual capacity is app-wide (23 total orders)
-	},
-	payment: {
-		deposit: 450, // Deposit amount in CZK
-		get description() {
-			return `Objednávka je platná až po uhrazení zálohy ${this.deposit} Kč převodem na účet, doplatek je pak v hotovosti na místě při převzetí`;
+	products: {
+		withFlowers: {
+			name: "Zákusky + kytice od Nedbalek",
+			price: 420,
 		},
-		qrCodePath: "/payments/payment-qr.jpg", // Universal QR code for all payments
+		dessertsOnly: {
+			name: "Pouze zákusky",
+			price: 160,
+		},
 	},
-	pickup: {
-		date: "v pátek 6.3.",
-		time: "od 13-16 hod",
-		location: "v Ostravě-Porubě (Pod Nemocnicí 2026/65)",
+	boxContents: [
+		"XXL tartaletka s karamelizovanou bílou čokoládou a marakujou",
+		"čokoládový větrník s mandlovo-malinovým krémem",
+	],
+	payment: {
+		deposit: 160,
+		description:
+			"Objednávka je platná po uhrazení zálohy 160 Kč.",
+		qrCodePath: "/payments/mdz-qr.jpg",
 	},
-	orderDeadline: "do úterý 3.3. anebo do naplnění kapacity",
-	message: "Děkujeme a budeme se na Vás moc těšit!",
+	pickup: [
+		{
+			label: "Poruba u Pandy",
+			location: "Pod Nemocnicí 2026/65",
+			time: "10:00–11:00",
+		},
+		{
+			label: "centrum u Nedbalek",
+			time: "11:30–12:00",
+		},
+	],
+	pickupDate: "v neděli 8.3.",
+	pickupNote: "Po domluvě zvládneme i sobotu.",
+	orderDeadline: "do čtvrtka 5.3.2026",
 } as const;
 
 export type MdzData = typeof MDZ_DATA;
