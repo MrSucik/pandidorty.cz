@@ -82,6 +82,9 @@ const mdzFormSchema = z.object({
 	productChoice: z.enum(["withFlowers", "dessertsOnly"], {
 		message: "Vyberte prosím jednu z možností",
 	}),
+	pickupLocation: z.enum(["poruba", "centrum"], {
+		message: "Vyberte prosím místo vyzvednutí",
+	}),
 });
 
 type MdzFormData = z.infer<typeof mdzFormSchema>;
@@ -92,6 +95,8 @@ export default function MdzForm() {
 	const phoneId = useId();
 	const withFlowersId = useId();
 	const dessertsOnlyId = useId();
+	const pickupPorubaId = useId();
+	const pickupCentrumId = useId();
 
 	const submitOrderMutation = useMutation({
 		mutationFn: submitMdzOrder,
@@ -421,6 +426,46 @@ export default function MdzForm() {
 								{errors.productChoice && (
 									<p className="text-red-600 text-sm">
 										{errors.productChoice.message}
+									</p>
+								)}
+							</div>
+						</div>
+
+						<div className="space-y-4">
+							<h2 className="text-xl font-semibold text-gray-900 border-b pb-2">
+								Místo vyzvednutí
+							</h2>
+
+							<div className="space-y-3">
+								<div className="flex items-center gap-3">
+									<input
+										type="radio"
+										id={pickupPorubaId}
+										value="poruba"
+										{...register("pickupLocation")}
+										className="w-5 h-5 text-pink-600 border-gray-300 focus:ring-pink-500"
+									/>
+									<label htmlFor={pickupPorubaId} className="text-base font-medium">
+										{MDZ_DATA.pickup[0].label} ({MDZ_DATA.pickup[0].time})
+									</label>
+								</div>
+
+								<div className="flex items-center gap-3">
+									<input
+										type="radio"
+										id={pickupCentrumId}
+										value="centrum"
+										{...register("pickupLocation")}
+										className="w-5 h-5 text-pink-600 border-gray-300 focus:ring-pink-500"
+									/>
+									<label htmlFor={pickupCentrumId} className="text-base font-medium">
+										{MDZ_DATA.pickup[1].label} ({MDZ_DATA.pickup[1].time})
+									</label>
+								</div>
+
+								{errors.pickupLocation && (
+									<p className="text-red-600 text-sm">
+										{errors.pickupLocation.message}
 									</p>
 								)}
 							</div>
