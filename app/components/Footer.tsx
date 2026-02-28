@@ -96,7 +96,7 @@ export function Footer({ currentPath }: FooterProps = {}) {
 					<div id="contact">
 						<h3 className="font-bold text-lg mb-3 md:mb-4">Kontakt</h3>
 						<div className="space-y-2 text-black">
-							<p className="text-base">Maďarská 6088/18, Ostrava-Poruba</p>
+							<p className="text-base">Pod Nemocnicí 2026/65, Ostrava-Poruba</p>
 							<p className="text-base">774 182 160</p>
 							<p className="text-base">pandidorty@gmail.com</p>
 						</div>
