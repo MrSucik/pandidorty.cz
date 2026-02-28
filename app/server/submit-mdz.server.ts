@@ -3,66 +3,28 @@ import { cs } from "date-fns/locale";
 import { count, eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { z } from "zod";
+import { MDZ_DATA } from "../data/mdz";
 import { db, orders } from "../db";
-
-// Maximum capacity for MDZ orders
-const MAX_MDZ_CAPACITY = 23;
 
 // Check if email is configured (but don't crash if not)
 const isEmailConfigured = !!process.env.RESEND_API_KEY;
 
-// Function to get current MDZ order count
-async function getCurrentMdzCount(): Promise<number> {
-	const result = await db
-		.select({ value: count() })
-		.from(orders)
-		.where(eq(orders.orderKind, "mdz"));
-	return result[0]?.value ?? 0;
-}
-
-// Export function to get remaining capacity
-export async function getMdzCapacity(): Promise<{
-	current: number;
-	max: number;
-	remaining: number;
-	isAvailable: boolean;
-}> {
-	const current = await getCurrentMdzCount();
-	const remaining = Math.max(0, MAX_MDZ_CAPACITY - current);
-	return {
-		current,
-		max: MAX_MDZ_CAPACITY,
-		remaining,
-		isAvailable: remaining > 0,
-	};
-}
-
 // Zod schema for MDZ order validation
-const mdzSchema = z
-	.object({
-		name: z
-			.string()
-			.min(1, "Jméno je povinné")
-			.min(2, "Jméno musí mít alespoň 2 znaky"),
-		email: z.string().min(1, "Email je povinný").email("Neplatný email"),
-		phone: z
-			.string()
-			.min(1, "Telefon je povinný")
-			.min(9, "Telefon musí mít alespoň 9 číslic")
-			.regex(/^[0-9+\s()-]+$/, "Zadejte platné telefonní číslo"),
-		cakeBox: z.boolean(),
-		sweetbarBox: z.boolean(),
-	})
-	.refine(
-		(data) => {
-			// At least one box type must be selected
-			return data.cakeBox || data.sweetbarBox;
-		},
-		{
-			message:
-				"Vyberte alespoň jednu krabičku (dorty nebo zákusky)",
-		},
-	);
+const mdzSchema = z.object({
+	name: z
+		.string()
+		.min(1, "Jméno je povinné")
+		.min(2, "Jméno musí mít alespoň 2 znaky"),
+	email: z.string().min(1, "Email je povinný").email("Neplatný email"),
+	phone: z
+		.string()
+		.min(1, "Telefon je povinný")
+		.min(9, "Telefon musí mít alespoň 9 číslic")
+		.regex(/^[0-9+\s()-]+$/, "Zadejte platné telefonní číslo"),
+	productChoice: z.enum(["withFlowers", "dessertsOnly"], {
+		message: "Vyberte prosím jednu z možností",
+	}),
+});
 
 export interface SubmitMdzResult {
 	success: boolean;
@@ -72,8 +34,8 @@ export interface SubmitMdzResult {
 		id: number;
 		orderNumber: string;
 		customerName: string;
-		cakeBox: boolean;
-		sweetbarBox: boolean;
+		productChoice: string;
+		price: number;
 	};
 }
 
@@ -95,8 +57,7 @@ export async function submitMdz(
 		name: formData.get("name") as string,
 		email: formData.get("email") as string,
 		phone: formData.get("phone") as string,
-		cakeBox: formData.get("cakeBox") === "true",
-		sweetbarBox: formData.get("sweetbarBox") === "true",
+		productChoice: formData.get("productChoice") as string,
 	};
 
 	// Validate with Zod
@@ -110,90 +71,57 @@ export async function submitMdz(
 	}
 
 	const validated = validationResult.data;
+	const withFlowers = validated.productChoice === "withFlowers";
+	const product = withFlowers
+		? MDZ_DATA.products.withFlowers
+		: MDZ_DATA.products.dessertsOnly;
 
 	try {
-		// Use transaction to ensure atomic capacity check and insert
-		const newOrder = await db.transaction(async (tx) => {
-			// Lock existing mdz rows to prevent race conditions
-			// Note: FOR UPDATE cannot be used with aggregate functions, so we lock rows first, then count
-			await tx
-				.select({ id: orders.id })
-				.from(orders)
-				.where(eq(orders.orderKind, "mdz"))
-				.for("update");
+		const orderNumber = generateOrderNumber();
+		const defaultDeliveryDate = addDays(new Date(), 7);
 
-			// Now count the locked rows
-			const [{ currentCount }] = await tx
-				.select({ currentCount: count() })
-				.from(orders)
-				.where(eq(orders.orderKind, "mdz"));
-
-			// Check capacity within the transaction
-			if (currentCount >= MAX_MDZ_CAPACITY) {
-				throw new Error(
-					`Omlouváme se, ale kapacita pro objednávky ke Dni žen je již naplněna (${MAX_MDZ_CAPACITY} objednávek). Zkuste to prosím později nebo nás kontaktujte přímo.`,
-				);
-			}
-
-			const orderNumber = generateOrderNumber();
-
-			// Save order to database
-			// Note: We set a default delivery date (7 days from now) since it's not collected in the form
-			const defaultDeliveryDate = addDays(new Date(), 7);
-
-			const [inserted] = await tx
-				.insert(orders)
-				.values({
+		const [newOrder] = await db
+			.insert(orders)
+			.values({
 				orderNumber,
 				customerName: validated.name,
 				customerEmail: validated.email,
 				customerPhone: validated.phone,
 				deliveryDate: defaultDeliveryDate,
 				orderKind: "mdz",
-				orderCake: validated.cakeBox,
-				orderDessert: validated.sweetbarBox,
-				cakeSize: validated.cakeBox ? "tasting" : null,
+				orderCake: withFlowers,
+				orderDessert: true,
+				cakeSize: null,
 				cakeFlavor: null,
 				cakeMessage: null,
-				dessertChoice: validated.sweetbarBox ? "tasting" : null,
-				tastingCakeBoxQty: validated.cakeBox ? 1 : null,
-				tastingSweetbarBoxQty: validated.sweetbarBox ? 1 : null,
+				dessertChoice: withFlowers ? "zakusky_kytice" : "zakusky",
+				tastingCakeBoxQty: null,
+				tastingSweetbarBoxQty: null,
 				tastingNotes: null,
 				shippingAddress: null,
 				billingAddress: null,
-				totalAmount: null,
+				totalAmount: product.price.toString(),
 				notes: null,
 				createdById: null,
 				updatedById: null,
 			})
 			.returning();
 
-			return inserted;
-		});
-
 		// Send notification emails
 		try {
-			// Prepare order details
-			let orderDetails = "Objednané položky:\n";
+			const orderDetailsText = withFlowers
+				? `${MDZ_DATA.products.withFlowers.name} (${MDZ_DATA.products.withFlowers.price} Kč)`
+				: `${MDZ_DATA.products.dessertsOnly.name} (${MDZ_DATA.products.dessertsOnly.price} Kč)`;
 
-			if (validated.cakeBox) {
-				orderDetails += "\n- Krabička dortů";
-			}
-
-			if (validated.sweetbarBox) {
-				orderDetails += "\n- Krabička zákusků";
-			}
-
-			// Send notification emails if configured
 			if (isEmailConfigured) {
 				const resend = new Resend(process.env.RESEND_API_KEY);
 
 				// Send admin notification email
 				await resend.emails.send({
-				from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
-				to: ["mr.sucik@gmail.com", "pandidorty@gmail.com"],
-				subject: `Nová objednávka MDŽ #${newOrder.orderNumber} - ${validated.name}`,
-				text: `
+					from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
+					to: ["mr.sucik@gmail.com", "pandidorty@gmail.com"],
+					subject: `Nová objednávka MDŽ #${newOrder.orderNumber} - ${validated.name}`,
+					text: `
 Nová objednávka ke Dni žen!
 
 Číslo objednávky: ${newOrder.orderNumber}
@@ -204,26 +132,31 @@ Jméno: ${validated.name}
 Email: ${validated.email}
 Telefon: ${validated.phone}
 
-${orderDetails}
+OBJEDNÁVKA:
+${orderDetailsText}
 `,
-			});
+				});
 
-			// Send customer confirmation email
-			await resend.emails.send({
-				from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
-				to: validated.email,
-				subject: `Potvrzení objednávky ke Dni žen #${newOrder.orderNumber}`,
-				text: `
+				// Send customer confirmation email
+				await resend.emails.send({
+					from: "Pandí Dorty <pandidorty@danielsuchan.dev>",
+					to: validated.email,
+					subject: `Potvrzení objednávky ke Dni žen #${newOrder.orderNumber}`,
+					text: `
 Dobrý den ${validated.name},
 
-děkujeme za Vaši objednávku ke Dni žen! Tímto potvrzujeme, že jsme Vaši objednávku přijali a brzy se Vám ozveme s dalšími informacemi.
+děkujeme za Vaši objednávku ke Dni žen!
 
 SHRNUTÍ OBJEDNÁVKY:
 Číslo objednávky: ${newOrder.orderNumber}
+${orderDetailsText}
 
-${orderDetails}
+Vyzvednutí proběhne ${MDZ_DATA.pickupDate}:
+- Poruba u Pandy (Pod Nemocnicí 2026/65): 10:00–11:00
+- centrum u Nedbalek: 11:30–12:00
+${MDZ_DATA.pickupNote}
 
-Ozveme se Vám co nejdříve ohledně termínu a dalších podrobností.
+${MDZ_DATA.payment.description}
 
 Pokud budete mít jakékoliv dotazy, neváhejte nás kontaktovat na pandidorty@gmail.com.
 
@@ -236,10 +169,8 @@ Tým Pandí Dorty
 			}
 		} catch (emailError) {
 			console.error("Error sending emails:", emailError);
-			// Don't throw here - the order was saved successfully
 		}
 
-		// Return success response with real order data
 		return {
 			success: true,
 			message:
@@ -249,19 +180,17 @@ Tým Pandí Dorty
 				id: newOrder.id,
 				orderNumber: newOrder.orderNumber,
 				customerName: newOrder.customerName,
-				cakeBox: validated.cakeBox,
-				sweetbarBox: validated.sweetbarBox,
+				productChoice: validated.productChoice,
+				price: product.price,
 			},
 		};
 	} catch (error) {
 		console.error("Error processing MDZ order:", error);
 
-		// Preserve specific error messages (like capacity full)
 		if (error instanceof Error) {
 			throw error;
 		}
 
-		// Generic fallback for unexpected errors
 		throw new Error(
 			"Došlo k chybě při zpracování objednávky. Zkuste to prosím později.",
 		);
