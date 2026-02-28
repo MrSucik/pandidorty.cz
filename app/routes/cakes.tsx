@@ -1,3 +1,7 @@
+export function meta() {
+	return [{ title: "Příchutě dortů | Pandí Dorty" }];
+}
+
 export default function Cakes() {
 	return (
 		<div className="min-h-screen relative">

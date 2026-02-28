@@ -9,6 +9,10 @@ import { useLoaderData } from "react-router";
 import { z } from "zod";
 import { WEDDING_TASTING_DATA } from "../data/wedding-tasting";
 
+export function meta() {
+	return [{ title: "Svatební ochutnávka | Pandí Dorty" }];
+}
+
 export async function loader() {
 	const { getWeddingTastingCapacity } = await import(
 		"../server/submit-wedding-tasting.server"

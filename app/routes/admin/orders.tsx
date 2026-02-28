@@ -6,6 +6,10 @@ import Pagination from "../../components/admin/Pagination";
 import { getOrdersPaged } from "../../server/get-orders.server";
 import { requireUserSession } from "../../utils/session.server";
 
+export function meta() {
+	return [{ title: "Objednávky | Admin | Pandí Dorty" }];
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	// Require authentication
 	await requireUserSession(request);

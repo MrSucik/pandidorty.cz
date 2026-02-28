@@ -4,6 +4,10 @@ import { Form, Link, useLoaderData } from "react-router";
 import { getOrderStats } from "../../server/get-order-stats.server";
 import { requireUserSession } from "../../utils/session.server";
 
+export function meta() {
+	return [{ title: "Admin | Pandí Dorty" }];
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const session = await requireUserSession(request);
 

@@ -8,6 +8,10 @@ import {
 import { z } from "zod";
 import { MDZ_DATA } from "../data/mdz";
 
+export function meta() {
+	return [{ title: "MDŽ nabídka | Pandí Dorty" }];
+}
+
 const mdzResponseSchema = z.object({
 	success: z.boolean(),
 	message: z.string().optional(),

@@ -5,6 +5,10 @@ import { Link, useLoaderData, useNavigate, useRevalidator } from "react-router";
 import { getBlockedDates } from "../../server/blocked-dates.server";
 import { requireUserSession } from "../../utils/session.server";
 
+export function meta() {
+	return [{ title: "Nastavení | Admin | Pandí Dorty" }];
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const session = await requireUserSession(request);
 
