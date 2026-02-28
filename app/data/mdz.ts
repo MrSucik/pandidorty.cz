@@ -2,7 +2,7 @@ export const MDZ_DATA = {
 	products: {
 		withFlowers: {
 			name: "Zákusky + kytice od Nedbalek",
-			price: 420,
+			price: 430,
 		},
 		dessertsOnly: {
 			name: "Pouze zákusky",
