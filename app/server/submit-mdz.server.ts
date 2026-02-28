@@ -21,6 +21,9 @@ const mdzSchema = z.object({
 	productChoice: z.enum(["withFlowers", "dessertsOnly"], {
 		message: "Vyberte prosím jednu z možností",
 	}),
+	pickupLocation: z.enum(["poruba", "centrum"], {
+		message: "Vyberte prosím místo vyzvednutí",
+	}),
 });
 
 export interface SubmitMdzResult {
@@ -52,6 +55,7 @@ export async function submitMdz(
 		email: formData.get("email") as string,
 		phone: formData.get("phone") as string,
 		productChoice: formData.get("productChoice") as string,
+		pickupLocation: formData.get("pickupLocation") as string,
 	};
 
 	const validationResult = mdzSchema.safeParse(orderData);
@@ -68,6 +72,11 @@ export async function submitMdz(
 	const product = withFlowers
 		? MDZ_DATA.products.withFlowers
 		: MDZ_DATA.products.dessertsOnly;
+	const pickupInfo =
+		validated.pickupLocation === "poruba"
+			? MDZ_DATA.pickup[0]
+			: MDZ_DATA.pickup[1];
+	const pickupLabel = `${pickupInfo.label} (${pickupInfo.time})`;
 
 	try {
 		const orderNumber = generateOrderNumber();
@@ -95,7 +104,7 @@ export async function submitMdz(
 				shippingAddress: null,
 				billingAddress: null,
 				totalAmount: product.price.toString(),
-				notes: null,
+				notes: `Vyzvednutí: ${pickupLabel}`,
 				createdById: null,
 				updatedById: null,
 			})
@@ -124,6 +133,9 @@ Telefon: ${validated.phone}
 
 OBJEDNÁVKA:
 ${orderDetailsText}
+
+VYZVEDNUTÍ:
+${pickupLabel} (${MDZ_DATA.pickupDate})
 `,
 				});
 
@@ -140,9 +152,7 @@ SHRNUTÍ OBJEDNÁVKY:
 Číslo objednávky: ${newOrder.orderNumber}
 ${orderDetailsText}
 
-Vyzvednutí proběhne ${MDZ_DATA.pickupDate}:
-- Poruba u Pandy (Pod Nemocnicí 2026/65): 10:00–11:00
-- centrum u Nedbalek: 11:30–12:00
+Vyzvednutí: ${pickupLabel} (${MDZ_DATA.pickupDate})
 ${MDZ_DATA.pickupNote}
 
 ${MDZ_DATA.payment.description}
